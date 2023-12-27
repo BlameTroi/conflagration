@@ -1,0 +1,4 @@
+# global excludes, other defaults
+--recurse=yes
+--exclude=*
+--exclude=.git/**

@@ -1,0 +1,6 @@
+# unigore dotfiles
+!.*/
+!.fpc.cfg
+!.zsh*
+!.zprofile
+!.vimrc

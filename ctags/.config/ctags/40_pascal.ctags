@@ -1,0 +1,5 @@
+# ctags options for fpc
+--exclude-exception=*.pas
+--exclude-exception=*.pp
+--exclude-exception=*.inc
+--languages=+pascal

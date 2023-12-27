@@ -1,0 +1,4 @@
+# ctags options for c
+--exclude-exception=*.c
+--exclude-exception=*.h
+--languages=+c

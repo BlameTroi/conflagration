@@ -1,0 +1,18 @@
+base mode:
+
+unprotected normal      green
+unprotected intensified red
+protected   normal      blue
+protected   intensified white
+
+extended color mode:
+
+neutral (white)
+red
+blue
+green (default)
+pink (magenta)
+yellow
+turquoise (cyan)
+
+both have black backgrounds.
