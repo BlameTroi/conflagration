@@ -8,3 +8,6 @@
 # but not
 tags
 TAGS
+
+# and not the tangled config
+literate-config.el
