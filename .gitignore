@@ -1,6 +1,10 @@
-# unigore dotfiles
+# unignore dotfiles
 !.*/
 !.fpc.cfg
 !.zsh*
 !.zprofile
 !.vimrc
+
+# but not
+tags
+TAGS

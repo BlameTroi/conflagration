@@ -1,0 +1,9 @@
+[user]
+	name = troi
+	email = blametroi@gmail.com
+[core]
+	editor = nvim
+[init]
+	defaultBranch = main
+	editor = emacs -nw
+
