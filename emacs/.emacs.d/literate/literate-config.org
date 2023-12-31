@@ -9,7 +9,7 @@ Lexical scope please.
   ;; -*- coding: utf-8; lexical-binding: t -*-
 #+end_src
 
-Packages are handled with use-package. So many options, but this is the one that suites me best.
+Packages are handled with ~use-package~. So many options, but this is the one that suites me best. I'm using ~diminish~ to remove clutter from the mode line. Both are handled in the base init.el file.
 
 
 ** Who are you?
@@ -31,6 +31,18 @@ I'm not a 'leave the editor up all the time' guy, but Emacs isn't just an editor
 #+begin_src emacs-lisp
 
 ;;  (desktop-save-mode 1)
+
+#+end_src
+
+
+** I hate meeces to pieces!
+
+Actually I don't, but touch pad accidents happen on my Mac Air, so let's try this. Another option can be found at https://endlessparentheses.com/disable-mouse-only-inside-emacs.html which might actually work better for me.
+
+#+begin_src emacs-lisp
+
+  (use-package disable-mouse
+    :config (global-disable-mouse-mode))
 
 #+end_src
 
@@ -64,8 +76,8 @@ Font and theme. Bigger, more contrast, and fewer colors ... all things the old m
   ;;(load-theme 'ef-melissa-light t)
   (load-theme 'ef-melissa-dark t)
   (add-to-list 'default-frame-alist
-               '(font . "SauceCodePro Nerd Font Mono-18.0"))
-  (set-frame-font "SauceCodePro Nerd Font Mono-18.0" nil t)
+               '(font . "SauceCodePro Nerd Font Mono-22.0"))
+  (set-frame-font "SauceCodePro Nerd Font Mono-22.0" nil t)
   ;;(set-face-attribute 'italic nil
   ;;                   :family "Inconsolata-Italic")
 
@@ -224,7 +236,7 @@ But as I wrestle with ~electric-indent-mode~ I have learned about C-j and C-o. I
 #+begin_src emacs-lisp
 
     (use-package ws-butler
-      :delight
+      :diminish
       :hook (prog-mode . ws-butler-mode))
 
     (use-package clean-aindent-mode)
@@ -255,7 +267,6 @@ There's so much that can be done in this area, but for now I'll leave things wit
 #+begin_src emacs-lisp
 
   (use-package vertico
-    :ensure t
     :config
     (vertico-mode t))
 
@@ -399,6 +410,7 @@ The Pascal mode needs work, but it'll do for now.
     (add-hook 'pascal-mode-hook (lambda ()
                                   (troi/pascal-helper))))
 
+  (use-package bnf-mode)
 #+end_src
 
 
@@ -601,6 +613,7 @@ Snippets should handle what I wanted ~auto-insert-mode~ to do, and more. I've pi
 
   (use-package yasnippet
     :defer 15 ;; takes a while to load, so do it async
+    :diminish
     :config
     (yas-global-mode))
     ;;:custom

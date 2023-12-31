@@ -5,5 +5,4 @@
 	editor = nvim
 [init]
 	defaultBranch = main
-	editor = emacs -nw
-
+	editor = nvim

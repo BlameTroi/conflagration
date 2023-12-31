@@ -1,6 +1,9 @@
 ;;; pascal.el --- major mode for editing pascal source in Emacs -*- lexical-binding: t -*-
 
-;; Copyright (C) 1993-2013 Free Software Foundation, Inc.
+;; December 2023, starting to build a better pascal mode as this one does a few things wrong imo. Troy Brumley blametroi@gmail.com.
+;; downloaded from current emacs sources at git.savannah.gnu.org 12-29-23.
+
+;; Copyright (C) 1993-2023 Free Software Foundation, Inc.
 
 ;; Author: Espen Skoglund <esk@gnu.org>
 ;; Keywords: languages
@@ -18,7 +21,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -26,8 +29,8 @@
 ;; =====
 
 ;; Emacs should enter Pascal mode when you find a Pascal source file.
-;; When you have entered Pascal mode, you may get more info by pressing
-;; C-h m. You may also get online help describing various functions by:
+;; When you have entered Pascal mode, you can get more info by pressing
+;; C-h m.  You can also get help describing various functions by:
 ;; C-h f <Name of function you want described>
 
 ;; If you want to customize Pascal mode to fit you better, you may add
@@ -47,8 +50,8 @@
 ;; 				     "reset" "rewrite" "write" "writeln")
 ;;       pascal-separator-keywords '("downto" "else" "mod" "div" "then"))
 
-;; KNOWN BUGS / BUGREPORTS
-;; =======================
+;; KNOWN BUGS / BUG REPORTS
+;; ========================
 ;; As far as I know, there are no bugs in the current version of this
 ;; package.  This may not be true however, since I never use this mode
 ;; myself and therefore would never notice them anyway.   If you do
@@ -64,7 +67,7 @@
   :group 'languages)
 
 (defvar pascal-mode-abbrev-table nil
-  "Abbrev table in use in Pascal-mode buffers.")
+  "Abbrev table in use in Pascal mode buffers.")
 (define-abbrev-table 'pascal-mode-abbrev-table ())
 
 (defvar pascal-mode-map
@@ -99,7 +102,7 @@
 
 (defvar pascal-imenu-generic-expression
   '((nil "^[ \t]*\\(function\\|procedure\\)[ \t\n]+\\([a-zA-Z0-9_.:]+\\)" 2))
-  "Imenu expression for Pascal-mode.  See `imenu-generic-expression'.")
+  "Imenu expression for Pascal mode.  See `imenu-generic-expression'.")
 
 (defvar pascal-keywords
   '("and" "array" "begin" "case" "const" "div" "do" "downto" "else" "end"
@@ -117,7 +120,7 @@
 (defconst pascal-beg-block-re   "\\<\\(begin\\|case\\|record\\|repeat\\)\\>")
 (defconst pascal-end-block-re   "\\<\\(end\\|until\\)\\>")
 (defconst pascal-declaration-re "\\<\\(const\\|label\\|type\\|var\\)\\>")
-(defconst pascal-progbeg-re     "\\<\\program\\>")
+(defconst pascal-progbeg-re     "\\<program\\>")
 (defconst pascal-defun-re       "\\<\\(function\\|procedure\\|program\\)\\>")
 (defconst pascal-sub-block-re   "\\<\\(if\\|else\\|for\\|while\\|with\\)\\>")
 (defconst pascal-noindent-re    "\\<\\(begin\\|end\\|until\\|else\\)\\>")
@@ -126,8 +129,10 @@
   "\\<\\(label\\|var\\|type\\|const\\|until\\|end\\|begin\\|repeat\\|else\\)\\>")
 
 ;;; Strings used to mark beginning and end of excluded text
-(defconst pascal-exclude-str-start "{-----\\/----- EXCLUDED -----\\/-----")
-(defconst pascal-exclude-str-end " -----/\\----- EXCLUDED -----/\\-----}")
+(defconst pascal-exclude-str-start "{-----\\/----- EXCLUDED -----\\/-----"
+  "String used to mark beginning of excluded text.")
+(defconst pascal-exclude-str-end " -----/\\----- EXCLUDED -----/\\-----}"
+  "String used to mark end of excluded text.")
 
 (defvar pascal-mode-syntax-table
   (let ((st (make-syntax-table)))
@@ -138,6 +143,9 @@
     ;; find about the syntax of Pascal's comments said that (* ... } is
     ;; a valid comment, just as { ... *) or (* ... *) or { ... }.
     (modify-syntax-entry ?* ". 23" st)
+    ;; Allow //...\n comments as accepted by Free Pascal (bug#13585).
+    (modify-syntax-entry ?/ ". 12c" st)
+    (modify-syntax-entry ?\n "> c" st)
     (modify-syntax-entry ?{ "<"    st)
     (modify-syntax-entry ?} ">"    st)
     (modify-syntax-entry ?+ "."    st)
@@ -155,88 +163,84 @@
 
 
 
-(defconst pascal-font-lock-keywords (purecopy
-  (list
-   '("^[ \t]*\\(function\\|pro\\(cedure\\|gram\\)\\)\\>[ \t]*\\([a-z]\\)"
-     1 font-lock-keyword-face)
-   '("^[ \t]*\\(function\\|pro\\(cedure\\|gram\\)\\)\\>[ \t]*\\([a-z][a-z0-9_]*\\)"
-     3 font-lock-function-name-face t)
-;   ("type" "const" "real" "integer" "char" "boolean" "var"
-;    "record" "array" "file")
-   (cons (concat "\\<\\(array\\|boolean\\|c\\(har\\|onst\\)\\|file\\|"
-		 "integer\\|re\\(al\\|cord\\)\\|type\\|var\\)\\>")
-	 'font-lock-type-face)
-   '("\\<\\(label\\|external\\|forward\\)\\>" . font-lock-constant-face)
-   '("\\<\\([0-9]+\\)[ \t]*:" 1 font-lock-function-name-face)
-;   ("of" "to" "for" "if" "then" "else" "case" "while"
-;    "do" "until" "and" "or" "not" "in" "with" "repeat" "begin" "end")
-   (concat "\\<\\("
-	   "and\\|begin\\|case\\|do\\|e\\(lse\\|nd\\)\\|for\\|i[fn]\\|"
-	   "not\\|o[fr]\\|repeat\\|t\\(hen\\|o\\)\\|until\\|w\\(hile\\|ith\\)"
-	   "\\)\\>")
-   '("\\<\\(goto\\)\\>[ \t]*\\([0-9]+\\)?"
-     1 font-lock-keyword-face)
-   '("\\<\\(goto\\)\\>[ \t]*\\([0-9]+\\)?"
-     2 font-lock-keyword-face t)))
+(defconst pascal-font-lock-keywords
+  `(("\\_<\\(function\\|pro\\(cedure\\|gram\\)\\)[ \t]+\\([[:alpha:]][[:alnum:]_]*\\)"
+     (1 font-lock-keyword-face)
+     (3 font-lock-function-name-face))
+    ;; ("type" "const" "real" "integer" "char" "boolean" "var"
+    ;;  "record" "array" "file")
+    (,(concat "\\_<\\(array\\|boolean\\|c\\(har\\|onst\\)\\|file\\|"
+              "integer\\|re\\(al\\|cord\\)\\|type\\|var\\)\\_>")
+     . font-lock-type-face)
+    ("\\_<\\(label\\|external\\|forward\\)\\_>" . font-lock-constant-face)
+    ("\\_<\\([0-9]+\\)[ \t]*:" 1 font-lock-function-name-face)
+    ;; ("of" "to" "for" "if" "then" "else" "case" "while"
+    ;;  "do" "until" "and" "or" "not" "in" "with" "repeat" "begin" "end")
+    ,(concat "\\_<\\("
+             "and\\|begin\\|case\\|do\\|e\\(lse\\|nd\\)\\|for\\|i[fn]\\|"
+             "not\\|o[fr]\\|repeat\\|t\\(hen\\|o\\)\\|until\\|w\\(hile\\|ith\\)"
+             "\\)\\_>")
+    ("\\_<\\(goto\\)\\_>[ \t]*\\([0-9]+\\)?"
+     (1 font-lock-keyword-face) (2 font-lock-keyword-face t)))
   "Additional expressions to highlight in Pascal mode.")
-(put 'pascal-mode 'font-lock-defaults '(pascal-font-lock-keywords nil t))
+
+(defconst pascal--syntax-propertize
+  (syntax-propertize-rules
+   ;; The syntax-table settings are too coarse and end up treating /* and (/
+   ;; as comment starters.  Fix it here by removing the "2" from the syntax
+   ;; of the second char of such sequences.
+   ("/\\(\\*\\)" (1 ". 3b"))
+   ("(\\(/\\)" (1 (prog1 ". 1c" (forward-char -1) nil)))
+   ;; Pascal uses '' and "" rather than \' and \" to escape quotes.
+   ("''\\|\"\"" (0 (if (save-excursion
+                         (nth 3 (syntax-ppss (match-beginning 0))))
+                       (string-to-syntax ".")
+                     ;; In case of 3 or more quotes in a row, only advance
+                     ;; one quote at a time.
+                     (forward-char -1)
+                     nil)))))
 
 (defcustom pascal-indent-level 3
   "Indentation of Pascal statements with respect to containing block."
-  :type 'integer
-  :group 'pascal)
+  :type 'integer)
 
 (defcustom pascal-case-indent 2
   "Indentation for case statements."
-  :type 'integer
-  :group 'pascal)
+  :type 'integer)
 
 (defcustom pascal-auto-newline nil
   "Non-nil means automatically insert newlines in certain cases.
 These include after semicolons and after the punctuation mark after an `end'."
-  :type 'boolean
-  :group 'pascal)
+  :type 'boolean)
 
 (defcustom pascal-indent-nested-functions t
   "Non-nil means nested functions are indented."
-  :type 'boolean
-  :group 'pascal)
+  :type 'boolean)
 
 (defcustom pascal-tab-always-indent t
   "Non-nil means TAB in Pascal mode should always reindent the current line.
 If this is nil, TAB inserts a tab if it is at the end of the line
 and follows non-whitespace text."
-  :type 'boolean
-  :group 'pascal)
+  :type 'boolean)
 
 (defcustom pascal-auto-endcomments t
   "Non-nil means automatically insert comments after certain `end's.
-Specifically, this is done after the ends of cases statements and functions.
+Specifically, this is done after the ends of case statements and functions.
 The name of the function or case is included between the braces."
-  :type 'boolean
-  :group 'pascal)
+  :type 'boolean)
 
 (defcustom pascal-auto-lineup '(all)
   "List of contexts where auto lineup of :'s or ='s should be done.
-Elements can be of type: 'paramlist', 'declaration' or 'case', which will
+Elements can be of type: `paramlist', `declaration' or `case', which will
 do auto lineup in parameterlist, declarations or case-statements
-respectively.  The word 'all' will do all lineups.  '(case paramlist) for
-instance will do lineup in case-statements and parameterlist, while '(all)
+respectively.  The word `all' will do all lineups.  (case paramlist) for
+instance will do lineup in case-statements and parameterlist, while (all)
 will do all lineups."
   :type '(set :extra-offset 8
 	      (const :tag "Everything" all)
 	      (const :tag "Parameter lists" paramlist)
 	      (const :tag "Declarations" declaration)
-	      (const :tag "Case statements" case))
-  :group 'pascal)
-
-(defvar pascal-toggle-completions nil
-  "If non-nil, `pascal-complete-word' tries all possible completions.
-Repeated use of \\[pascal-complete-word] then shows all
-completions in turn, instead of displaying a list of all possible
-completions.")
-(make-obsolete-variable 'pascal-toggle-completions
-                        'completion-cycle-threshold "24.1")
+              (const :tag "Case statements" case)))
 
 (defcustom pascal-type-keywords
   '("array" "file" "packed" "char" "integer" "real" "string" "record")
@@ -244,8 +248,7 @@ completions.")
 These include integer, real, char, etc.
 The types defined within the Pascal program
 are handled in another way, and should not be added to this list."
-  :type '(repeat (string :tag "Keyword"))
-  :group 'pascal)
+  :type '(repeat (string :tag "Keyword")))
 
 (defcustom pascal-start-keywords
   '("begin" "end" "function" "procedure" "repeat" "until" "while"
@@ -254,8 +257,7 @@ are handled in another way, and should not be added to this list."
 These are keywords such as begin, repeat, until, readln.
 The procedures and variables defined within the Pascal program
 are handled in another way, and should not be added to this list."
-  :type '(repeat (string :tag "Keyword"))
-  :group 'pascal)
+  :type '(repeat (string :tag "Keyword")))
 
 (defcustom pascal-separator-keywords
   '("downto" "else" "mod" "div" "then")
@@ -263,8 +265,7 @@ are handled in another way, and should not be added to this list."
 These are keywords such as downto, else, mod, then.
 Variables and function names defined within the Pascal program
 are handled in another way, and should not be added to this list."
-  :type '(repeat (string :tag "Keyword"))
-  :group 'pascal)
+  :type '(repeat (string :tag "Keyword")))
 
 
 ;;;
@@ -276,7 +277,7 @@ are handled in another way, and should not be added to this list."
     (while (and (> nest 0)
 		(re-search-forward
 		 "[:=]\\|\\(\\<record\\>\\)\\|\\(\\<end\\>\\)"
-		 (point-at-eol 2) t))
+                 (line-end-position 2) t))
       (cond ((match-beginning 1) (setq nest (1+ nest)))
 	    ((match-beginning 2) (setq nest (1- nest)))
 	    ((looking-at "[^(\n]+)") (setq nest 0))))))
@@ -285,7 +286,8 @@ are handled in another way, and should not be added to this list."
 (defun pascal-declaration-beg ()
   (let ((nest 1))
     (while (and (> nest 0)
-		(re-search-backward "[:=]\\|\\<\\(type\\|var\\|label\\|const\\)\\>\\|\\(\\<record\\>\\)\\|\\(\\<end\\>\\)" (point-at-bol 0) t))
+                (re-search-backward "[:=]\\|\\<\\(type\\|var\\|label\\|const\\)\\>\\|\\(\\<record\\>\\)\\|\\(\\<end\\>\\)"
+                                    (line-beginning-position 0) t))
       (cond ((match-beginning 1) (setq nest 0))
 	    ((match-beginning 2) (setq nest (1- nest)))
 	    ((match-beginning 3) (setq nest (1+ nest)))))
@@ -293,12 +295,12 @@ are handled in another way, and should not be added to this list."
 
 
 (defsubst pascal-within-string ()
-  (nth 3 (parse-partial-sexp (point-at-bol) (point))))
+  (nth 3 (parse-partial-sexp (line-beginning-position) (point))))
 
 
 ;;;###autoload
 (define-derived-mode pascal-mode prog-mode "Pascal"
-  "Major mode for editing Pascal code. \\<pascal-mode-map>
+  "Major mode for editing Pascal code.\\<pascal-mode-map>
 TAB indents for Pascal code.  Delete converts tabs to spaces as it moves back.
 
 \\[completion-at-point] completes the word around current point with respect \
@@ -339,27 +341,23 @@ Variables controlling indentation/edit style:
     List of contexts where auto lineup of :'s or ='s should be done.
 
 See also the user variables `pascal-type-keywords', `pascal-start-keywords' and
-`pascal-separator-keywords'.
-
-Turning on Pascal mode calls the value of the variable pascal-mode-hook with
-no args, if that value is non-nil."
-  (set (make-local-variable 'local-abbrev-table) pascal-mode-abbrev-table)
-  (set (make-local-variable 'indent-line-function) 'pascal-indent-line)
-  (set (make-local-variable 'comment-indent-function) 'pascal-indent-comment)
-  (set (make-local-variable 'parse-sexp-ignore-comments) nil)
-  (set (make-local-variable 'blink-matching-paren-dont-ignore-comments) t)
-  (set (make-local-variable 'case-fold-search) t)
-  (set (make-local-variable 'comment-start) "{")
-  (set (make-local-variable 'comment-start-skip) "(\\*+ *\\|{ *")
-  (set (make-local-variable 'comment-end) "}")
+`pascal-separator-keywords'."
+  (setq-local local-abbrev-table pascal-mode-abbrev-table)
+  (setq-local indent-line-function 'pascal-indent-line)
+  (setq-local comment-indent-function 'pascal-indent-comment)
+  (setq-local parse-sexp-ignore-comments nil)
+  (setq-local blink-matching-paren-dont-ignore-comments t)
+  (setq-local case-fold-search t)
+  (setq-local comment-start "{")
+  (setq-local comment-start-skip "(\\*+ *\\|{ *")
+  (setq-local comment-end "}")
   (add-hook 'completion-at-point-functions 'pascal-completions-at-point nil t)
   ;; Font lock support
-  (set (make-local-variable 'font-lock-defaults)
-       '(pascal-font-lock-keywords nil t))
+  (setq-local font-lock-defaults '(pascal-font-lock-keywords nil t))
+  (setq-local syntax-propertize-function pascal--syntax-propertize)
   ;; Imenu support
-  (set (make-local-variable 'imenu-generic-expression)
-       pascal-imenu-generic-expression)
-  (set (make-local-variable 'imenu-case-fold-search) t)
+  (setq-local imenu-generic-expression pascal-imenu-generic-expression)
+  (setq-local imenu-case-fold-search t)
   ;; Pascal-mode's own hide/show support.
   (add-to-invisibility-spec '(pascal . t)))
 
@@ -394,7 +392,7 @@ no args, if that value is non-nil."
 	     (forward-char 1)
 	     (delete-horizontal-space))
 	    ((and (looking-at "(\\*\\|\\*[^)]")
-		  (not (save-excursion (search-forward "*)" (point-at-eol) t))))
+                  (not (save-excursion (search-forward "*)" (line-end-position) t))))
 	     (setq setstar t))))
     ;; If last line was a star comment line then this one shall be too.
     (if (null setstar)
@@ -492,25 +490,23 @@ no args, if that value is non-nil."
   (insert "  "))
 
 (defun pascal-mark-defun ()
-  "Mark the current pascal function (or procedure).
+  "Mark the current Pascal function (or procedure).
 This puts the mark at the end, and point at the beginning."
   (interactive)
-  (push-mark (point))
+  (push-mark)
   (pascal-end-of-defun)
-  (push-mark (point))
-  (pascal-beg-of-defun)
-  (when (featurep 'xemacs)
-    (zmacs-activate-region)))
+  (push-mark)
+  (pascal-beg-of-defun))
 
 (defun pascal-comment-area (start end)
-  "Put the region into a Pascal comment.
+  "Put the region into a Pascal comment.\\<pascal-mode-map>
 The comments that are in this area are \"deformed\":
 `*)' becomes `!(*' and `}' becomes `!{'.
 These deformed comments are returned to normal if you use
 \\[pascal-uncomment-area] to undo the commenting.
 
-The commented area starts with `pascal-exclude-str-start', and ends with
-`pascal-include-str-end'.  But if you change these variables,
+The commented area starts with `pascal-exclude-str-start', and ends
+with `pascal-exclude-str-end'.  But if you change these variables,
 \\[pascal-uncomment-area] won't recognize the comments."
   (interactive "r")
   (save-excursion
@@ -538,8 +534,8 @@ The commented area starts with `pascal-exclude-str-start', and ends with
 
 (defun pascal-uncomment-area ()
   "Uncomment a commented area; change deformed comments back to normal.
-This command does nothing if the pointer is not in a commented
-area.  See also `pascal-comment-area'."
+This command does nothing if the pointer is not in a commented area.
+See also `pascal-comment-area'."
   (interactive)
   (save-excursion
     (let ((start (point))
@@ -579,7 +575,7 @@ area.  See also `pascal-comment-area'."
   (interactive)
   (catch 'found
     (if (not (looking-at (concat "\\s \\|\\s)\\|" pascal-defun-re)))
-	(forward-sexp 1))
+	(ignore-errors (forward-sexp 1)))
     (let ((nest 0) (max -1) (func 0)
 	  (reg (concat pascal-beg-block-re "\\|"
 		       pascal-end-block-re "\\|"
@@ -715,7 +711,7 @@ on the line which ends a function or procedure named NAME."
     (if (and (looking-at "\\<end;")
 	     (not (save-excursion
 		    (end-of-line)
-		    (search-backward "{" (point-at-bol) t))))
+                    (search-backward "{" (line-beginning-position) t))))
 	(let ((type (car (pascal-calculate-indent))))
 	  (if (eq type 'declaration)
 	      ()
@@ -923,7 +919,7 @@ Return a list of two elements: (INDENT-TYPE INDENT-LEVEL)."
 
 (defun pascal-indent-level ()
   "Return the indent-level the current statement has.
-Do not count labels, case-statements or records."
+Do not count labels, case statements or records."
   (save-excursion
     (beginning-of-line)
     (if (looking-at "[ \t]*[0-9a-zA-Z]+[ \t]*:[^=]")
@@ -980,14 +976,14 @@ Do not count labels, case-statements or records."
 
 (defun pascal-indent-paramlist (&optional arg)
   "Indent current line in parameterlist.
-If optional arg is non-nil, just return the
+If optional ARG is non-nil, just return the
 indent of the current line in parameterlist."
   (save-excursion
     (let* ((oldpos (point))
 	   (stpos (progn (goto-char (scan-lists (point) -1 1)) (point)))
 	   (stcol (1+ (current-column)))
 	   (edpos (progn (pascal-declaration-end)
-			 (search-backward ")" (point-at-bol) t)
+                         (search-backward ")" (line-beginning-position) t)
 			 (point)))
 	   (usevar (re-search-backward "\\<var\\>" stpos t)))
       (if arg (progn
@@ -1011,7 +1007,7 @@ indent of the current line in parameterlist."
       (let ((lineup (if (or (looking-at "\\<var\\>\\|\\<record\\>") arg start)
 			":" "="))
 	    (stpos (if start start
-		       (forward-word 2) (backward-word 1) (point)))
+		       (forward-word-strictly 2) (backward-word 1) (point)))
 	    (edpos (set-marker (make-marker)
 			       (if end end
 				 (max (progn (pascal-declaration-end)
@@ -1034,7 +1030,7 @@ indent of the current line in parameterlist."
 	(setq pascal--extra-indent (pascal-get-lineup-indent stpos edpos lineup))
 	(goto-char stpos)
 	(while (and (<= (point) edpos) (not (eobp)))
-	  (if (search-forward lineup (point-at-eol) 'move)
+          (if (search-forward lineup (line-end-position) 'move)
 	      (forward-char -1))
 	  (delete-horizontal-space)
 	  (indent-to pascal--extra-indent)
@@ -1061,7 +1057,7 @@ indent of the current line in parameterlist."
       (goto-char b)
       ;; Get rightmost position
       (while (< (point) e)
-	(and (re-search-forward reg (min e (point-at-eol 2)) 'move)
+        (and (re-search-forward reg (min e (line-end-position 2)) 'move)
 	     (cond ((match-beginning 1)
 		    ;; Skip record blocks
 		    (pascal-declaration-end))
@@ -1125,7 +1121,7 @@ indent of the current line in parameterlist."
 
       ;; Search through all reachable functions
       (while (pascal-beg-of-defun)
-        (if (re-search-forward pascal-str (point-at-eol) t)
+        (if (re-search-forward pascal-str (line-end-position) t)
             (progn (setq match (buffer-substring (match-beginning 2)
                                                  (match-end 2)))
                    (push match pascal-all)))
@@ -1142,17 +1138,17 @@ indent of the current line in parameterlist."
 	match)
     ;; Traverse lines
     (while (< (point) end)
-      (if (re-search-forward "[:=]" (point-at-eol) t)
+      (if (re-search-forward "[:=]" (line-end-position) t)
 	  ;; Traverse current line
 	  (while (and (re-search-backward
 		       (concat "\\((\\|\\<\\(var\\|type\\|const\\)\\>\\)\\|"
 			       pascal-symbol-re)
-		       (point-at-bol) t)
+                       (line-beginning-position) t)
 		      (not (match-end 1)))
 	    (setq match (buffer-substring (match-beginning 0) (match-end 0)))
 	    (if (string-match (concat "\\<" pascal-str) match)
                 (push match pascal-all))))
-      (if (re-search-forward "\\<record\\>" (point-at-eol) t)
+      (if (re-search-forward "\\<record\\>" (line-end-position) t)
 	  (pascal-declaration-end)
 	(forward-line 1)))
 
@@ -1160,26 +1156,27 @@ indent of the current line in parameterlist."
 
 (defun pascal-type-completion (pascal-str)
   "Calculate all possible completions for types."
-  (let ((start (point))
-        (pascal-all ())
-	goon)
-    ;; Search for all reachable type declarations
-    (while (or (pascal-beg-of-defun)
-	       (setq goon (not goon)))
-      (save-excursion
-	(if (and (< start (prog1 (save-excursion (pascal-end-of-defun)
-						 (point))
-			    (forward-char 1)))
-		 (re-search-forward
-		  "\\<type\\>\\|\\<\\(begin\\|function\\|procedure\\)\\>"
-		  start t)
-		 (not (match-end 1)))
-	    ;; Check current type declaration
-            (setq pascal-all
-                  (nconc (pascal-get-completion-decl pascal-str)
-                         pascal-all)))))
+  (save-excursion
+    (let ((start (point))
+          (pascal-all ())
+	  goon)
+      ;; Search for all reachable type declarations
+      (while (or (pascal-beg-of-defun)
+	         (setq goon (not goon)))
+        (save-excursion
+	  (if (and (< start (prog1 (save-excursion (pascal-end-of-defun)
+						   (point))
+			      (forward-char 1)))
+		   (re-search-forward
+		    "\\<type\\>\\|\\<\\(begin\\|function\\|procedure\\)\\>"
+		    start t)
+		   (not (match-end 1)))
+	      ;; Check current type declaration
+              (setq pascal-all
+                    (nconc (pascal-get-completion-decl pascal-str)
+                           pascal-all)))))
 
-    pascal-all))
+      pascal-all)))
 
 (defun pascal-var-completion (prefix)
   "Calculate all possible completions for variables (or constants)."
@@ -1194,7 +1191,7 @@ indent of the current line in parameterlist."
           (if (> start (prog1 (save-excursion (pascal-end-of-defun)
                                               (point))))
               ()                        ; Declarations not reachable
-            (if (search-forward "(" (point-at-eol) t)
+            (if (search-forward "(" (line-end-position) t)
                 ;; Check parameterlist
                 ;; FIXME: pascal-get-completion-decl doesn't understand
                 ;; the var declarations in parameter lists :-(
@@ -1252,12 +1249,14 @@ indent of the current line in parameterlist."
                 (or (eq state 'declaration) (eq state 'paramlist)
                     (and (eq state 'defun)
                          (save-excursion
-                           (re-search-backward ")[ \t]*:" (point-at-bol) t))))
-                (if (or (eq state 'paramlist) (eq state 'defun))
-                    (pascal-beg-of-defun))
-                (nconc
-                 (pascal-type-completion pascal-str)
-                 (pascal-keyword-completion pascal-type-keywords pascal-str)))
+                           (re-search-backward ")[ \t]*:" (line-beginning-position) t))))
+                (save-excursion
+                  (if (or (eq state 'paramlist) (eq state 'defun))
+                      (pascal-beg-of-defun))
+                  (nconc
+                   (pascal-type-completion pascal-str)
+                   (pascal-keyword-completion pascal-type-keywords
+                                              pascal-str))))
                (                        ;--Starting a new statement
                 (and (not (eq state 'contexp))
                      (save-excursion
@@ -1293,13 +1292,6 @@ indent of the current line in parameterlist."
 	 (e (save-excursion (skip-chars-forward "a-zA-Z0-9_") (point))))
     (when (> e b)
       (list b e #'pascal-completion))))
-
-(define-obsolete-function-alias 'pascal-complete-word
-  'completion-at-point "24.1")
-
-(define-obsolete-function-alias 'pascal-show-completions
-  'completion-help-at-point "24.1")
-
 
 (defun pascal-get-default-symbol ()
   "Return symbol around current point as a string."
@@ -1354,9 +1346,7 @@ The default is a name found in the buffer around point."
 		      default ""))
 	 (label
           ;; Do completion with default.
-          (completing-read (if (not (string= default ""))
-                               (concat "Label (default " default "): ")
-                             "Label: ")
+          (completing-read (format-prompt "Label" default)
                            ;; Complete with the defuns found in the
                            ;; current-buffer.
                            (let ((buf (current-buffer)))
@@ -1381,8 +1371,6 @@ The default is a name found in the buffer around point."
 ;;;
 (defvar pascal-outline-map
   (let ((map (make-sparse-keymap)))
-    (if (fboundp 'set-keymap-name)
-        (set-keymap-name pascal-outline-map 'pascal-outline-map))
     (define-key map "\M-\C-a"  'pascal-outline-prev-defun)
     (define-key map "\M-\C-e"  'pascal-outline-next-defun)
     (define-key map "\C-c\C-d" 'pascal-outline-goto-defun)
@@ -1391,15 +1379,11 @@ The default is a name found in the buffer around point."
     map)
   "Keymap used in Pascal Outline mode.")
 
-(define-obsolete-function-alias 'pascal-outline 'pascal-outline-mode "22.1")
 (define-minor-mode pascal-outline-mode
   "Outline-line minor mode for Pascal mode.
-With a prefix argument ARG, enable the mode if ARG is positive,
-and disable it otherwise.  If called from Lisp, enable the mode
-if ARG is omitted or nil.
 
 When enabled, portions of the text being edited may be made
-invisible. \\<pascal-outline-map>
+invisible.\\<pascal-outline-map>
 
 Pascal Outline mode provides some additional commands.
 
@@ -1413,7 +1397,7 @@ Pascal Outline mode provides some additional commands.
 \\[pascal-show-all]\t- Show the whole buffer.
 \\[pascal-hide-other-defuns]\
 \t- Hide everything but the current function (function under the cursor).
-\\[pascal-outline]\t- Leave pascal-outline-mode."
+\\[pascal-outline-mode]\t- Leave Pascal Outline mode."
   :init-value nil :lighter " Outl" :keymap pascal-outline-map
   (add-to-invisibility-spec '(pascal . t))
   (unless pascal-outline-mode

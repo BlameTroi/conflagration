@@ -41,7 +41,6 @@
 
 (setq max-lisp-eval-depth 3000)
 
-
 ;; package infrastructure
 
 (when (window-system)
@@ -70,6 +69,9 @@
 
 (eval-when-compile
   (require 'use-package))
+
+(use-package diminish
+  :ensure t)
 
 (defun reload-config ()
   "Reload the literate config from ~/.emacs.d/literate/literate-config.org"

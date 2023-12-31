@@ -14,10 +14,13 @@
 # unignore all files with extensions
 !*.*
 
-# unignore the unextensioned license files
+# unignore the unextensioned license/readme/make files
 !LICENSE
 !UNLICENSE
-
+!README
+!COPYING
+!makefile
+!Makefile
 # and let directories back in
 !*/
 
