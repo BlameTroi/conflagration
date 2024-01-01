@@ -41,8 +41,8 @@ Actually I don't, but touch pad accidents happen on my Mac Air, so let's try thi
 
 #+begin_src emacs-lisp
 
-  (use-package disable-mouse
-    :config (global-disable-mouse-mode))
+;;  (use-package disable-mouse              
+;;    :config (global-disable-mouse-mode))
 
 #+end_src
 
@@ -513,19 +513,16 @@ A set of "let's start somewhere" settings for org.
   (use-package org
     :hook
     ((org-mode . visual-line-mode)
-    (org-src-mode . display-line-numbers-mode))
+     (org-src-mode . display-line-numbers-mode))
     :bind
     (("C-c o c" . org-capture)
      ("C-c o a" . org-agenda)
      ("C-c o A" . consult-org-agenda))
     :custom
-    (org-adapt-indentation nil)
-    (org-directory "~/org")
+    (org-directory "~/Dropbox/org")
+    (org-src-window-setup 'current-window)
     (org-default-notes-file (concat org-directory "/notes.org"))
-    (org-return-follows-link t)
-     (org-src-window-setup 'current-window)
-    (org-agenda-files (list (concat org-directory "/todo.org")))
-    (org-pretty-entities t))
+    (org-agenda-files (list (concat org-directory "/todo.org"))))
 
   (use-package org-modern
     :config
@@ -539,19 +536,22 @@ A set of "let's start somewhere" settings for org.
 
 Magit is popular but I'm not a serious git user as a lone hobbiest programmer. It's included in the hope that I'll be a little more serious about source control. Offsite backup is nice, but I know you can do more with vcs.
 
+Disabled until I feel a need to stop going to a shell.
+
 #+begin_src emacs-lisp
 
-  (use-package magit
-    :defer t
-    :bind
-    (("C-c g" . #'magit-status))
-    :custom
-    (magit-diff-refine-hunk t)
-    (magit-repository-directories '(("~/projects" . 1)))
-    (magit-list-refs-sortby "-creatordate"))
+  ;; (use-package magit
+  ;;   :disabled
+  ;;   :bind
+  ;;   (("C-c g" . #'magit-status))
+  ;;   :custom
+  ;;   (magit-diff-refine-hunk t)
+  ;;   (magit-repository-directories '(("~/projects" . 1)))
+  ;;   (magit-list-refs-sortby "-creatordate"))
 
-  (use-package forge
-    :after magit)
+  ;; (use-package forge
+  ;;   :disabled
+  ;;   :after magit)
 
 #+end_src
 
@@ -565,7 +565,7 @@ It's a bit different than ~compiler~ and ~make~ in vim.
 
   (use-package compile
     :custom
-    (compilation-read-command nil "Don't prompt every time.")
+    ;;    (compilation-read-command nil "Don't prompt every time.")
     (compilation-scroll-output 'first-error))
 
 #+end_src
