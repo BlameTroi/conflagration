@@ -30,7 +30,11 @@ I'm not a 'leave the editor up all the time' guy, but Emacs isn't just an editor
 
 #+begin_src emacs-lisp
 
-;;  (desktop-save-mode 1)
+  ;;  (desktop-save-mode 1)
+
+  (use-package persistent-scratch
+    :config
+    (persistent-scratch-setup-default))
 
 #+end_src
 
@@ -100,18 +104,19 @@ Mac OS and possibly Linux need to know the shell's exec path. The ~use-package~ 
 
 #+end_src
 
-Emacs leaves backups and auto-saves all over the file system. this should move everything to a central and obviously temporary location. Some disable auto-save and backup, but I'm not there yet.
+Emacs leaves backups and auto-saves all over the file system. I'm leaving auto-saves and lock files in the same directory as the base file, but backups are off under .tmp. Some disable auto-save and backup, but I'm not there yet.
+
+Note that if you do the auto-save file name transform incorrectly you can end up with all your auto saves named "##" which is not what you want. If you see a confusing "file has auto save data consider M-x recover" for a new file, that is probably what is happening.
 
 #+begin_src emacs-lisp
 
   ;; non packaged stuff or my own work in progress
   (add-to-list 'load-path (concat user-emacs-directory "~/.emacs.d/site-lisp/"))
 
-  ;; autosave and backup
+  ;; autosave and backup and temp
   (setq auto-save-no-message t)
-  (make-directory "~/.tmp/emacs/auto-save/" t)
   (make-directory "~/.tmp/emacs/backup/" t)
-  (setq auto-save-file-name-transforms '((".*" "~/.tmp/emacs/auto-save/" nil)))
+  (setq temporary-file-directory "~/.tmp/emacs/")
   (setq backup-directory-alist '(("." . "~/.tmp/emacs/backup/")))
   (setq backup-by-copying t)
 
@@ -519,8 +524,9 @@ A set of "let's start somewhere" settings for org.
      ("C-c o a" . org-agenda)
      ("C-c o A" . consult-org-agenda))
     :custom
-    (org-directory "~/Dropbox/org")
+    (org-directory "~/Library/CloudStorage/Dropbox/org")
     (org-src-window-setup 'current-window)
+    (org-startup-folded t)
     (org-default-notes-file (concat org-directory "/notes.org"))
     (org-agenda-files (list (concat org-directory "/todo.org"))))
 
@@ -612,7 +618,7 @@ Snippets should handle what I wanted ~auto-insert-mode~ to do, and more. I've pi
 #+begin_src emacs-lisp
 
   (use-package yasnippet
-    :defer 15 ;; takes a while to load, so do it async
+    ;; :defer t ;; takes a while to load, so do it async
     :diminish
     :config
     (yas-global-mode))

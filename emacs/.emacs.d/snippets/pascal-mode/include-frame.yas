@@ -3,7 +3,12 @@
 # key: iframe
 # my standard for pascal
 # --
-{ `(filename-non-directory (buffer-file-name))` --  -- `(user-full-name)` `(user-mail-address)` }
+#ifndef ${1:_`(upcase (file-name-nondirectory (file-name-sans-extension (buffer-file-name))))`_H_}
+#define $1
+
+$0
+
+#endif /* $1 */{ `(filename-non-directory (buffer-file-name))` --  -- `(user-full-name)` `(user-mail-address)` }
 
 {$LONGSTRINGS OFF}            { to be sure, use AnsiString or pchar explicitly }
 {$BOOLEVAL ON}                { standard pascal expects this }

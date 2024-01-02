@@ -3,7 +3,7 @@
 # key: pframe
 # my standard for pascal
 # --
-{ `(filename-non-directory (buffer-file-name))` --  -- `(user-full-name)` `(user-mail-address)` }
+{ `(file-name-nondirectory (buffer-file-name))` --  -- `(concat (user-full-name) " " user-mail-address)` }
 
 program `(file-name-nondirectory (file-name-sans-extension (buffer-file-name)))`;
 
@@ -24,4 +24,4 @@ type
 begin
 end.
 
-{ end `(filename-non-directory (buffer-file-name))` }
+{ end `(file-name-nondirectory (buffer-file-name))` }
