@@ -519,10 +519,10 @@ A set of "let's start somewhere" settings for org.
     :hook
     ((org-mode . visual-line-mode)
      (org-src-mode . display-line-numbers-mode))
-    :bind
-    (("C-c o c" . org-capture)
-     ("C-c o a" . org-agenda)
-     ("C-c o A" . consult-org-agenda))
+    ;; :bind
+    ;; (("C-c o c" . org-capture)
+    ;;  ("C-c o a" . org-agenda)
+    ;;  ("C-c o A" . consult-org-agenda))
     :custom
     (org-directory "~/Library/CloudStorage/Dropbox/org")
     (org-src-window-setup 'current-window)
@@ -643,7 +643,7 @@ Another case of "one standard to bind them all" becoming many. I'm going with Gi
   (use-package markdown-mode
     :defer t
     :hook (gfm-mode . visual-line-mode)
-    :bind (:map markdown-mode-map ("C-c C-s a" . markdown-table-align))
+;;    :bind (:map markdown-mode-map ("C-c C-s a" . markdown-table-align))
     :mode ("\\.md$" . gfm-mode))
 
 #+end_src
@@ -662,13 +662,14 @@ I need to figure out tag generation and such.
     :hook (c-mode-common . (lambda ()
                              (when (derived-mode-p 'c-mode 'asm-mode 'pascal-mode)
                                (ggtags-mode 1))))
-    :bind (:map ggtags-mode-map
-                ("C-c g s" . ggtags-find-other-symbol)
-                ("C-c g h" . ggtags-view-tag-history)
-                ("C-c g r" . ggtags-find-reference)
-                ("C-c g f" . ggtags-find-file)
-                ("C-c g c" . ggtags-create-tags)
-                ("C-c g u" . ggtags-update-tags)
-                ("M-," . pop-tag-mark)))
+    ;; :bind (:map ggtags-mode-map
+    ;;             ("C-c g s" . ggtags-find-other-symbol)
+    ;;             ("C-c g h" . ggtags-view-tag-history)
+    ;;             ("C-c g r" . ggtags-find-reference)
+    ;;             ("C-c g f" . ggtags-find-file)
+    ;;             ("C-c g c" . ggtags-create-tags)
+    ;;             ("C-c g u" . ggtags-update-tags)
+    ;;             ("M-," . pop-tag-mark))
+    )
 
 #+end_src
