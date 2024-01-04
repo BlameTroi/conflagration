@@ -111,7 +111,7 @@ Note that if you do the auto-save file name transform incorrectly you can end up
 #+begin_src emacs-lisp
 
   ;; non packaged stuff or my own work in progress
-  (add-to-list 'load-path (concat user-emacs-directory "~/.emacs.d/site-lisp/"))
+  (add-to-list 'load-path (concat user-emacs-directory "site-lisp/"))
 
   ;; autosave and backup and temp
   (setq auto-save-no-message t)
@@ -397,7 +397,7 @@ The Pascal mode needs work, but it'll do for now.
     :custom
     (pascal-auto-lineup '(all paramlist declaration case))
     (pascal-auto-newline nil)
-    (pascal-indent-level 2)
+    (pascal-indent-level 3)
     (pascal-indent-nested-functions nil)
     :config
     ;; this is a helper for compiler message parsing
@@ -415,7 +415,8 @@ The Pascal mode needs work, but it'll do for now.
     (add-hook 'pascal-mode-hook (lambda ()
                                   (troi/pascal-helper))))
 
-  (use-package bnf-mode)
+  (use-package bnf-mode
+    :defer t)
 #+end_src
 
 

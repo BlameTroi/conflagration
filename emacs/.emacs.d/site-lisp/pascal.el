@@ -70,6 +70,7 @@
   "Abbrev table in use in Pascal mode buffers.")
 (define-abbrev-table 'pascal-mode-abbrev-table ())
 
+;; txb:
 (defvar pascal-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map ";"        'electric-pascal-semi-or-dot)
@@ -111,7 +112,12 @@
     "type" "until" "var" "while" "with"
     ;; The following are not standard in pascal, but widely used.
     "get" "put" "input" "output" "read" "readln" "reset" "rewrite" "write"
-    "writeln"))
+    "writeln"
+    ;; txb: additions
+    "eof" "eoln" "get" "put" "result" "break" "exit" "continue" "halt"
+    "assign" "close" "forward"
+    ))
+
 
 ;;;
 ;;; Regular expressions used to calculate indent, etc.
@@ -139,6 +145,7 @@
     (modify-syntax-entry ?\\ "."   st)
     (modify-syntax-entry ?\( "()1" st)
     (modify-syntax-entry ?\) ")(4" st)
+    ;; txb: fix this, (* } might be legal but we'renot going to allow it
     ;; This used to use comment-syntax `b'.  But the only document I could
     ;; find about the syntax of Pascal's comments said that (* ... } is
     ;; a valid comment, just as { ... *) or (* ... *) or { ... }.
@@ -161,25 +168,26 @@
     st)
   "Syntax table in use in Pascal-mode buffers.")
 
+;; updated face regexp, as optimized
+;; (regexp-opt '("type" "const" "real" "integer" "char" "boolean" "var" "record" "array" "file" "text"
+;;               "string" "shortstring" "longint" "int64" "ansistring" "pchar" "int32"))
+;; "\\_<\\(?:a\\(?:nsistring\\|rray\\)\\|boolean\\|c\\(?:har\\|onst\\)\\|file\\|int\\(?:32\\|64\\|eger\\)\\|longint\\|pchar\\|re\\(?:al\\|cord\\)\\|s\\(?:\\(?:horts\\)?tring\\)\\|t\\(?:ext\\|ype\\)\\|var\\)\\_>"
+;; (regexp-opt '("and" "assign" "begin" "break" "case" "close" "continue" "do" "else" "end" "eof" "eoln"
+;;               "exit" "for" "forward" "get" "halt" "if" "in" "not" "of" "or" "put" "repeat" "result"
+;;               "shl" "shr" "then" "to" "until" "while" "with"))
+;; "\\(?:a\\(?:nd\\|ssign\\)\\|b\\(?:egin\\|reak\\)\\|c\\(?:\\(?:as\\|los\\|ontinu\\)e\\)\\|do\\|e\\(?:lse\\|nd\\|o\\(?:f\\|ln\\)\\|xit\\)\\|for\\(?:ward\\)?\\|get\\|halt\\|i[fn]\\|not\\|o[fr]\\|put\\|re\\(?:\\(?:pea\\|sul\\)t\\)\\|sh[lr]\\|t\\(?:hen\\|o\\)\\|until\\|w\\(?:hile\\|ith\\)\\)"
 
 
 (defconst pascal-font-lock-keywords
   `(("\\_<\\(function\\|pro\\(cedure\\|gram\\)\\)[ \t]+\\([[:alpha:]][[:alnum:]_]*\\)"
      (1 font-lock-keyword-face)
      (3 font-lock-function-name-face))
-    ;; ("type" "const" "real" "integer" "char" "boolean" "var"
-    ;;  "record" "array" "file")
-    (,(concat "\\_<\\(array\\|boolean\\|c\\(har\\|onst\\)\\|file\\|"
-              "integer\\|re\\(al\\|cord\\)\\|type\\|var\\)\\_>")
-     . font-lock-type-face)
-    ("\\_<\\(label\\|external\\|forward\\)\\_>" . font-lock-constant-face)
+    ("\\_<\\(?:a\\(?:nsistring\\|rray\\)\\|boolean\\|c\\(?:har\\|onst\\)\\|file\\|int\\(?:32\\|64\\|eger\\)\\|longint\\|pchar\\|re\\(?:al\\|cord\\)\\|s\\(?:\\(?:horts\\)?tring\\)\\|t\\(?:ext\\|ype\\)\\|var\\)\\_>" . font-lock-type-face)
+    ("\\_<\\(label\\|external\\|forward\\|nil\\)\\_>" . font-lock-constant-face)
     ("\\_<\\([0-9]+\\)[ \t]*:" 1 font-lock-function-name-face)
-    ;; ("of" "to" "for" "if" "then" "else" "case" "while"
-    ;;  "do" "until" "and" "or" "not" "in" "with" "repeat" "begin" "end")
-    ,(concat "\\_<\\("
-             "and\\|begin\\|case\\|do\\|e\\(lse\\|nd\\)\\|for\\|i[fn]\\|"
-             "not\\|o[fr]\\|repeat\\|t\\(hen\\|o\\)\\|until\\|w\\(hile\\|ith\\)"
-             "\\)\\_>")
+    ,(concat "\\_<"
+             "\\(?:a\\(?:nd\\|ssign\\)\\|b\\(?:egin\\|reak\\)\\|c\\(?:\\(?:as\\|los\\|ontinu\\)e\\)\\|do\\|e\\(?:lse\\|nd\\|o\\(?:f\\|ln\\)\\|xit\\)\\|for\\(?:ward\\)?\\|get\\|halt\\|i[fn]\\|not\\|o[fr]\\|put\\|re\\(?:\\(?:pea\\|sul\\)t\\)\\|sh[lr]\\|t\\(?:hen\\|o\\)\\|until\\|w\\(?:hile\\|ith\\)\\)"
+             "\\_>")
     ("\\_<\\(goto\\)\\_>[ \t]*\\([0-9]+\\)?"
      (1 font-lock-keyword-face) (2 font-lock-keyword-face t)))
   "Additional expressions to highlight in Pascal mode.")
@@ -399,16 +407,19 @@ See also the user variables `pascal-type-keywords', `pascal-start-keywords' and
 	(pascal-indent-line)
       (insert "*  "))))
 
-
+;; txb: this expression is the recommended way to detect if comment, see doc for parse-partial-sexp in pascal-within-string
+;;(nth 4 (syntax-ppss))
 (defun electric-pascal-semi-or-dot ()
   "Insert `;' or `.' character and reindent the line."
   (interactive)
   (insert last-command-event)
+  (if (nth 4 (syntax-ppss)) ;; within comment?
+      ()
   (save-excursion
     (beginning-of-line)
     (pascal-indent-line))
   (if pascal-auto-newline
-      (electric-pascal-terminate-line)))
+      (electric-pascal-terminate-line))))
 
 (defun electric-pascal-colon ()
   "Insert `:' and do all indentations except line indent on this line."
