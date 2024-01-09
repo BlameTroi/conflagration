@@ -178,3 +178,4 @@ umask 033
 
 # use nvim as man pager if it is available
 type nvim >/dev/null 2>&1 && export MANPAGER='nvim +Man!'
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"

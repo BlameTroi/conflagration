@@ -26,7 +26,9 @@ Packages are handled with ~use-package~. So many options, but this is the one th
 
 ** Save the desktop or not?
 
-I'm not a 'leave the editor up all the time' guy, but Emacs isn't just an editor. 
+I'm not a 'leave the editor up all the time' guy, but Emacs isn't just an editor.
+
+On my Mac laptop, I keep hitting the command key by mistake so confirm kill is back in vogue.
 
 #+begin_src emacs-lisp
 
@@ -36,6 +38,7 @@ I'm not a 'leave the editor up all the time' guy, but Emacs isn't just an editor
     :config
     (persistent-scratch-setup-default))
 
+  (when (display-graphic-p) (setq confirm-kill-emacs 'yes-or-no-p))
 #+end_src
 
 
@@ -223,12 +226,12 @@ This has to be a setq-default since a setq makes the value buffer-local.
 
 #+end_src
 
-And here is what I think rational indenting and spacing look like.
+And here is what I think rational indenting and spacing look like. I was using a width of two but on the new laptop three looks better. I love me some wide screens.
 
 #+begin_src emacs-lisp
 
-  (setq-default tab-width 2)
-  (setq standard-indent 2)
+  (setq-default tab-width 3)
+  (setq standard-indent 3)
   (setq sentence-end-double-space nil)
   (setq mode-require-final-newline t)
 
@@ -417,6 +420,16 @@ The Pascal mode needs work, but it'll do for now.
 
   (use-package bnf-mode
     :defer t)
+#+end_src
+
+
+** Ruby, you're a fine girl
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist
+               '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
+  (add-to-list 'auto-mode-alist
+               '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
 #+end_src
 
 

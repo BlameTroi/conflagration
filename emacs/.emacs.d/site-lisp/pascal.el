@@ -43,8 +43,9 @@
 ;;       pascal-tab-always-indent  t
 ;;       pascal-auto-endcomments   t
 ;;       pascal-auto-lineup        '(all)
-;;       pascal-type-keywords      '("array" "file" "packed" "char"
-;; 				     "integer" "real" "string" "record")
+;;       pascal-type-keywords      '("array" "file" "char"
+;; 				     "integer" "real" "string")
+;; txb: removed packed and record, they are not types
 ;;       pascal-start-keywords     '("begin" "end" "function" "procedure"
 ;; 				     "repeat" "until" "while" "read" "readln"
 ;; 				     "reset" "rewrite" "write" "writeln")
@@ -114,7 +115,7 @@
     "get" "put" "input" "output" "read" "readln" "reset" "rewrite" "write"
     "writeln"
     ;; txb: additions
-    "eof" "eoln" "get" "put" "result" "break" "exit" "continue" "halt"
+    "eof" "eoln" "result" "break" "exit" "continue" "halt"
     "assign" "close" "forward"
     ))
 
@@ -250,8 +251,10 @@ will do all lineups."
 	      (const :tag "Declarations" declaration)
               (const :tag "Case statements" case)))
 
+;; txb: removed "record" and "packed" from pascal-type-keywords. record is
+;;      structuring and packed is a directive.
 (defcustom pascal-type-keywords
-  '("array" "file" "packed" "char" "integer" "real" "string" "record")
+  '("array" "file" "char" "integer" "real" "string")
   "Keywords for types used when completing a word in a declaration or parmlist.
 These include integer, real, char, etc.
 The types defined within the Pascal program
@@ -304,6 +307,14 @@ are handled in another way, and should not be added to this list."
 
 (defsubst pascal-within-string ()
   (nth 3 (parse-partial-sexp (line-beginning-position) (point))))
+
+;; txb: factored out as it spreads to other electric functions
+
+(defsubst pascal-within-comment ()
+  (nth 4 (syntax-ppss)))  ;; within comment?
+
+(defsubst pascal-within-comment-or-string ()
+  (or (pascal-within-comment) (pascal-within-string)))
 
 
 ;;;###autoload
@@ -409,11 +420,12 @@ See also the user variables `pascal-type-keywords', `pascal-start-keywords' and
 
 ;; txb: this expression is the recommended way to detect if comment, see doc for parse-partial-sexp in pascal-within-string
 ;;(nth 4 (syntax-ppss))
+;; none of the electric-pascal functions should fire if in a comment
 (defun electric-pascal-semi-or-dot ()
   "Insert `;' or `.' character and reindent the line."
   (interactive)
   (insert last-command-event)
-  (if (nth 4 (syntax-ppss)) ;; within comment?
+  (if (pascal-within-comment-or-string) ;; within comment?
       ()
   (save-excursion
     (beginning-of-line)
@@ -426,7 +438,7 @@ See also the user variables `pascal-type-keywords', `pascal-start-keywords' and
   (interactive)
   (insert last-command-event)
   ;; Do nothing if within string.
-  (if (pascal-within-string)
+  (if (pascal-within-comment-or-string)
       ()
     (save-excursion
       (beginning-of-line)
@@ -454,7 +466,7 @@ See also the user variables `pascal-type-keywords', `pascal-start-keywords' and
   "Function called when TAB is pressed in Pascal mode."
   (interactive)
   ;; Do nothing if within a string or in a CPP directive.
-  (if (or (pascal-within-string)
+  (if (or (pascal-within-comment-or-string)
 	  (and (not (bolp))
 	       (save-excursion (beginning-of-line) (eq (following-char) ?#))))
       (insert "\t")
