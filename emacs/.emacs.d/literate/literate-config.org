@@ -401,6 +401,8 @@ The Pascal mode needs work, but it'll do for now.
     (pascal-auto-lineup '(all paramlist declaration case))
     (pascal-auto-newline nil)
     (pascal-indent-level 3)
+    (pascal-case-indent 6)
+    ;; (pascal--extra-indent 3)
     (pascal-indent-nested-functions nil)
     :config
     ;; this is a helper for compiler message parsing
@@ -426,10 +428,11 @@ The Pascal mode needs work, but it'll do for now.
 ** Ruby, you're a fine girl
 
 #+begin_src emacs-lisp
-(add-to-list 'auto-mode-alist
+  (add-to-list 'auto-mode-alist
                '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
   (add-to-list 'auto-mode-alist
                '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
+  (setq ruby-indent-level 3)
 #+end_src
 
 
@@ -482,6 +485,31 @@ After more research, I'm thinking snippets are better for my habits.
 
 #+end_src
 
+
+** No comment, next question.
+
+#+begin_src emacs-lisp
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Full width comment box                                                 ;;
+  ;; from http://irreal.org/blog/?p=374                                     ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (defun troi-comment-box (b e)
+    "Draw a box comment around the region but arrange for the region to extend to at least the fill column. Place the point after the comment box."
+
+    (interactive "r")
+
+    (let ((e (copy-marker e t)))
+      (goto-char b)
+      (end-of-line)
+      (insert-char ?  (- fill-column (current-column)))
+      (comment-box b e 1)
+      (goto-char e)
+      (set-marker e nil)))
+
+  (global-set-key (kbd "C-c b b") 'troi-comment-box)
+
+#+end_src
 
 ** ~Dired~ 
 
