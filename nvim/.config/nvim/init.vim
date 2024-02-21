@@ -204,11 +204,11 @@ Plug 'preservim/nerdtree'
 
 " old school tag management and fuzzy finding with gutentags and
 " ctrlp.
-Plug 'ludovicchabant/vim-gutentags'
-Plug 'ctrlpvim/ctrlp.vim'
+" Plug 'ludovicchabant/vim-gutentags'
+" Plug 'ctrlpvim/ctrlp.vim'
 
 " my own fork to allow fpc as a synonym of pascal
-Plug 'blametroi/tagbar'
+" Plug 'blametroi/tagbar'
 
 " my own fork just because
 Plug 'blametroi/vim-dirdiff'

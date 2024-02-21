@@ -78,10 +78,8 @@ Font and theme. Bigger, more contrast, and fewer colors ... all things the old m
 #+begin_src emacs-lisp
 
   ;;(load-theme 'nofrils-acme t)
-  ;;(load-theme 'vegetative t)
-  ;;(load-theme 'eink t)
-  ;;(load-theme 'ef-melissa-light t)
-  (load-theme 'ef-melissa-dark t)
+  (load-theme 'vegetative t)
+    ;;(load-theme 'ef-melissa-dark t)
   (add-to-list 'default-frame-alist
                '(font . "SauceCodePro Nerd Font Mono-22.0"))
   (set-frame-font "SauceCodePro Nerd Font Mono-22.0" nil t)
