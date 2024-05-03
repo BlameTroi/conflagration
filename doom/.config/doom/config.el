@@ -39,7 +39,11 @@
 ;;; change `org-directory'. It must be set before org loads!
 ;;;
 
-(setq org-directory "~/Dropbox/org/")
+(after! org
+  (setq org-directory "~/Dropbox/org/")
+  (setq org-journal-dir "~/Dropbox/org/journal/")
+  (setq org-journal-date-format "%A, %d %B %Y"))
+
 
 
 ;;;
