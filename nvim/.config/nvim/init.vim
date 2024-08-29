@@ -210,9 +210,6 @@ Plug 'preservim/nerdtree'
 " my own fork to allow fpc as a synonym of pascal
 " Plug 'blametroi/tagbar'
 
-" my own fork just because
-Plug 'blametroi/vim-dirdiff'
-
 " ecumenial support
 Plug 'tpope/vim-surround'
 " Plug 'tpope/vim-sensible'
@@ -246,14 +243,10 @@ Plug 'robertmeta/nofrils'
 
 " languages
 
-" fpc
-Plug 'blametroi/fpc-vim'
+Plug 'sterpe/vim-algol68'
 
 " go, i don't seem able to avoid it
 Plug 'fatih/vim-go', {'tag': 'v1.*'}
-
-" aarch64
-Plug 'blametroi/arm-syntax-vim'
 
 call plug#end()
 " plug#end()  sets `filetype plugin indent on` and `syntax enable`

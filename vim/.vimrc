@@ -103,6 +103,10 @@ Plug 'altercation/vim-colors-solarized'
 Plug '~/projects/vim/vim-retroi'
 
 "
+" algol
+Plug 'sterpe/vim-algol68'
+
+"
 Plug 'habamax/vim-pire'
 
 call plug#end()
