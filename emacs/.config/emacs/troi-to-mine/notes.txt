@@ -1,0 +1,56 @@
+from a reddit post on simplifying/decolorizing themes to
+reduce the clown barf color overload that some induce.
+
+(use-package font-lock
+  :custom-face
+  (font-lock-keyword-face ((t (:foreground unspecified))))
+  (font-lock-operator-face ((t (:foreground unspecified))))
+  (font-lock-type-face ((t (:foreground unspecified))))
+  (font-lock-variable-name-face ((t (:foreground unspecified))))
+  (font-lock-constant-face ((t (:foreground unspecified))))
+  (font-lock-number-face ((t (:foreground unspecified))))
+  (font-lock-doc-face ((t (:foreground unspecified :inherit 'font-lock-comment-face))))
+  (font-lock-preprocessor-face ((t (:foreground unspecified))))
+  (font-lock-builtin-face ((t (:foreground unspecified)))))
+
+by jdriverrun on emacs reddit
+
+I get convenient access to Control/Meta/Super/Hyper and 3-button emulation (when on the trackpad):
+
+(setq
+;; ⌘=super-key: can't use s-SPACE,TAB
+mac-command-modifier '(:function super :ordinary super :button 3)
+;; Fn: note some already bound by MacOS (arrows, ACEFNHMDQ, etc.)
+;; omit :function so home/end/pgup/pgdwn work correctly
+mac-function-modifier '(:button 2 :ordinary hyper)
+mac-right-command-modifier 'meta ; meta-f/b are hard to reach otherwise
+mac-option-modifier 'meta ;alt=meta=option
+mac-right-option-modifier nil ;retain compose characters, düde
+mac-emulate-three-button-mouse nil) ; not needed, see :button's above
+
+There are few other tweaks you can do with something like Karabiner Elements. I set Caps Lock -> left_control (naturally) and Left + Right Shift => Caps Lock. I also set left_control -> Fn. This always gives me a button at bottom left (Fn or left_control, depending on keyboard) which acts as Hyper.
+
+And forgot to mention I bind a bunch of `super`=`Command` keys that match other OS shortcuts (this is with emacs-mac, which provides native tabs):
+
+(bind-keys
+("s-s" . save-buffer)
+("s-a" . mark-whole-buffer)
+("s-c" . kill-ring-save)
+("s-m" . suspend-frame)
+("s-t" . (lambda (arg) (interactive "p") (let ((mac-frame-tabbing t)) (if (not (eq arg 4)) (make-frame) (call-interactively #'find-file-other-frame)))))
+("s-x" . kill-region)
+("s-v" . yank)
+("s-z" . undo)
+("s-w" . delete-frame)
+("s-{" . mac-previous-tab)
+("s-}" . mac-next-tab)
+("S-s-<left>" . mac-previous-tab)
+("S-<swipe-left>" . mac-previous-tab)
+("S-s-<right>" . mac-next-tab)
+("S-<swipe-right>" . mac-next-tab)
+("s-n" . make-frame-command)
+("s-|" . mac-toggle-tab-group-overview)
+("s-M-t" . mac-move-tab-to-new-frame)
+("S-s-M-<right>" . mac-move-tab-right)
+("S-s-M-<left>" . mac-move-tab-left))
+

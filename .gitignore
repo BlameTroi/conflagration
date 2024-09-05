@@ -11,3 +11,13 @@ TAGS
 
 # and not the tangled config
 literate-config.el
+
+# remove emacs runtime transient stuff
+**/emacs/eln-cache/**
+**/emacs/elpa/**
+**/emacs/eshell/history
+**/emacs/eshell/lastdir
+**/emacs/recentf
+**/emacs/places
+**/emacs/auto-save-alist
+**/emacs/projects
