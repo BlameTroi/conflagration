@@ -6,11 +6,15 @@
  ;; If there is more than one, they won't work right.
  '(apropos-sort-by-scores t)
  '(blink-matching-delay 0.1)
+ '(c-ts-mode-indent-offset 8)
+ '(c-ts-mode-indent-style 'linux)
  '(fido-vertical-mode t)
  '(global-auto-revert-mode t)
  '(help-window-select t)
  '(mode-line-position-column-line-format '(" (%l,%C)"))
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(acme-theme astyle diminish eglot emacsshot exec-path-from-shell
+		form-feed-st free-keys tomorrow-night-deepblue-theme))
  '(package-vc-selected-packages
    '((emacsshot :url "https://github.com/BlameTroi/emacsshot.git")))
  '(save-place-mode t)

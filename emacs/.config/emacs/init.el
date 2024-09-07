@@ -95,11 +95,12 @@
   (add-to-list
    'package-archives
    '("melpa" . "https://melpa.org/packages/") t)
-  (setq package-archive-priorities
+  (setopt package-archive-priorities
         '(("gnu" . 10)
           ("nongnu" . 9)
           ("melpa-stable" . 8)
-          ("melpa" . 5))))
+          ("melpa" . 5)))
+  (setopt package-install-upgrade-built-in t))
 
 ;; this is a good place to make sure these are done.
 
@@ -313,11 +314,6 @@
 ;; instead of the various c-ts modes. i can always go back to ts if i
 ;; feel a need.
 
-;; enforce my local c style in c-modes.
-
-(require 'troi-c-style)
-(add-hook 'c-mode-common-hook 'troi-set-c-style)
-
 ;; use astyle to do formatting for c. i have an .astylerc set up with
 ;; options that match troi-c-style.
 
@@ -328,8 +324,8 @@
   :when (executable-find "astyle")
   :diminish (astyle-on-save-mode . "as")
   :hook
-  (c-mode . astyle-on-save-mode)
-  (c++-mode . astyle-on-save-mode))
+  (c-ts-mode . astyle-on-save-mode)
+  (c++-ts-mode . astyle-on-save-mode))
 
 ;; discoverability via go to definition/references and xref seems to
 ;; work best with eglot instead of the various tagging options.  less
@@ -338,8 +334,8 @@
 (use-package eglot
   :pin gnu
   :hook
-  (c-mode . eglot-ensure)
-  (c++-mode . eglot-ensure)
+  (c-ts-mode . eglot-ensure)
+  (c++-ts-mode . eglot-ensure)
   (f90-mode . eglot-ensure)
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
@@ -359,7 +355,7 @@
 (with-eval-after-load 'eglot
   (setopt completion-category-defaults nil)
   (add-to-list 'eglot-server-programs
-               '((c-mode c++-mode)
+               '((c-ts-mode c++-ts-mode)
                  . ("clangd"
                     "-j=4"
                     "--log=error"
@@ -376,8 +372,8 @@
 (use-package flymake
   :pin gnu
   :hook
-  (c-mode . flymake-mode)
-  (c++-mode . flymake-mode)
+  (c-ts-mode . flymake-mode)
+  (c++-ts-mode . flymake-mode)
   (emacs-lisp-mode . flymake-mode)
   :custom (flymake-mode-line-lighter "FM")
   :bind (:map flymake-mode-map
@@ -391,6 +387,34 @@
 
 (with-eval-after-load 'flymake
   (setopt elisp-flymake-byte-compile-load-path load-path))
+
+;; this is really C specific, 3 is confusing, 1 and 2 are unhelpful.
+
+(setopt treesit-font-lock-level 4)
+
+;; use treesitter for c and c++. make sure the grammars are built.
+
+(setopt major-mode-remap-alist
+        '((c-mode . c-ts-mode)
+          (c++-mode . c++-ts-mode)))
+
+;; it is unclear how much or how little of the cc-mode variables
+;; carry forward into treesitter. keeping the various settings
+;; for now, but using c(++)-ts-mode, it seems to play better with
+;; flymake and tooltips.
+
+(require 'troi-c-style)
+(add-hook 'c-mode-common-hook 'troi-set-c-style)
+(add-hook 'c-ts-mode 'troi-set-c-style)
+
+(setopt c-basic-offset 8)
+(setopt c-default-style "linux")
+(setopt c-ignore-auto-fill nil)
+(setopt c-mark-wrong-style-of-comment t)
+(setopt c-require-final-newline nil)
+(setopt c-ts-mode-indent-offset 8)
+(setopt c-ts-mode-indent-style 'linux)
+
 
 ;; i keep thinking i should use the doxygen comment format even if
 ;; nothing i am doing needs a full doxygen treatment. i found this
@@ -494,3 +518,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
