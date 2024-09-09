@@ -25,10 +25,10 @@
 ;;; Code:
 
 
-(global-unset-key (kbd "C-x C-c"))
 
 (when (< emacs-major-version 29)
   (error "This configuration requires Emacs 29 or newer!"))
+
 
 
 (setopt user-full-name "Troy Brumley")
@@ -36,6 +36,7 @@
 (setopt auth-sources '("~/.authinfo.gpg"))
 (setopt auth-source-cache-expiry nil)
 (setopt initial-scratch-message "
+
 ;;; so let it be written,
 ;;; so let it be done.
 
@@ -66,10 +67,9 @@
 ;; packaging and repositories
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; use-package is now part of standard emacs. it can be updated from
-;; gnu elpa, as can several other built in packages. while use-package
-;; is a built in, you have to require it for some of the macro
-;; keywords to process.
+;; while use-package is a built in, you have to require it for some of
+;; the macro keywords to process. (this may no longer be needed, but
+;; it doesn't seem to hurt so i'll leave it in.)
 
 (eval-when-compile
   (require 'use-package))
@@ -87,8 +87,11 @@
 ;; melpa-stable and melpa but prioritize them below gnu and nongnu.
 ;; it is also probably a good idea to pin some packages to specific
 ;; repositories--suspenders and belt.
+;;
+;; experimenting with using 'package-install-upgrade-built-in'
 
 (with-eval-after-load 'package
+  (defvar package-archives)
   (add-to-list
    'package-archives
    '("melpa-stable" . "https://stable.melpa.org/packages/") t)
@@ -102,40 +105,87 @@
           ("melpa" . 5)))
   (setopt package-install-upgrade-built-in t))
 
-;; this is a good place to make sure these are done.
-
-(use-package diminish
-  :demand t)
-
-(use-package bind-key
-  :demand t)
-
+(use-package diminish)
+(use-package bind-key)
+(use-package free-keys)
 (use-package which-key
   :diminish
   :init (which-key-mode));
 
-(use-package free-keys
+
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; simple options and one off things
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-unset-key (kbd "C-x C-c"))
+(global-set-key (kbd "C-x C-d") 'dired)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "M-o") 'other-window)
+(global-set-key "\M-z" 'zap-up-to-char)
+
+(setopt apropos-sort-by-scores t)
+(setopt blink-matching-delay 0.1)
+(setopt global-auto-revert-mode t)
+(setopt save-place-mode t)
+(setopt delete-by-moving-to-trash t)
+
+(setopt switch-to-buffer-obey-display-actions t)
+(setopt help-window-select t)
+(setopt enable-recursive-minibuffers t)
+
+(savehist-mode)
+
+(global-tab-line-mode)
+
+;; an experiment
+(when (display-graphic-p)
+  (context-menu-mode))
+
+(setopt scroll-bar-mode 'right)
+(setopt scroll-conservatively 10000)
+(setopt sentence-end-double-space nil)
+
+(column-number-mode)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(setopt display-line-numbers-width 4)
+(setopt mode-line-position-column-line-format '(" (%l,%C)"))
+
+;; i am not liking visual-line-mode for program text. my text
+;; mode work is also usually not wanting visual-line-mode so
+;; we'll turn this off in the init and turn it on manually
+;; for a while.
+;; (add-hook 'text-mode-hook 'visual-line-mode)
+;; the system default is to not truncate so
+(setopt truncate-lines t)
+
+(let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
+  (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+
+;; i often use C-l for visual breaks
+
+(use-package form-feed-st
   :diminish
-  :pin nongnu)
+  :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
 
 
+(use-package ws-butler
+  :hook (prog-mode . ws-butler-mode))
 
-;; ;;;;;;;;;;;
-;; os specific
-;; ;;;;;;;;;;;
 
-;; macos is a horse of an entirely different color! these are those
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; mac os specific changes
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; mac os is a horse of an entirely different color! these are those
 ;; things that are mac specific. the key remaps for various keys that
-;; the mac desktop wants are a work in progress.  i don't gate these
-;; by operating system, but they could be if needed.
-
-;; shell path isn't always included on mac os x.
+;; the mac desktop wants are a work in progress. i don't gate these by
+;; operating system, but they could be if needed.
 
 (use-package exec-path-from-shell
-  :demand t)
-
-(setopt exec-path-from-shell-arguments nil)
-(exec-path-from-shell-initialize)
+  :init
+  (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
+  (exec-path-from-shell-initialize))
 
 ;; remap modifier keys.
 ;;
@@ -165,7 +215,6 @@
 ;; unless you find the menu distracting. i do not.
 ;;
 ;; (setopt ns-auto-hide-menu-bar t)
-
 
 ;; ;;;;;;;;;;;;;;;;;;;
 ;; touchpad touchiness
@@ -204,11 +253,17 @@
 
 (mouse-avoidance-mode 'exile)
 
+;; use gls if it's around. the mac supplied ls doesn't suppport all
+;; the options dired wants.
+
+(when (executable-find "gls")
+  (setopt insert-directory-program "gls"))
 
 
-;; ;;;;;;;;;;;;;;;;;;
-;; directories, paths
-;; ;;;;;;;;;;;;;;;;;;
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; directories, paths, file system stuff
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; my additional elisp that doesn't need to be right in the init
 ;; file. this is for work in progress, things that i might autoload,
@@ -223,96 +278,144 @@
 
 (defun troi-backup-file-name (fpath)
   "Return a new file path of FPATH, creating directories if needed."
-  (let* ((backupRootDir "~/.tmp/emacs-backup/")
-         (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir fpath "~") )))
-    (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
-    backupFilePath))
+  (let* ((backup-root-dir "~/.tmp/emacs-backup/")
+         (backup-file-path (replace-regexp-in-string "//" "/" (concat backup-root-dir fpath "~") )))
+    (make-directory (file-name-directory backup-file-path) (file-name-directory backup-file-path))
+    backup-file-path))
 (setopt make-backup-file-name-function 'troi-backup-file-name)
 
-;; one last chance to un-delete a file.
-
-(setopt delete-by-moving-to-trash t)
 
 
+;; ;;;;;;;;
+;; movement
+;; ;;;;;;;;
 
-;; ;;;;;;;;;;;;;;;;;;;;;
-;; dired and directories
-;; ;;;;;;;;;;;;;;;;;;;;;
-
-;; use gls if it's around. the mac supplied ls doesn't suppport all
-;; the options dired wants.
-
-(when (executable-find "gls")
-  (setopt insert-directory-program "gls"))
-
-;; the number of times i've wantd a brief directory list instead of
-;; dired is zero.
-
-(global-set-key (kbd "C-x C-d") 'dired)
+(use-package avy
+  :demand t
+  :bind (("C-c j" . avy-goto-line)
+         ("s-j"   . avy-goto-char-timer)))
 
 
 
-;; ;;;;;;;;;;;;;;;;;;;
-;; visuals and helpers
-;; ;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;
+;; completion
+;; ;;;;;;;;;;
 
-;; line numbers for programming modes.
+;; (setopt completion-cycle-threshold 1)
+(setopt completions-detailed t)
+;; (setopt tab-always-indent 'complete)
+(setopt completion-styles '(basic initials substring))
+(setopt completion-auto-help 'always)
+(setopt completions-max-height 20)
+(setopt completions-detailed t)
+(setopt completions-format 'one-column)
+(setopt completions-group t)
 
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-(setopt display-line-numbers-width 4)
+;; tab more like shell
+(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
 
-;; text modes wrap so use visual-line-mode.
+(use-package consult
+  :ensure t
+  :bind (
+         ;; Drop-in replacements
+         ("C-x b" . consult-buffer)     ; orig. switch-to-buffer
+         ("M-y"   . consult-yank-pop)   ; orig. yank-pop
+         ;; Searching
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)       ; alternative: rebind C-s to use
+         ("M-s s" . consult-line)       ; consult-line instead of isearch, bind
+         ("M-s L" . consult-line-multi) ; isearch to M-s s
+         ("M-s o" . consult-outline)    ; was occur regexp
+         ;; Isearch integration
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)   ; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history) ; orig. isearch-edit-string
+         ("M-s l" . consult-line)            ; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)      ; needed by consult-line to detect isearch
+         )
+  :config
+  (setopt consult-narrow-key "<"))
 
-(add-hook 'text-mode-hook 'visual-line-mode)
+(use-package vertico
+  :ensure t
+  :init
+  (declare-function vertico-mode "vertico")
+  (vertico-mode))
 
-;; highlight the current line.
+(use-package vertico-directory
+  :ensure nil
+  :after vertico
+  :bind (:map vertico-map
+              ("M-DEL" . vertico-directory-delete-word)))
 
-(let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
-  (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+(use-package marginalia
+  :ensure t
+  :config
+  (declare-function marginalia-mode "marginalia")
+  (marginalia-mode))
 
-;; i often use C-l for visual breaks
+(use-package corfu
+  :ensure t
+  :init
+  (declare-function global-corfu-mode "corfu")
+  (global-corfu-mode)
+  :bind
+  (:map corfu-map
+        ("SPC" . corfu-insert-separator)
+        ("C-n" . corfu-next)
+        ("C-p" . corfu-previous)))
 
-(use-package form-feed-st
-  :defer t
-  :diminish
-  :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
+(use-package corfu-popupinfo
+  :after corfu
+  :ensure nil
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :custom
+  (corfu-popupinfo-delay '(0.25 . 0.1))
+  (corfu-popupinfo-hide nil)
+  :config
+  (corfu-popupinfo-mode))
 
-;; column number mode is a must
-(column-number-mode)
+;; i don't run in terminal, so the terminal popup support isn't needed
+
+;; completion at point, highly configurable, this is minimal
+(use-package cape
+  :ensure t
+  :init
+  (declare-function cape-dabbrev "cape")
+  (declare-function cape-file "cape")
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file))
+
+(use-package orderless
+  :ensure t
+  :config
+  (setq completion-styles '(orderless)))
 
 
 
-;; ;;;;;;;;;;;;;;
-;; ibuffer & fido
-;; ;;;;;;;;;;;;;;
-
-(global-set-key [remap list-buffers] 'ibuffer)
-(fido-mode)
-
+;; Modify search results en masse
+(use-package wgrep
+  :ensure t
+  :config
+  (setopt wgrep-auto-save-buffer t))
 
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;
-;; these hippies don't lie
-;; ;;;;;;;;;;;;;;;;;;;;;;;
+;; ;; ;;;;;;
+;; ;; eshell
+;; ;; ;;;;;;
+;; (use-package eshell
+;;   :init
+;;   (defun bedrock/setup-eshell ()
+;;     ;; Something funny is going on with how Eshell sets up its keymaps; this is
+;;     ;; a work-around to make C-r bound in the keymap
+;;     (keymap-set eshell-mode-map "C-r" 'consult-history))
+;;   :hook ((eshell-mode . bedrock/setup-eshell)))
 
-(global-set-key [remap dabbrev-expand] 'hippie-expand)
-
-
-;; ;;;;;;;;;;;;;;;;;;
-;; windowing and tabs
-;; ;;;;;;;;;;;;;;;;;;
-
-(global-set-key (kbd "M-o") 'other-window)
-(global-tab-line-mode)
 
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; programming mode configuration and helpers
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; indenting, formatting, and navigation. i have reverted to cc-mode
-;; instead of the various c-ts modes. i can always go back to ts if i
-;; feel a need.
 
 ;; use astyle to do formatting for c. i have an .astylerc set up with
 ;; options that match troi-c-style.
@@ -407,6 +510,9 @@
 (add-hook 'c-mode-common-hook 'troi-set-c-style)
 (add-hook 'c-ts-mode 'troi-set-c-style)
 
+(setopt c-ts-mode-indent-offset 8)
+(setopt c-ts-mode-indent-style 'linux)
+
 (setopt c-basic-offset 8)
 (setopt c-default-style "linux")
 (setopt c-ignore-auto-fill nil)
@@ -414,7 +520,6 @@
 (setopt c-require-final-newline nil)
 (setopt c-ts-mode-indent-offset 8)
 (setopt c-ts-mode-indent-style 'linux)
-
 
 ;; i keep thinking i should use the doxygen comment format even if
 ;; nothing i am doing needs a full doxygen treatment. i found this
@@ -427,33 +532,6 @@
  (concat user-emacs-directory "troi-lisp/gendoxy-v1.0.13"))
 (require 'gendoxy)
 
-
-
-;; ;;;;;;;;;;;;;;;;;;
-;; assorted utilities
-;; ;;;;;;;;;;;;;;;;;;
-
-;; screen shots from emacs
-
-;; (use-package emacsshot
-;;   :pin melpa-stable
-;;   :bind
-;;   ("M-S f" . emacsshot-snap-frame)
-;;   ("M-S w" . emacsshot-snap-window-include-modeline))
-
-;; the above is out of date, convert is deprecated.
-;; WARNING: The convert command is deprecated in IMv7, use "magick" instead of "convert" or "magick convert"
-;; doesn't work without xquartz or similar ... commenting out for now.
-;; (use-package emacsshot
-;;   :vc (:url "https://github.com/BlameTroi/emacsshot.git"
-;; 	    :rev :newest)
-;;   :bind
-;;   ("M-S f" . emacsshot-snap-frame)
-;;  ("M-S w" . emacsshot-snap-window-include-modeline))
-
-
-
-(global-set-key "\M-z" 'zap-up-to-char)      ;; this is the way
 
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -503,19 +581,27 @@
   (load-theme 'tomorrow-night-deepblue t))
 
 
+(use-package nerd-icons)
+(use-package nerd-icons-dired
+  :after nerd-icons
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+(use-package nerd-icons-completion
+  :after nerd-icons marginalia
+  :config
+  (declare-function nerd-icons-completion-mode "nerd-icons-completion")
+  (nerd-icons-completion-mode)
+  (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+(use-package nerd-icons-corfu
+  :after nerd-icons corfu
+  :config
+  (declare-function nerd-icons-corfu-formatter "nerd-icons-corfu")
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+(use-package nerd-icons-ibuffer
+  :after nerd-icons
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
+
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-vc-selected-packages
-   '((emacsshot :url "https://github.com/BlameTroi/emacsshot.git"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-(put 'downcase-region 'disabled nil)

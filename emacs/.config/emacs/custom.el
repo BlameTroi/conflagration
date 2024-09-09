@@ -4,27 +4,22 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(apropos-sort-by-scores t)
- '(blink-matching-delay 0.1)
- '(c-ts-mode-indent-offset 8)
- '(c-ts-mode-indent-style 'linux)
- '(fido-vertical-mode t)
- '(global-auto-revert-mode t)
- '(help-window-select t)
- '(mode-line-position-column-line-format '(" (%l,%C)"))
  '(package-selected-packages
-   '(acme-theme astyle diminish eglot emacsshot exec-path-from-shell
-		form-feed-st free-keys tomorrow-night-deepblue-theme))
- '(package-vc-selected-packages
-   '((emacsshot :url "https://github.com/BlameTroi/emacsshot.git")))
- '(save-place-mode t)
- '(scroll-bar-mode 'right)
- '(scroll-conservatively 10000)
- '(sentence-end-double-space nil))
+   '(acme-theme astyle avy cape cl-generic consult corfu-terminal
+		diminish editorconfig eglot erc exec-path-from-shell
+		external-completion faceup form-feed-st free-keys
+		idlwave kind-icon let-alist map marginalia nadvice
+		nerd-icons nerd-icons-completion nerd-icons-corfu
+		nerd-icons-dired nerd-icons-ibuffer ntlm org peg
+		python so-long soap-client svg svg-lib
+		tomorrow-night-deepblue-theme track-changes tramp
+		transient use-package verilog-mode vertico which-key
+		window-tool-bar ws-butler xref)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "FiraCode Nerd Font Mono" :foundry "nil" :slant normal :weight regular :height 190 :width normal))))
+ '(highlight ((t (:background "#00546e" :inverse-video nil))))
  '(hl-line ((t (:inherit highlight :extend t :background "LightGoldenrod2" :foreground "black")))))
