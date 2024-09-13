@@ -89,6 +89,7 @@
 ;; repositories--suspenders and belt.
 ;;
 ;; experimenting with using 'package-install-upgrade-built-in'
+;; didn't like it.
 
 (with-eval-after-load 'package
   (defvar package-archives)
@@ -102,8 +103,7 @@
         '(("gnu" . 10)
           ("nongnu" . 9)
           ("melpa-stable" . 8)
-          ("melpa" . 5)))
-  (setopt package-install-upgrade-built-in t))
+          ("melpa" . 5))))
 
 (use-package diminish)
 (use-package bind-key)
@@ -167,7 +167,6 @@
 (use-package form-feed-st
   :diminish
   :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
-
 
 (use-package ws-butler
   :hook (prog-mode . ws-butler-mode))
@@ -251,7 +250,11 @@
 ;;    (mouse-wheel-mode -1)
 ;;    (message "trackpad stuff set to ignore")))
 
-(mouse-avoidance-mode 'exile)
+(mouse-avoidance-mode 'banish)
+(setopt mouse-avoidance-banish-position
+   '((frame-or-window . frame) (side . right) (side-pos . 1)
+     (top-or-bottom . bottom) (top-or-bottom-pos . 10)))
+
 
 ;; use gls if it's around. the mac supplied ls doesn't suppport all
 ;; the options dired wants.
@@ -286,6 +289,34 @@
 
 
 
+;; an idea from superuser to deal with fat fingering in dired
+;; and opening executables or objects files.
+;;
+;; a better idea would be to use dired-open package from dired-hacks
+;; and then check the file via "file -b --mime-type <filename>" which
+;; can be used to filter out application/x-mach-binary and other types
+;; and prompt to verify the file should be opened in emacs.
+;;
+;; https://superuser.com/questions/373942/how-to-stop-emacs-from-opening-binary-files/373943#373943
+;;
+;;(defvar troi-find-file-check-source-extensions
+;;  '(".cpp" ".cc" ".c" ".h" ".f90" ".s" ".S"))
+;; (defun troi-ad-find-file-read-args (:after my-find-file-read-args-check-source)
+;;   (let* ((filename (car ad-return-value))
+;;          (source-filename
+;;           (catch 'source-file-exists
+;;             (mapc (lambda (ext)
+;;                     (let ((source-filename (concat filename ext)))
+;;                       (when (file-exists-p source-filename)
+;;                         (throw 'source-file-exists source-filename))))
+;;                   my-find-file-check-source-extensions)
+;;             nil)))
+;;     (and source-filename
+;;          (not (y-or-n-p (format "Source file %s detected. Are you sure you want to open %s? " source-filename filename)))
+;;          (error "find-file aborted by user"))))
+;; (ad-activate 'find-file-read-args)
+
+
 ;; ;;;;;;;;
 ;; movement
 ;; ;;;;;;;;
@@ -306,7 +337,7 @@
 ;; (setopt tab-always-indent 'complete)
 (setopt completion-styles '(basic initials substring))
 (setopt completion-auto-help 'always)
-(setopt completions-max-height 20)
+(setopt completions-max-height 15)
 (setopt completions-detailed t)
 (setopt completions-format 'one-column)
 (setopt completions-group t)
@@ -386,10 +417,10 @@
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
 
-(use-package orderless
-  :ensure t
-  :config
-  (setq completion-styles '(orderless)))
+;; (use-package orderless
+;;   :ensure t
+;;   :config
+;;   (setq completion-styles '(orderless)))
 
 
 
@@ -506,20 +537,19 @@
 ;; for now, but using c(++)-ts-mode, it seems to play better with
 ;; flymake and tooltips.
 
-(require 'troi-c-style)
-(add-hook 'c-mode-common-hook 'troi-set-c-style)
+;;(require 'troi-c-style)
+;;(add-hook 'c-mode-common-hook 'troi-set-c-style)
 (add-hook 'c-ts-mode 'troi-set-c-style)
 
 (setopt c-ts-mode-indent-offset 8)
 (setopt c-ts-mode-indent-style 'linux)
 
-(setopt c-basic-offset 8)
-(setopt c-default-style "linux")
-(setopt c-ignore-auto-fill nil)
-(setopt c-mark-wrong-style-of-comment t)
-(setopt c-require-final-newline nil)
-(setopt c-ts-mode-indent-offset 8)
-(setopt c-ts-mode-indent-style 'linux)
+;;(setopt c-basic-offset 8)
+;;(setopt c-default-style "linux")
+
+;;(setopt c-ignore-auto-fill nil)
+;;(setopt c-mark-wrong-style-of-comment t)
+;;(setopt c-require-final-newline nil)
 
 ;; i keep thinking i should use the doxygen comment format even if
 ;; nothing i am doing needs a full doxygen treatment. i found this
