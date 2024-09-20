@@ -4,7 +4,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(completions-group-sort 'alphabetical)
+ '(package-selected-packages
+   '(astyle avy cape consult corfu diminish exec-path-from-shell
+	    form-feed-st free-keys marginalia nerd-icons-completion
+	    nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
+	    tomorrow-night-deepblue-theme vertico wgrep which-key
+	    ws-butler)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -614,10 +614,12 @@
 (use-package nerd-icons)
 (use-package nerd-icons-dired
   :after nerd-icons
+  :diminish
   :hook
   (dired-mode . nerd-icons-dired-mode))
 (use-package nerd-icons-completion
   :after nerd-icons marginalia
+  :diminish
   :config
   (declare-function nerd-icons-completion-mode "nerd-icons-completion")
   (nerd-icons-completion-mode)
@@ -625,11 +627,13 @@
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 (use-package nerd-icons-corfu
   :after nerd-icons corfu
+  :diminish
   :config
   (declare-function nerd-icons-corfu-formatter "nerd-icons-corfu")
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 (use-package nerd-icons-ibuffer
   :after nerd-icons
+  :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
 
