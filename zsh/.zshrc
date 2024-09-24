@@ -177,7 +177,9 @@ umask 033
 type nvim >/dev/null 2>&1 && export MANPAGER='nvim +Man!'
 
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-export PATH=/usr/local/smlnj/bin:"$PATH"
-export PATH="$HOME/.emacs.d/bin:$PATH"
-export PATH="$HOME/.local/bin/smlformat:$PATH"
-
+# export PATH=/usr/local/smlnj/bin:"$PATH"
+# export PATH="$HOME/.local/bin/smlformat:$PATH"
+export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
+# if you need compilers to find node ...
+# export LDFLAGS="-L/opt/homebrew/opt/node@20/lib"
+# export CPPFLAGS="-I/opt/homebrew/opt/node@20/include"

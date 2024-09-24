@@ -4,18 +4,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(completions-group-sort 'alphabetical)
  '(package-selected-packages
-   '(astyle avy cape consult corfu diminish exec-path-from-shell
-	    form-feed-st free-keys marginalia nerd-icons-completion
-	    nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
-	    tomorrow-night-deepblue-theme vertico wgrep which-key
-	    ws-butler)))
+   '(astyle avy cape consult corfu diminish dot-mode exec-path-from-shell
+	    form-feed-st free-keys imenu-list marginalia
+	    nerd-icons-completion nerd-icons-corfu nerd-icons-dired
+	    nerd-icons-ibuffer side-notes
+	    tomorrow-night-deepblue-theme treesit-auto vertico wgrep
+	    which-key ws-butler)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "FiraCode Nerd Font Mono" :foundry "nil" :slant normal :weight regular :height 190 :width normal))))
- '(highlight ((t (:background "#00546e" :inverse-video nil))))
- '(hl-line ((t (:inherit highlight :extend t :background "LightGoldenrod2" :foreground "black")))))
+ '(default ((t (:family "FiraCode Nerd Font Mono" :foundry "nil" :slant normal :weight regular :height 190 :width normal)))))

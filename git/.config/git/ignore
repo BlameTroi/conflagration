@@ -1,0 +1,99 @@
+#-----------------------------------------------------------
+# let's try an exclude everything and then include
+#
+# i don't like the catch-all approach of include everything
+# and ignore specific files. i prefer to prevent accidental
+# inclusion but that's not easy to achieve with .gitignore.
+#
+# hopefully this is a sustainable compromise when dealing
+# with *nix binaries.
+#-----------------------------------------------------------
+
+# ignore all
+*
+# unignore all files with extensions
+!*.*
+
+# unignore the unextensioned license/readme/make files
+!LICENSE
+!UNLICENSE
+!README
+!COPYING
+!makefile
+!Makefile
+!Dockerfile
+# and let directories back in
+!*/
+
+
+!**/git/.config/git/ignore
+!**/git/.config/git/config
+
+
+#-----------------------------------------------------------
+# exclude compilation and build artifacts and targets
+#-----------------------------------------------------------
+
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.elc
+*.pyc
+*.lst
+*.map
+
+
+#-----------------------------------------------------------
+# packages and archives
+#-----------------------------------------------------------
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+
+#-----------------------------------------------------------
+# Logs and databases
+#-----------------------------------------------------------
+*.log
+*.db
+*.sqlite
+
+
+#-----------------------------------------------------------
+# file system helpers
+#-----------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+
+#-----------------------------------------------------------
+# editor backups, swaps, and helpers
+#-----------------------------------------------------------
+*.swp
+tags
+tags.lock
+tags.temp
+.netrwhist
+.viminfo
+*~
+.#*
+\#*#
+
+#-----------------------------------------------------------
+# side-notes (emacs package) files should stay local
+#-----------------------------------------------------------
+side-notes.txt
+general-side-notes.txt

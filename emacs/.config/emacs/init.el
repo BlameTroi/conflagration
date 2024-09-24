@@ -36,7 +36,6 @@
 (setopt auth-sources '("~/.authinfo.gpg"))
 (setopt auth-source-cache-expiry nil)
 (setopt initial-scratch-message "
-
 ;;; so let it be written,
 ;;; so let it be done.
 
@@ -53,8 +52,6 @@
 ;; superword-mode       -- deals with snake_case word movement
 ;;
 ;; both of the above can be made global by customize-option global-xxx-mode
-
-;; https://gitlab.com/mp81ss_repo/gendoxy if i want to try to use doxygen
 
 ;; currently the customization interface is live and changes are loaded
 ;; at the end of 'init.el'.
@@ -136,7 +133,13 @@
 
 (savehist-mode)
 
-(global-tab-line-mode)
+;; dired droppings
+(setopt dired-kill-when-opening-new-dired-buffer t)
+
+
+;; try using new frames instead of tabs
+
+;; (global-tab-line-mode)
 
 ;; an experiment
 (when (display-graphic-p)
@@ -148,6 +151,7 @@
 
 (column-number-mode)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(add-hook 'prog-mode-hook 'which-function-mode)
 (setopt display-line-numbers-width 4)
 (setopt mode-line-position-column-line-format '(" (%l,%C)"))
 
@@ -170,6 +174,24 @@
 
 (use-package ws-butler
   :hook (prog-mode . ws-butler-mode))
+
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; dot-mode brings the vim '.' to emacs
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; if i end up liking this i'll want to customize the key binds, C-M-.
+;; is bound to (xref-find-apropos PATTERN) and i can see wanting to
+;; use that.
+
+;; should this be a toggle instead of global? i'm not sure, but
+;; (dot-mode) will toggle.
+
+(use-package dot-mode
+  ;; :diminish
+  :init
+  (declare-function global-dot-mode "dot-mode")
+  (global-dot-mode t))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -279,13 +301,13 @@
 ;; backups are a pain in the ass. sure, they are needed but let's
 ;; segregate them by collecting them in one place
 
-(defun troi-backup-file-name (fpath)
+(defun troi/backup-file-name (fpath)
   "Return a new file path of FPATH, creating directories if needed."
   (let* ((backup-root-dir "~/.tmp/emacs-backup/")
          (backup-file-path (replace-regexp-in-string "//" "/" (concat backup-root-dir fpath "~") )))
     (make-directory (file-name-directory backup-file-path) (file-name-directory backup-file-path))
     backup-file-path))
-(setopt make-backup-file-name-function 'troi-backup-file-name)
+(setopt make-backup-file-name-function 'troi/backup-file-name)
 
 
 
@@ -299,9 +321,9 @@
 ;;
 ;; https://superuser.com/questions/373942/how-to-stop-emacs-from-opening-binary-files/373943#373943
 ;;
-;;(defvar troi-find-file-check-source-extensions
+;;(defvar troi/find-file-check-source-extensions
 ;;  '(".cpp" ".cc" ".c" ".h" ".f90" ".s" ".S"))
-;; (defun troi-ad-find-file-read-args (:after my-find-file-read-args-check-source)
+;; (defun troi/ad-find-file-read-args (:after my-find-file-read-args-check-source)
 ;;   (let* ((filename (car ad-return-value))
 ;;          (source-filename
 ;;           (catch 'source-file-exists
@@ -315,6 +337,37 @@
 ;;          (not (y-or-n-p (format "Source file %s detected. Are you sure you want to open %s? " source-filename filename)))
 ;;          (error "find-file aborted by user"))))
 ;; (ad-activate 'find-file-read-args)
+
+
+
+;; ;;;;;;
+;; frames
+;; ;;;;;;
+
+;; from https://stackoverflow.com/a/57318988 how to move a buffer to a
+;; new frame. tear-off-window is usually bound to a mouse button but
+;; i'm not a heavy mouse user so this function should do the job.
+
+;; it gets an error if the window is the sole window and doesn't
+;; actually close the old window, but that's probably because i'm
+;; trying to use tab-line-mode, but i'm starting to think that new
+;; frames fit my workflow better than tabs.
+
+;; i'll roll back tabs and see how i like using macos desktops
+;; instead.
+
+(defun troi/tear-off-window ()
+  "Delete the selected window, and create a new frame displaying its buffer."
+  (interactive)
+  (let* ((window (selected-window))
+     (buf (window-buffer window))
+     (frame (make-frame)))
+    (select-frame frame)
+    (switch-to-buffer buf)
+    (delete-window window)))
+
+(bind-key "C-x 5t" #'troi/tear-off-window)
+
 
 
 ;; ;;;;;;;;
@@ -335,12 +388,13 @@
 ;; (setopt completion-cycle-threshold 1)
 (setopt completions-detailed t)
 ;; (setopt tab-always-indent 'complete)
-(setopt completion-styles '(basic initials substring))
+;; (setopt completion-styles '(basic initials substring))
 (setopt completion-auto-help 'always)
 (setopt completions-max-height 15)
 (setopt completions-detailed t)
 (setopt completions-format 'one-column)
 (setopt completions-group t)
+(setopt completions-group-sort 'alphabetical)
 
 ;; tab more like shell
 (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
@@ -500,6 +554,27 @@
                     "--header-insertion=never"
                     "--header-insertion-decorators=0"))))
 
+;; trying to get lsp for typescript working and this is helpful. i am
+;; explicit about the languages here even though that's most of the
+;; languages in the default value for 'treesit-auto-recipe-list' to
+;; document where things come from.
+
+;; i can not figure out why the 'declare-function' for
+;; 'treesit-auto-add-to-auto-mode-alist' doesn't suppress the
+;; "function might not be defined at run time" warning. it works fine
+;; for 'global-treesit-auto-mode-alist' from the same file.
+
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (declare-function treeset-auto-add-to-auto-mode-alist "treesit-auto" t t)
+  (treesit-auto-add-to-auto-mode-alist
+   '(bash c commonlisp cpp go html java javascript json make markdown org python ruby toml typescript yaml))
+  (declare-function global-treesit-auto-mode "treesit-auto")
+  (global-treesit-auto-mode))
+
+
 ;; flymake isn't too intrusive, so i'm adding it for programming modes
 ;; that i use enough to warrant it.
 
@@ -517,7 +592,7 @@
               ("C-c ! L" . flymake-show-project-diagnostics)))
 
 ;; this is needed to avoid false 'can not find/load' errors on
-;; requires that occure before this point in the source.
+;; requires that occur before this point in the source.
 
 (with-eval-after-load 'flymake
   (setopt elisp-flymake-byte-compile-load-path load-path))
@@ -539,7 +614,7 @@
 
 ;;(require 'troi-c-style)
 ;;(add-hook 'c-mode-common-hook 'troi-set-c-style)
-(add-hook 'c-ts-mode 'troi-set-c-style)
+;;(add-hook 'c-ts-mode 'troi-set-c-style)
 
 (setopt c-ts-mode-indent-offset 8)
 (setopt c-ts-mode-indent-style 'linux)
@@ -551,17 +626,23 @@
 ;;(setopt c-mark-wrong-style-of-comment t)
 ;;(setopt c-require-final-newline nil)
 
-;; i keep thinking i should use the doxygen comment format even if
-;; nothing i am doing needs a full doxygen treatment. i found this
-;; as a working template generator. i may or may not use it, but
-;; leaving it on for now. it isn't in melpa, so i downloaded the
-;; source instead of doing use-package against git.
 
-(add-to-list
- 'load-path
- (concat user-emacs-directory "troi-lisp/gendoxy-v1.0.13"))
-(require 'gendoxy)
+;; imenu-list
+(use-package imenu-list
+  :diminish
+  :config
+  (setopt imenu-list-focus-after-activation t)
+  (setopt imenu-list-auto-resize t)
+  :bind ("C-'" . imenu-list-smart-toggle))
 
+
+;; side-notes
+(use-package side-notes
+  :diminish
+  :bind ("M-s n" . side-notes-toggle-notes)
+  :custom
+  (side-notes-file "side-notes.txt")
+  (side-notes-secondary-file "~/general-side-notes.txt"))
 
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -603,6 +684,8 @@
 ;;                   :background "LightGoldenrod2"
 ;;                   :foreground "black"))))
 ;;    ))
+;; '(highlight ((t (:background "#00546e" :inverse-video nil))))
+;; '(hl-line ((t (:inherit highlight :extend t :background "LightGoldenrod2" :foreground "black")))))
 
 (use-package tomorrow-night-deepblue-theme
   :pin melpa

@@ -9,6 +9,10 @@
 tags
 TAGS
 
+# side notes emacs package
+side-notes.txt
+general-side-notes.txt
+
 # and not the tangled config
 literate-config.el
 
