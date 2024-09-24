@@ -26,8 +26,8 @@
 !*/
 
 
-!**/git/.config/git/ignore
-!**/git/.config/git/config
+!**/git/ignore
+!**/git/config
 
 
 #-----------------------------------------------------------
