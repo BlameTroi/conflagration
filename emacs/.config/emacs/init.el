@@ -53,6 +53,9 @@
 ;;
 ;; both of the above can be made global by customize-option global-xxx-mode
 
+;; emacs regexp cheatsheet
+;; https://www.emacswiki.org/emacs/RegularExpression
+
 ;; currently the customization interface is live and changes are loaded
 ;; at the end of 'init.el'.
 
@@ -206,7 +209,9 @@
 (use-package exec-path-from-shell
   :init
   (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
-  (exec-path-from-shell-initialize))
+  (declare-function exec-path-from-shell-copy-envs "exec-path-from-shell")
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH")))
 
 ;; remap modifier keys.
 ;;
@@ -718,6 +723,16 @@
   :after nerd-icons
   :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
+;; ;;;;;;;;
+;; dired hacks
+;; ;;;;;;;;
+
+(use-package dired-gitignore
+  :init
+  (dired-gitignore-global-mode)
+  :bind (:map dired-mode-map
+	      ("h" . dired-gitignore-global-mode)))
 
 
 (provide 'init)

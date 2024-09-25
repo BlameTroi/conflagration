@@ -5,10 +5,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(astyle avy cape consult corfu diminish dot-mode exec-path-from-shell
-	    form-feed-st free-keys imenu-list marginalia
-	    nerd-icons-completion nerd-icons-corfu nerd-icons-dired
-	    nerd-icons-ibuffer side-notes
+   '(astyle avy cape consult corfu diminish dired-gitignore dot-mode
+	    exec-path-from-shell form-feed-st free-keys imenu-list
+	    marginalia nerd-icons-completion nerd-icons-corfu
+	    nerd-icons-dired nerd-icons-ibuffer side-notes
 	    tomorrow-night-deepblue-theme treesit-auto vertico wgrep
 	    which-key ws-butler)))
 (custom-set-faces

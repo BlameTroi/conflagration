@@ -25,10 +25,15 @@
 # and let directories back in
 !*/
 
-
+# i had forgotten to add these when i moved from the
+# .git* filenames to xdg style
 !**/git/ignore
 !**/git/config
 
+# eshell customizations
+!**/eshell/alias
+!**/eshell/login
+!**/eshell/profile
 
 #-----------------------------------------------------------
 # exclude compilation and build artifacts and targets

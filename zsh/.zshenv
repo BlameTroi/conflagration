@@ -57,3 +57,11 @@ export GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
 #export LIBRARY_PATH=/opt/homebrew/lib:~/.local/lib
 export CPATH=~/.local/include
 export LIBRARY_PATH=~/.local/lib
+
+# after sequoia it seems that libmalloc is using a new zone
+# and warnings about failure to allocate or reserve space
+# in the 'nano' zone. the following should turn off the
+# nano zone in my terminal shell and that'll shut up the
+# warnings for my work, hopefully without messing up anything
+# else.
+export MallocNanoZone=0
