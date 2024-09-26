@@ -237,10 +237,9 @@
 ;; (setopt ns-right-alternate-modifier 'super)
 
 ;; hiding the menu bare merely dims it, its space appears to always
-;; be allocated with the notch, so there's no pressing need to do this
-;; unless you find the menu distracting. i do not.
-;;
-;; (setopt ns-auto-hide-menu-bar t)
+;; be allocated due to the notch.
+
+(setopt ns-auto-hide-menu-bar t)
 
 ;; ;;;;;;;;;;;;;;;;;;;
 ;; touchpad touchiness
@@ -248,6 +247,9 @@
 
 ;; i've turned this off as i've learned the right settings to work
 ;; with in mac system settings, but leaving it for documentation.
+;;
+;; even after that i still brush too often. disabling everything but
+;; mwheel-scroll.
 ;;
 ;; a rather heavy handed (but working) way to stop the mac touchpad
 ;; from moving things on me. i tried to find way to do this as a doom
@@ -259,23 +261,23 @@
 ;; feelings about drag-the-scrollbar mouse scrolling, but i don't like
 ;; the mouse wheel in text editing.
 ;;
-;; (add-to-list
-;;  'emacs-startup-hook
-;;  (lambda ()
-;;    (global-set-key [wheel-up] 'ignore)
-;;    (global-set-key [double-wheel-up] 'ignore)
-;;    (global-set-key [triple-wheel-up] 'ignore)
-;;    (global-set-key [wheel-down] 'ignore)
-;;    (global-set-key [double-wheel-down] 'ignore)
-;;    (global-set-key [triple-wheel-down] 'ignore)
-;;    (global-set-key [wheel-left] 'ignore)
-;;    (global-set-key [double-wheel-left] 'ignore)
-;;    (global-set-key [triple-wheel-left] 'ignore)
-;;    (global-set-key [wheel-right] 'ignore)
-;;    (global-set-key [double-wheel-right] 'ignore)
-;;    (global-set-key [triple-wheel-right] 'ignore)
-;;    (mouse-wheel-mode -1)
-;;    (message "trackpad stuff set to ignore")))
+(add-to-list
+ 'emacs-startup-hook
+ (lambda ()
+   (global-set-key [wheel-up] 'ignore)
+   (global-set-key [double-wheel-up] 'ignore)
+   (global-set-key [triple-wheel-up] 'ignore)
+   (global-set-key [wheel-down] 'ignore)
+   (global-set-key [double-wheel-down] 'ignore)
+   (global-set-key [triple-wheel-down] 'ignore)
+   (global-set-key [wheel-left] 'ignore)
+   (global-set-key [double-wheel-left] 'ignore)
+   (global-set-key [triple-wheel-left] 'ignore)
+   (global-set-key [wheel-right] 'ignore)
+   (global-set-key [double-wheel-right] 'ignore)
+   (global-set-key [triple-wheel-right] 'ignore)
+   (mouse-wheel-mode -1)
+   (message "trackpad stuff set to ignore")))
 
 (mouse-avoidance-mode 'banish)
 (setopt mouse-avoidance-banish-position
