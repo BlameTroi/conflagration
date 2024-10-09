@@ -102,3 +102,23 @@ tags.temp
 #-----------------------------------------------------------
 side-notes.txt
 general-side-notes.txt
+
+#-----------------------------------------------------------
+# build system artifacts
+#-----------------------------------------------------------
+# build directories are project by project exclusions
+*.ninja
+.ninja*
+# Makefile is project by project exclusion
+*.d
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+CMakeUserPresets.json

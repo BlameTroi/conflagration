@@ -65,3 +65,9 @@ export LIBRARY_PATH=~/.local/lib
 # warnings for my work, hopefully without messing up anything
 # else.
 export MallocNanoZone=0
+
+# learning cmake (slowly)
+export CMAKE_GENERATOR="Ninja Multi-Config"
+
+# how did i not know about this?
+export CDPATH=.:~/projects:~

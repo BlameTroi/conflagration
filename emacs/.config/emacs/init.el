@@ -24,12 +24,24 @@
 
 ;;; Code:
 
-
+;; TODO start doing this way
+;; (use-package emacs
+;;    :init
+;;    (tool-bar-mode -1)
+;;    (when scroll-bar-mode
+;;      (scroll-bar-mode -1))
+;;    (load-theme 'wombat)
+;;    (set-face-attribute 'default nil :font "CaskaydiaCove Nerd Font Mono" :height 160)
+;;    (fido-vertical-mode)
+;;    :custom
+;;    (treesit-language-source-alist
+;;     '((ruby "https://github.com/tree-sitter/tree-sitter-ruby"))))
 
 (when (< emacs-major-version 29)
   (error "This configuration requires Emacs 29 or newer!"))
 
-
+;;use after-focus-change-function instead of focus-out-hook since 27.1
+;; (add-hook 'focus-out-hook 'garbage-collect)
 
 (setopt user-full-name "Troy Brumley")
 (setopt user-mail-address "BlameTroi@gmail.com")
@@ -112,7 +124,18 @@
   :diminish
   :init (which-key-mode));
 
+(use-package exec-path-from-shell
+;;  :demand t
+  :init
+  (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
+  (declare-function exec-path-from-shell-copy-envs "exec-path-from-shell")
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH" "CDPATH")))
 
+(use-package info
+  :after exec-path-from-shell
+  :custom
+  (Info-additional-directory-list '("/opt/homebrew/share/info")))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; simple options and one off things
@@ -123,6 +146,16 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-o") 'other-window)
 (global-set-key "\M-z" 'zap-up-to-char)
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+
+;; not mine, stolen from tess oconnor
+(defun troi/clear (&optional prefix)
+  "Move the line containing point to the top of the window.
+With PREFIX, move the line containing point to line PREFIX of the window."
+  (interactive "P")
+  (recenter (or prefix 0)))
+(global-set-key (kbd "C-c c") 'troi/clear)
 
 (setopt apropos-sort-by-scores t)
 (setopt blink-matching-delay 0.1)
@@ -139,6 +172,10 @@
 ;; dired droppings
 (setopt dired-kill-when-opening-new-dired-buffer t)
 
+;; experiment from tess oc
+(setopt indicate-empty-lines     nil)
+(setopt indicate-buffer-boundaries t)
+
 
 ;; try using new frames instead of tabs
 
@@ -148,7 +185,9 @@
 (when (display-graphic-p)
   (context-menu-mode))
 
-(setopt scroll-bar-mode 'right)
+(when scroll-bar-mode
+  (scroll-bar-mode -1))
+
 (setopt scroll-conservatively 10000)
 (setopt sentence-end-double-space nil)
 
@@ -176,7 +215,13 @@
   :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
 
 (use-package ws-butler
+  :diminish
   :hook (prog-mode . ws-butler-mode))
+
+(use-package eldoc
+  :diminish
+  :init (global-eldoc-mode))
+
 
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -191,7 +236,7 @@
 ;; (dot-mode) will toggle.
 
 (use-package dot-mode
-  ;; :diminish
+  :diminish
   :init
   (declare-function global-dot-mode "dot-mode")
   (global-dot-mode t))
@@ -206,12 +251,6 @@
 ;; the mac desktop wants are a work in progress. i don't gate these by
 ;; operating system, but they could be if needed.
 
-(use-package exec-path-from-shell
-  :init
-  (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
-  (declare-function exec-path-from-shell-copy-envs "exec-path-from-shell")
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH")))
 
 ;; remap modifier keys.
 ;;
@@ -386,6 +425,10 @@
   :bind (("C-c j" . avy-goto-line)
          ("s-j"   . avy-goto-char-timer)))
 
+(use-package ace-window
+  :after avy
+  :bind (("C-x o" . ace-window)
+	 ("M-o" . ace-window)))
 
 
 ;; ;;;;;;;;;;
@@ -508,11 +551,26 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; programming mode configuration and helpers
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package smartparens
+  :defer
+  :diminish "SP"
+  :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+  :config
+  ;; load default config
+  (require 'smartparens-config))
+
+;; etags, we don't need to steenkin etags.
+
+(use-package dumb-jump
+  :hook
+  (xref-backend-functions . dump-jump-xref-activate))
+
 
 ;; use astyle to do formatting for c. i have an .astylerc set up with
 ;; options that match troi-c-style.
 
-(use-package reformatter)
+(use-package reformatter
+  :after exec-path-from-shell)
 
 (use-package astyle
   :after reformatter
@@ -527,11 +585,15 @@
 ;; configuration and better dwim.
 
 (use-package eglot
+  :after exec-path-from-shell
   :pin gnu
+  ;; :init
+  ;; (setopt eglot-stay-out-of '(flymake))
   :hook
   (c-ts-mode . eglot-ensure)
   (c++-ts-mode . eglot-ensure)
   (f90-mode . eglot-ensure)
+  ;;  (ruby-ts-mode . eglot-ensure)
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
               ("C-c c r" . eglot-rename))
@@ -539,6 +601,7 @@
   ;; log size 0 disables logging which improves performance
   (eglot-events-buffer-config '(:size 0 :format short))
   (eglot-autoshutdown t)
+  (eglot-extend-to-xref t)
   (eglot-ignored-server-capabilities '(:documentFormattingProvider
                                        :documentRangeFormattingProvider
                                        :documentOnTypeFormattingProvider)))
@@ -572,6 +635,7 @@
 ;; for 'global-treesit-auto-mode-alist' from the same file.
 
 (use-package treesit-auto
+  :after exec-path-from-shell
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -586,6 +650,7 @@
 ;; that i use enough to warrant it.
 
 (use-package flymake
+  :after exec-path-from-shell
   :pin gnu
   :hook
   (c-ts-mode . flymake-mode)
@@ -604,6 +669,36 @@
 (with-eval-after-load 'flymake
   (setopt elisp-flymake-byte-compile-load-path load-path))
 
+;; ruby
+(use-package ruby-ts-mode
+  :after treesit
+  :mode "\\.rb\\'"
+  :mode "Rakefile\\'"
+  :mode "Gemfile\\'")
+;;  :hook (ruby-ts-mode . subword-mode))
+;; :bind (:map ruby-ts-mode-map
+;;             ("C-c r b" . 'treesit-beginning-of-defun)
+;;             ("C-c r e" . 'treesit-end-of-defun))
+;; :custom
+;; (ruby-indent-level 2)
+;; (ruby-indent-tabs-mode nil))
+
+;; (use-package flymake-ruby
+;;   :after flymake
+;;   :hook (ruby-mode . flymake-ruby-load)
+;;   (ruby-ts-mode . flymake-ruby-load)
+;;   )
+
+(use-package inf-ruby
+  :defer t)
+
+;; not sure if i should add the following
+  ;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+  ;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter-and-focus)
+  ;; (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+
+
+
 ;; this is really C specific, 3 is confusing, 1 and 2 are unhelpful.
 
 (setopt treesit-font-lock-level 4)
@@ -612,7 +707,11 @@
 
 (setopt major-mode-remap-alist
         '((c-mode . c-ts-mode)
-          (c++-mode . c++-ts-mode)))
+          (c++-mode . c++-ts-mode)
+	  (ruby-mode . ruby-ts-mode)))
+
+;;(with-eval-after-load 'eglot
+;; (add-to-list 'eglot-server-programs '((ruby-mode ruby-ts-mode) "ruby-lsp")))
 
 ;; it is unclear how much or how little of the cc-mode variables
 ;; carry forward into treesitter. keeping the various settings
@@ -632,6 +731,22 @@
 ;;(setopt c-ignore-auto-fill nil)
 ;;(setopt c-mark-wrong-style-of-comment t)
 ;;(setopt c-require-final-newline nil)
+
+
+;; (setq load-path (cons (expand-file-name "/dir/with/cmake-mode") load-path))
+;; (require 'cmake-mode)
+(use-package cmake-mode)
+
+(use-package ninja-mode)
+
+;; i don't use markdown much, but if i have a file i'll accept it
+;; being formatted.
+(use-package markdown-ts-mode
+   :mode ("\\.md\\'" . markdown-ts-mode)
+   :defer 't
+   :config
+   (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+   (add-to-list 'treesit-language-source-alist '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src")))
 
 
 ;; imenu-list
@@ -730,12 +845,22 @@
 ;; dired hacks
 ;; ;;;;;;;;
 
-(use-package dired-gitignore
-  :init
-  (dired-gitignore-global-mode)
-  :bind (:map dired-mode-map
-	      ("h" . dired-gitignore-global-mode)))
+;; (use-package dired-gitignore
+;;   :init
+;;   (dired-gitignore-global-mode)
+;;   :bind (:map dired-mode-map
+;; 	      ("h" . dired-gitignore-global-mode)))
 
+;; ztree for documentation
+
+(use-package ztree)
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; open some common things in background
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(find-file-noselect "~/notepad/regexp.txt")
+(find-file-noselect "~/notepad/todo.txt")
 
 (provide 'init)
 ;;; init.el ends here
