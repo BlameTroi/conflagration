@@ -1,6 +1,5 @@
 ;;; init.el --- troy brumley's init.el -*- lexical-binding: t -*-
 
-
 ;;; Commentary:
 
 ;; just an 'init.el' file.
@@ -28,17 +27,26 @@
 ;;    (treesit-language-source-alist
 ;;     '((ruby "https://github.com/tree-sitter/tree-sitter-ruby"))))
 
+;; i don't move my int around to foreign systems that don't have
+;; current emacs builds. no version checks for breaking changes here!
+
 (when (< emacs-major-version 29)
   (error "This configuration requires Emacs 29 or newer!"))
 
+;; i don't use terminal emacs. i do try to check display-graphic-p to
+;; guard some settings where i think it is needed, but a warning never
+;; hurts.
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; packaging and repositories
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (not (display-graphic-p))
+  (message "This configuration assumes you are running a GUI Emacs, some things may break")
+  (sleep-for 5))
 
 ;; while use-package is a built in, you have to require it for some of
 ;; the macro keywords to process. (this may no longer be needed, but
 ;; it doesn't seem to hurt so i'll leave it in.)
+;;
+;; a rare case of setting options outside of a use-package here to
+;; make sure they are done early.
 
 (eval-when-compile
   (require 'use-package))
@@ -68,51 +76,94 @@
   (setopt package-archive-priorities
         '(("gnu" . 10)
           ("nongnu" . 9)
-          ("melpa-stable" . 8)
+          ("melpa-stable" . 6)
           ("melpa" . 5))))
 
-;;;;;;;;;;;;;;;;;
-;; all the things
-;;;;;;;;;;;;;;;;;
+;; i've been seeing people using "use-package emacs" for collecting
+;; many settings and options. this seems like a good idea so i'm give
+;; it at try.
 
 (use-package emacs
 
-  ;;; collecting alll the loose runnable sexps from throughout the old
-  ;;; init.
+  ;; many of the setq and setopt directives can be lumped under
+  ;; :custom, remove "setopt" leaving just (setting value).
+  ;;
+  ;; mode setting and other executable directives belong under
+  ;; init:.
 
   :init
 
   ;; my additional elisp that doesn't need to be right in the init
   ;; file. this is for work in progress, things that i might autoload,
   ;; and things that aren't in (m)elpa.
+  ;;
+  ;; at the time of this writing, it's empty, but that may change.
 
   (add-to-list
    'load-path
    (concat user-emacs-directory "troi-lisp"))
 
-
-  ;; open some common things in background
+  ;; i know the intelligentsia all use org, but i'm not them and i
+  ;; don't use org. it invites too much fiddling.
+  ;;
+  ;; for quick reference, find but do not switch to various things
+  ;; i want to access quickly ... i'm regexp impaired, so a cheat
+  ;; sheet is mandatory.
 
   (ignore-errors
     (find-file-noselect "~/notepad/regexp.txt")
     (find-file-noselect "~/notepad/todo.txt"))
 
-  ;; tab more like shell
+  ;; a scratch buffer to call my own.
+
+  (if (file-exists-p (concat user-emacs-directory "initial-scratch-message.txt"))
+      (with-current-buffer (get-buffer "*scratch*")
+        (delete-region (point-min) (point-max))
+	(insert-file-contents (concat user-emacs-directory "initial-scratch-message.txt"))
+	(set-buffer-modified-p nil))
+    (setopt initial-scratch-message ";; nothing to see here, move along"))
+
+  ;; this makes tab in the minibuffer behave more like it does in
+  ;; a shell.
 
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
 
+  ;; completin, i'm turning off consult and the other stuff from bedrock to
+  ;; see how things work with built in completion.
+
+  (fido-vertical-mode +1)
+
+  ;; persist minibuffer command history across emacs sessions.
+
   (savehist-mode)
 
-  ;; an experiment
+  ;; and while we're being historical, remember position in
+  ;; files.
+
+  (save-place-mode +1)
+
+  ;; get file system changes as they happen.
+
+  (global-auto-revert-mode +1)
+
+  ;; spruce up the display. in addition to column number mode
+  ;; here, don't forget to set display-line-numbers-width and
+  ;; mode-line-position-column-line-format. column in particular
+  ;; needs to be "%C" and not "%c" if you want counting to start
+  ;; from one the way god intended.
+
   (when (display-graphic-p)
     (context-menu-mode))
-
   (when scroll-bar-mode
     (scroll-bar-mode -1))
 
   (column-number-mode)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
+  (add-hook 'prog-mode-hook 'which-function-mode)
 
+  (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
+    (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
 
   ;;; collecting all the loose setopt/setq from throughout the old
   ;;; init.
@@ -130,56 +181,71 @@
   ;; mode work is also usually not wanting visual-line-mode so
   ;; we'll turn this off in the init and turn it on manually
   ;; for a while.
-  ;; (add-hook 'text-mode-hook 'visual-line-mode)
+  ;;
   ;; the system default is to not truncate so
+
   (truncate-lines t)
+  ;; (add-hook 'text-mode-hook 'visual-line-mode)
 
-
+  ;; i'm used to line numbers from my mainframe days. i prefer that
+  ;; they be uniform witdth. %C prints the column number starting from
+  ;; 1 and not 0.
 
   (display-line-numbers-width 4)
   (mode-line-position-column-line-format '(" (%l,%C)"))
 
-
+  ;; this seems to make the scroll feel more vim like.
 
   (scroll-conservatively 10000)
+
+  ;; i've lost this battle, everthing comes at me with one space so
+  ;; we'll deal with it.
+
   (sentence-end-double-space nil)
 
-
+  ;; if i want multiple dired buffers i'll open them explicitly.
 
   (dired-kill-when-opening-new-dired-buffer t)
 
-  (indicate-buffer-boundaries t)
-
-
-
-  (apropos-sort-by-scores t)
-  (blink-matching-delay 0.1)
-  (global-auto-revert-mode t)
-  (save-place-mode t)
-  (delete-by-moving-to-trash t)
+  ;; when i open a new buffer in the same frame, or a minibuffer comes
+  ;; up, i'm generally going to want it selected. this doesn't work
+  ;; all the time, but it's a start.
 
   (switch-to-buffer-obey-display-actions t)
   (help-window-select t)
+  (help-wndow-keep-selected t)
   (enable-recursive-minibuffers t)
 
+  (indicate-buffer-boundaries t)
 
-  ;; ;;;;;;;;;;
-  ;; completion
-  ;; ;;;;;;;;;;
+  (apropos-sort-by-scores t)
+  (blink-matching-delay 0.1)
+  (delete-by-moving-to-trash t)
 
-  ;; (completion-cycle-threshold 1)
+  ;; macos better support notifications.
+
+  (auto-revert-avoid-polling t)
+
+  ;; completion. i didn't like orderless when i tried it so
+  ;; going back to alphabetical. i need to figure out how to
+  ;; get fuzzy matching. i think flex is what i want.
+  ;;
+  ;; overview at:
+  ;; https://www.masteringemacs.org/article/understanding-minibuffer-completion
+
   (completions-detailed t)
-  ;; (tab-always-indent 'complete)
-  ;; (completion-styles '(basic initials substring))
+  (completion-cycle-threshold 1)
+  (tab-always-indent 'complete)
+  ;; completion styles was basic partial-completion emacs22
+  (completion-styles '(flex basic initials substring))
   (completion-auto-help 'always)
-  (completions-max-height 15)
+  (completions-max-height 10)
   (completions-detailed t)
-  (completions-format 'one-column)
+  (completions-format 'vertical)   ;; consider vertical
   (completions-group t)
   (completions-group-sort 'alphabetical)
 
-
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;d
   ;; mac os specific changes
   ;; ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -216,9 +282,12 @@
 
   (ns-auto-hide-menu-bar t)
 
-  (treesit-font-lock-level 4)
+  ;; *** programming stuff ***
 
-  ;; use treesitter for c and c++. make sure the grammars are built.
+  ;; i use treesitter for everything i can. make sure the grammars are
+  ;; built.
+
+  (treesit-font-lock-level 4)
 
   (major-mode-remap-alist '((c-mode . c-ts-mode)
 			    (c++-mode . c++-ts-mode)
@@ -229,34 +298,10 @@
 
 
 
-  (initial-scratch-message "
-;;; so let it be written,
-;;; so let it be done.
-
-;; useful to remember
-;;
-;; customize-customized -- options and faces changed but not yet saved
-;;
-;; customize-saved      -- displays all saved options and faces
-;;
-;; customize-mode       -- for the active major mode
-
-;; subword-mode         -- deals with CamelCase word movement
-;;
-;; superword-mode       -- deals with snake_case word movement
-;;
-;; both of the above can be made global by customize-option global-xxx-mode
-
-;; emacs regexp cheatsheet
-;; https://www.emacswiki.org/emacs/RegularExpression
-
-;; currently the customization interface is live and changes are loaded
-;; at the end of 'init.el'.
-
-")
 
   )
 
+;; some obvious rational things to have in any emacs.
 
 (use-package diminish)
 (use-package bind-key)
@@ -265,6 +310,10 @@
   :diminish
   :init (which-key-mode));
 
+;; sometimes a build of emacs doesn't grab the environment correctly, especially
+;; when run from a shortcut on macos. make sure the variables i count on are
+;; set to match a login shell.
+
 (use-package exec-path-from-shell
   :init
   (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
@@ -272,15 +321,59 @@
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH" "CDPATH"))
 
-  ;; use gls if it's around. the mac supplied ls doesn't suppport all
+  ;; use gls if it's around. the macos supplied ls doesn't suppport all
   ;; the options dired wants.
+
   (when (executable-find "gls")
     (setopt insert-directory-program "gls")))
+
+;; documentation with info and eldoc. for some reason i'm missing
+;; system info from homebrew. i should probably move this into my
+;; zshenv.
 
 (use-package info
   :after exec-path-from-shell
   :custom
   (Info-additional-directory-list '("/opt/homebrew/share/info")))
+
+(use-package eldoc
+  :diminish
+  :init (global-eldoc-mode))
+
+;; i often use C-l for visual breaks.
+
+(use-package form-feed-st
+  :diminish
+  :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
+
+;; alfred, take care of that will you?
+
+(use-package ws-butler
+  :diminish
+  :hook (prog-mode . ws-butler-mode))
+
+;; dot-mode brings the vim '.' to emacs!
+;;
+;; i may want to customize the keybinds. C-M-. conflicts with
+;; xref-find-apropos.
+
+(use-package dot-mode
+  :diminish
+  :init
+  (declare-function global-dot-mode "dot-mode")
+  (global-dot-mode t))
+
+;; moving at the speed of 'what was that keybind again?'.
+
+(use-package avy
+  :demand t
+  :bind (("C-c j" . avy-goto-line)
+         ("s-j"   . avy-goto-char-timer)))
+
+(use-package ace-window
+  :after avy
+  :bind (("C-x o" . ace-window)
+	 ("M-o" . ace-window)))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; simple options and one off things
@@ -294,7 +387,9 @@
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
-;; not mine, stolen from tess oconnor
+;; this is not mine, i stole from tess o'connor's config.
+;; C-l a few times also moves the line to the top.
+
 (defun troi/clear (&optional prefix)
   "Move the line containing point to the top of the window.
 With PREFIX, move the line containing point to line PREFIX of the window."
@@ -304,54 +399,7 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 
 
 
-;; dired droppings
-
-
-;; try using new frames instead of tabs
-
-;; (global-tab-line-mode)
-
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-(add-hook 'prog-mode-hook 'which-function-mode)
-
-
-(let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
-  (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
-
-;; i often use C-l for visual breaks
-
-(use-package form-feed-st
-  :diminish
-  :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
-
-(use-package ws-butler
-  :diminish
-  :hook (prog-mode . ws-butler-mode))
-
-(use-package eldoc
-  :diminish
-  :init (global-eldoc-mode))
-
-
-
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; dot-mode brings the vim '.' to emacs
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; if i end up liking this i'll want to customize the key binds, C-M-.
-;; is bound to (xref-find-apropos PATTERN) and i can see wanting to
-;; use that.
-
-;; should this be a toggle instead of global? i'm not sure, but
-;; (dot-mode) will toggle.
-
-(use-package dot-mode
-  :diminish
-  :init
-  (declare-function global-dot-mode "dot-mode")
-  (global-dot-mode t))
-
-
+;
 
 ;; ;;;;;;;;;;;;;;;;;;;
 ;; touchpad touchiness
@@ -448,98 +496,86 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 
 
 
-;; ;;;;;;;;
-;; movement
-;; ;;;;;;;;
 
-(use-package avy
-  :demand t
-  :bind (("C-c j" . avy-goto-line)
-         ("s-j"   . avy-goto-char-timer)))
+;; turning these off and working through the built in stuff
+;; to see if i really need this.
 
-(use-package ace-window
-  :after avy
-  :bind (("C-x o" . ace-window)
-	 ("M-o" . ace-window)))
+;; (use-package consult
+;;   :ensure t
+;;   :bind (
+;;          ;; Drop-in replacements
+;;          ("C-x b" . consult-buffer)     ; orig. switch-to-buffer
+;;          ("M-y"   . consult-yank-pop)   ; orig. yank-pop
+;;          ;; Searching
+;;          ("M-s r" . consult-ripgrep)
+;;          ("M-s l" . consult-line)       ; alternative: rebind C-s to use
+;;          ("M-s s" . consult-line)       ; consult-line instead of isearch, bind
+;;          ("M-s L" . consult-line-multi) ; isearch to M-s s
+;;          ("M-s o" . consult-outline)    ; was occur regexp
+;;          ;; Isearch integration
+;;          :map isearch-mode-map
+;;          ("M-e" . consult-isearch-history)   ; orig. isearch-edit-string
+;;          ("M-s e" . consult-isearch-history) ; orig. isearch-edit-string
+;;          ("M-s l" . consult-line)            ; needed by consult-line to detect isearch
+;;          ("M-s L" . consult-line-multi)      ; needed by consult-line to detect isearch
+;;          )
+;;   :config
+;;   (setopt consult-narrow-key "<"))
 
-(use-package consult
-  :ensure t
-  :bind (
-         ;; Drop-in replacements
-         ("C-x b" . consult-buffer)     ; orig. switch-to-buffer
-         ("M-y"   . consult-yank-pop)   ; orig. yank-pop
-         ;; Searching
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)       ; alternative: rebind C-s to use
-         ("M-s s" . consult-line)       ; consult-line instead of isearch, bind
-         ("M-s L" . consult-line-multi) ; isearch to M-s s
-         ("M-s o" . consult-outline)    ; was occur regexp
-         ;; Isearch integration
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)   ; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history) ; orig. isearch-edit-string
-         ("M-s l" . consult-line)            ; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)      ; needed by consult-line to detect isearch
-         )
-  :config
-  (setopt consult-narrow-key "<"))
+;; (use-package vertico
+;;   :ensure t
+;;   :init
+;;   (declare-function vertico-mode "vertico")
+;;   (vertico-mode))
 
-(use-package vertico
-  :ensure t
-  :init
-  (declare-function vertico-mode "vertico")
-  (vertico-mode))
+;; (use-package vertico-directory
+;;   :ensure nil
+;;   :after vertico
+;;   :bind (:map vertico-map
+;;               ("M-DEL" . vertico-directory-delete-word)))
 
-(use-package vertico-directory
-  :ensure nil
-  :after vertico
-  :bind (:map vertico-map
-              ("M-DEL" . vertico-directory-delete-word)))
+;; (use-package marginalia
+;;   :ensure t
+;;   :config
+;;   (declare-function marginalia-mode "marginalia")
+;;   (marginalia-mode))
 
-(use-package marginalia
-  :ensure t
-  :config
-  (declare-function marginalia-mode "marginalia")
-  (marginalia-mode))
+;; (use-package corfu
+;;   :ensure t
+;;   :init
+;;   (declare-function global-corfu-mode "corfu")
+;;   (global-corfu-mode)
+;;   :bind
+;;   (:map corfu-map
+;;         ("SPC" . corfu-insert-separator)
+;;         ("C-n" . corfu-next)
+;;         ("C-p" . corfu-previous)))
 
-(use-package corfu
-  :ensure t
-  :init
-  (declare-function global-corfu-mode "corfu")
-  (global-corfu-mode)
-  :bind
-  (:map corfu-map
-        ("SPC" . corfu-insert-separator)
-        ("C-n" . corfu-next)
-        ("C-p" . corfu-previous)))
-
-(use-package corfu-popupinfo
-  :after corfu
-  :ensure nil
-  :hook (corfu-mode . corfu-popupinfo-mode)
-  :custom
-  (corfu-popupinfo-delay '(0.25 . 0.1))
-  (corfu-popupinfo-hide nil)
-  :config
-  (corfu-popupinfo-mode))
+;; (use-package corfu-popupinfo
+;;   :after corfu
+;;   :ensure nil
+;;   :hook (corfu-mode . corfu-popupinfo-mode)
+;;   :custom
+;;   (corfu-popupinfo-delay '(0.25 . 0.1))
+;;   (corfu-popupinfo-hide nil)
+;;   :config
+;;   (corfu-popupinfo-mode))
 
 ;; i don't run in terminal, so the terminal popup support isn't needed
 
 ;; completion at point, highly configurable, this is minimal
-(use-package cape
-  :ensure t
-  :init
-  (declare-function cape-dabbrev "cape")
-  (declare-function cape-file "cape")
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file))
+;; (use-package cape
+;;   :ensure t
+;;   :init
+;;   (declare-function cape-dabbrev "cape")
+;;   (declare-function cape-file "cape")
+;;   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+;;   (add-to-list 'completion-at-point-functions #'cape-file))
 
 ;; (use-package orderless
 ;;   :ensure t
 ;;   :config
 ;;   (setq completion-styles '(orderless)))
-
-
 
 ;; Modify search results en masse
 (use-package wgrep
@@ -843,16 +879,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
   :after nerd-icons
   :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
-
-;; ;;;;;;;;
-;; dired hacks
-;; ;;;;;;;;
-
-;; (use-package dired-gitignore
-;;   :init
-;;   (dired-gitignore-global-mode)
-;;   :bind (:map dired-mode-map
-;; 	      ("h" . dired-gitignore-global-mode)))
 
 ;; ztree for documentation
 

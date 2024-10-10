@@ -6,9 +6,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(ace-window astyle avy cape cmake-mode consult corfu diminish
-		dired-gitignore dot-mode dumb-jump
-		exec-path-from-shell flymake-ruby form-feed-st
-		free-keys imenu-list inf-ruby marginalia
+		dot-mode dumb-jump exec-path-from-shell flymake-ruby
+		form-feed-st free-keys imenu-list inf-ruby marginalia
 		markdown-ts-mode nerd-icons-completion
 		nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
 		ninja-mode side-notes tomorrow-night-deepblue-theme

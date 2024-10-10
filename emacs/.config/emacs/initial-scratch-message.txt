@@ -1,0 +1,17 @@
+;; this is troi's emacs
+;;
+;; so let it be written,
+;; so let it be done.
+;;
+;; useful to remember
+;;
+;; customize-customized -- options and faces changed but not yet saved
+;;
+;; customize-saved      -- displays all saved options and faces
+;;
+;; customize-mode       -- for the active major mode
+
+;; currently the customization interface is live and changes are loaded
+;; at the end of 'init.el'.
+
+
