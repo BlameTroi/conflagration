@@ -5,21 +5,12 @@
 
 ;; just an 'init.el' file.
 ;;
-;; i am aware of the formatting preference of no dangling close
-;; parens, but i sometimes leave the closing paren in use-package
-;; blocks on its own line for the sake of error avoidance when working
-;; on the settings and for clarity in diff output. when i'm done
-;; tweaking i may undangle them if i see them.
+;; i'm keeping most real 'init' configuration in this file, but some
+;; leaks into (ugh) 'custom.el', but i don't like it. it's good for
+;; discovery, but i don't think its maintainable.
 ;;
-;; after three or four rounds of tearing it down and trying new things
-;; i'm finally seriously starting _mastering emacs_ and as the author
-;; recommends it, i'm going back to a very minimal starting 'init.el'
-;; and adding stuff as he discusses it or if i feel a strong need.
-;;
-;; i'm keeping most real 'init' configuration in this file and in
-;; (ugh) 'custom.el'. i get why he says to use the customization
-;; interface, but i don't like it. it's good for discovery, but i
-;; don't think its maintainable.
+;; i expect to periodically go through custom.el and review changes
+;; and pull them into this init if they are worth keeping.
 
 
 ;;; Code:
@@ -39,40 +30,6 @@
 
 (when (< emacs-major-version 29)
   (error "This configuration requires Emacs 29 or newer!"))
-
-;;use after-focus-change-function instead of focus-out-hook since 27.1
-;; (add-hook 'focus-out-hook 'garbage-collect)
-
-(setopt user-full-name "Troy Brumley")
-(setopt user-mail-address "BlameTroi@gmail.com")
-(setopt auth-sources '("~/.authinfo.gpg"))
-(setopt auth-source-cache-expiry nil)
-(setopt initial-scratch-message "
-;;; so let it be written,
-;;; so let it be done.
-
-;; useful to remember
-;;
-;; customize-customized -- options and faces changed but not yet saved
-;;
-;; customize-saved      -- displays all saved options and faces
-;;
-;; customize-mode       -- for the active major mode
-
-;; subword-mode         -- deals with CamelCase word movement
-;;
-;; superword-mode       -- deals with snake_case word movement
-;;
-;; both of the above can be made global by customize-option global-xxx-mode
-
-;; emacs regexp cheatsheet
-;; https://www.emacswiki.org/emacs/RegularExpression
-
-;; currently the customization interface is live and changes are loaded
-;; at the end of 'init.el'.
-
-")
-
 
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -99,9 +56,6 @@
 ;; melpa-stable and melpa but prioritize them below gnu and nongnu.
 ;; it is also probably a good idea to pin some packages to specific
 ;; repositories--suspenders and belt.
-;;
-;; experimenting with using 'package-install-upgrade-built-in'
-;; didn't like it.
 
 (with-eval-after-load 'package
   (defvar package-archives)
@@ -117,6 +71,193 @@
           ("melpa-stable" . 8)
           ("melpa" . 5))))
 
+;;;;;;;;;;;;;;;;;
+;; all the things
+;;;;;;;;;;;;;;;;;
+
+(use-package emacs
+
+  ;;; collecting alll the loose runnable sexps from throughout the old
+  ;;; init.
+
+  :init
+
+  ;; my additional elisp that doesn't need to be right in the init
+  ;; file. this is for work in progress, things that i might autoload,
+  ;; and things that aren't in (m)elpa.
+
+  (add-to-list
+   'load-path
+   (concat user-emacs-directory "troi-lisp"))
+
+
+  ;; open some common things in background
+
+  (ignore-errors
+    (find-file-noselect "~/notepad/regexp.txt")
+    (find-file-noselect "~/notepad/todo.txt"))
+
+  ;; tab more like shell
+
+  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
+
+  (savehist-mode)
+
+  ;; an experiment
+  (when (display-graphic-p)
+    (context-menu-mode))
+
+  (when scroll-bar-mode
+    (scroll-bar-mode -1))
+
+  (column-number-mode)
+
+
+
+  ;;; collecting all the loose setopt/setq from throughout the old
+  ;;; init.
+
+  :custom
+
+  ;; the odd globals
+
+  (user-full-name "Troy Brumley")
+  (user-mail-address "BlameTroi@gmail.com")
+  (auth-sources '("~/.authinfo.gpg"))
+  (auth-source-cache-expiry nil)
+
+  ;; i am not liking visual-line-mode for program text. my text
+  ;; mode work is also usually not wanting visual-line-mode so
+  ;; we'll turn this off in the init and turn it on manually
+  ;; for a while.
+  ;; (add-hook 'text-mode-hook 'visual-line-mode)
+  ;; the system default is to not truncate so
+  (truncate-lines t)
+
+
+
+  (display-line-numbers-width 4)
+  (mode-line-position-column-line-format '(" (%l,%C)"))
+
+
+
+  (scroll-conservatively 10000)
+  (sentence-end-double-space nil)
+
+
+
+  (dired-kill-when-opening-new-dired-buffer t)
+
+  (indicate-buffer-boundaries t)
+
+
+
+  (apropos-sort-by-scores t)
+  (blink-matching-delay 0.1)
+  (global-auto-revert-mode t)
+  (save-place-mode t)
+  (delete-by-moving-to-trash t)
+
+  (switch-to-buffer-obey-display-actions t)
+  (help-window-select t)
+  (enable-recursive-minibuffers t)
+
+
+  ;; ;;;;;;;;;;
+  ;; completion
+  ;; ;;;;;;;;;;
+
+  ;; (completion-cycle-threshold 1)
+  (completions-detailed t)
+  ;; (tab-always-indent 'complete)
+  ;; (completion-styles '(basic initials substring))
+  (completion-auto-help 'always)
+  (completions-max-height 15)
+  (completions-detailed t)
+  (completions-format 'one-column)
+  (completions-group t)
+  (completions-group-sort 'alphabetical)
+
+
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;
+  ;; mac os specific changes
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; mac os is a horse of an entirely different color! these are those
+  ;; things that are mac specific. the key remaps for various keys that
+  ;; the mac desktop wants are a work in progress. i don't gate these by
+  ;; operating system, but they could be if needed.
+
+  ;; remap modifier keys.
+  ;;
+  ;; in addition to changing caps lock to control, a standard (non mac)
+  ;; keyboard has on the bottom row control fn os alt |spacebar| alt(gr)
+  ;; os menu control
+  ;;
+  ;; using karbiner i've changed the bottom row thusly:
+  ;;
+  ;; fn->control
+  ;; control->fn
+  ;; option->command
+  ;; command->alt
+  ;; spbr
+  ;; command->unchanged
+  ;; option->unchanged
+  ;;
+  ;; and so i don't need these anymore, as near as i can tell:
+  ;;
+  ;; (setopt ns-alternate-modifier 'alt)
+  ;; (setopt ns-command-modifier 'meta)
+  ;; (setopt ns-function-modifier 'hyper)
+  ;; (setopt ns-right-alternate-modifier 'super)
+
+  ;; hiding the menu bare merely dims it, its space appears to always
+  ;; be allocated due to the notch.
+
+  (ns-auto-hide-menu-bar t)
+
+  (treesit-font-lock-level 4)
+
+  ;; use treesitter for c and c++. make sure the grammars are built.
+
+  (major-mode-remap-alist '((c-mode . c-ts-mode)
+			    (c++-mode . c++-ts-mode)
+			    (ruby-mode . ruby-ts-mode)))
+
+  (c-ts-mode-indent-offset 8)
+  (c-ts-mode-indent-style 'linux)
+
+
+
+  (initial-scratch-message "
+;;; so let it be written,
+;;; so let it be done.
+
+;; useful to remember
+;;
+;; customize-customized -- options and faces changed but not yet saved
+;;
+;; customize-saved      -- displays all saved options and faces
+;;
+;; customize-mode       -- for the active major mode
+
+;; subword-mode         -- deals with CamelCase word movement
+;;
+;; superword-mode       -- deals with snake_case word movement
+;;
+;; both of the above can be made global by customize-option global-xxx-mode
+
+;; emacs regexp cheatsheet
+;; https://www.emacswiki.org/emacs/RegularExpression
+
+;; currently the customization interface is live and changes are loaded
+;; at the end of 'init.el'.
+
+")
+
+  )
+
+
 (use-package diminish)
 (use-package bind-key)
 (use-package free-keys)
@@ -125,12 +266,16 @@
   :init (which-key-mode));
 
 (use-package exec-path-from-shell
-;;  :demand t
   :init
   (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
   (declare-function exec-path-from-shell-copy-envs "exec-path-from-shell")
   (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH" "CDPATH")))
+  (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH" "CDPATH"))
+
+  ;; use gls if it's around. the mac supplied ls doesn't suppport all
+  ;; the options dired wants.
+  (when (executable-find "gls")
+    (setopt insert-directory-program "gls")))
 
 (use-package info
   :after exec-path-from-shell
@@ -157,53 +302,18 @@ With PREFIX, move the line containing point to line PREFIX of the window."
   (recenter (or prefix 0)))
 (global-set-key (kbd "C-c c") 'troi/clear)
 
-(setopt apropos-sort-by-scores t)
-(setopt blink-matching-delay 0.1)
-(setopt global-auto-revert-mode t)
-(setopt save-place-mode t)
-(setopt delete-by-moving-to-trash t)
 
-(setopt switch-to-buffer-obey-display-actions t)
-(setopt help-window-select t)
-(setopt enable-recursive-minibuffers t)
-
-(savehist-mode)
 
 ;; dired droppings
-(setopt dired-kill-when-opening-new-dired-buffer t)
-
-;; experiment from tess oc
-(setopt indicate-empty-lines     nil)
-(setopt indicate-buffer-boundaries t)
 
 
 ;; try using new frames instead of tabs
 
 ;; (global-tab-line-mode)
 
-;; an experiment
-(when (display-graphic-p)
-  (context-menu-mode))
-
-(when scroll-bar-mode
-  (scroll-bar-mode -1))
-
-(setopt scroll-conservatively 10000)
-(setopt sentence-end-double-space nil)
-
-(column-number-mode)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'which-function-mode)
-(setopt display-line-numbers-width 4)
-(setopt mode-line-position-column-line-format '(" (%l,%C)"))
 
-;; i am not liking visual-line-mode for program text. my text
-;; mode work is also usually not wanting visual-line-mode so
-;; we'll turn this off in the init and turn it on manually
-;; for a while.
-;; (add-hook 'text-mode-hook 'visual-line-mode)
-;; the system default is to not truncate so
-(setopt truncate-lines t)
 
 (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
   (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
@@ -242,43 +352,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
   (global-dot-mode t))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; mac os specific changes
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; mac os is a horse of an entirely different color! these are those
-;; things that are mac specific. the key remaps for various keys that
-;; the mac desktop wants are a work in progress. i don't gate these by
-;; operating system, but they could be if needed.
-
-
-;; remap modifier keys.
-;;
-;; in addition to changing caps lock to control, a standard (non mac)
-;; keyboard has on the bottom row control fn os alt |spacebar| alt(gr)
-;; os menu control
-;;
-;; using karbiner i've changed the bottom row thusly:
-;;
-;; fn->control
-;; control->fn
-;; option->command
-;; command->alt
-;; spbr
-;; command->unchanged
-;; option->unchanged
-;;
-;; and so i don't need these anymore, as near as i can tell:
-;;
-;; (setopt ns-alternate-modifier 'alt)
-;; (setopt ns-command-modifier 'meta)
-;; (setopt ns-function-modifier 'hyper)
-;; (setopt ns-right-alternate-modifier 'super)
-
-;; hiding the menu bare merely dims it, its space appears to always
-;; be allocated due to the notch.
-
-(setopt ns-auto-hide-menu-bar t)
 
 ;; ;;;;;;;;;;;;;;;;;;;
 ;; touchpad touchiness
@@ -324,11 +397,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
      (top-or-bottom . bottom) (top-or-bottom-pos . 10)))
 
 
-;; use gls if it's around. the mac supplied ls doesn't suppport all
-;; the options dired wants.
-
-(when (executable-find "gls")
-  (setopt insert-directory-program "gls"))
 
 
 
@@ -336,13 +404,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;; directories, paths, file system stuff
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; my additional elisp that doesn't need to be right in the init
-;; file. this is for work in progress, things that i might autoload,
-;; and things that aren't in (m)elpa.
-
-(add-to-list
- 'load-path
- (concat user-emacs-directory "troi-lisp"))
 
 ;; backups are a pain in the ass. sure, they are needed but let's
 ;; segregate them by collecting them in one place
@@ -354,35 +415,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
     (make-directory (file-name-directory backup-file-path) (file-name-directory backup-file-path))
     backup-file-path))
 (setopt make-backup-file-name-function 'troi/backup-file-name)
-
-
-
-;; an idea from superuser to deal with fat fingering in dired
-;; and opening executables or objects files.
-;;
-;; a better idea would be to use dired-open package from dired-hacks
-;; and then check the file via "file -b --mime-type <filename>" which
-;; can be used to filter out application/x-mach-binary and other types
-;; and prompt to verify the file should be opened in emacs.
-;;
-;; https://superuser.com/questions/373942/how-to-stop-emacs-from-opening-binary-files/373943#373943
-;;
-;;(defvar troi/find-file-check-source-extensions
-;;  '(".cpp" ".cc" ".c" ".h" ".f90" ".s" ".S"))
-;; (defun troi/ad-find-file-read-args (:after my-find-file-read-args-check-source)
-;;   (let* ((filename (car ad-return-value))
-;;          (source-filename
-;;           (catch 'source-file-exists
-;;             (mapc (lambda (ext)
-;;                     (let ((source-filename (concat filename ext)))
-;;                       (when (file-exists-p source-filename)
-;;                         (throw 'source-file-exists source-filename))))
-;;                   my-find-file-check-source-extensions)
-;;             nil)))
-;;     (and source-filename
-;;          (not (y-or-n-p (format "Source file %s detected. Are you sure you want to open %s? " source-filename filename)))
-;;          (error "find-file aborted by user"))))
-;; (ad-activate 'find-file-read-args)
 
 
 
@@ -429,25 +461,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
   :after avy
   :bind (("C-x o" . ace-window)
 	 ("M-o" . ace-window)))
-
-
-;; ;;;;;;;;;;
-;; completion
-;; ;;;;;;;;;;
-
-;; (setopt completion-cycle-threshold 1)
-(setopt completions-detailed t)
-;; (setopt tab-always-indent 'complete)
-;; (setopt completion-styles '(basic initials substring))
-(setopt completion-auto-help 'always)
-(setopt completions-max-height 15)
-(setopt completions-detailed t)
-(setopt completions-format 'one-column)
-(setopt completions-group t)
-(setopt completions-group-sort 'alphabetical)
-
-;; tab more like shell
-(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
 
 (use-package consult
   :ensure t
@@ -701,14 +714,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 
 ;; this is really C specific, 3 is confusing, 1 and 2 are unhelpful.
 
-(setopt treesit-font-lock-level 4)
-
-;; use treesitter for c and c++. make sure the grammars are built.
-
-(setopt major-mode-remap-alist
-        '((c-mode . c-ts-mode)
-          (c++-mode . c++-ts-mode)
-	  (ruby-mode . ruby-ts-mode)))
 
 ;;(with-eval-after-load 'eglot
 ;; (add-to-list 'eglot-server-programs '((ruby-mode ruby-ts-mode) "ruby-lsp")))
@@ -722,8 +727,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;;(add-hook 'c-mode-common-hook 'troi-set-c-style)
 ;;(add-hook 'c-ts-mode 'troi-set-c-style)
 
-(setopt c-ts-mode-indent-offset 8)
-(setopt c-ts-mode-indent-style 'linux)
 
 ;;(setopt c-basic-offset 8)
 ;;(setopt c-default-style "linux")
@@ -854,13 +857,6 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;; ztree for documentation
 
 (use-package ztree)
-
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; open some common things in background
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(find-file-noselect "~/notepad/regexp.txt")
-(find-file-noselect "~/notepad/todo.txt")
 
 (provide 'init)
 ;;; init.el ends here
