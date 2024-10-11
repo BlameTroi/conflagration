@@ -535,8 +535,7 @@
   :defer t
   :config
   (setopt deft-directory
-	  (expand-file-name
-	   "~/Library/Mobile Documents/com~apple~CloudDocs"))
+	  (expand-file-name "~/Notepad"))
   (setopt deft-text-mode (seq-find 'fboundp '(markdown-mode text-mode)))
   (setopt deft-extension
         (assoc-default deft-text-mode '((markdown-mode . "md"))
