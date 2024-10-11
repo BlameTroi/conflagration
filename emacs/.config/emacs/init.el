@@ -110,7 +110,8 @@
 
   (ignore-errors
     (find-file-noselect "~/notepad/regexp.txt")
-    (find-file-noselect "~/notepad/todo.txt"))
+    (find-file-noselect "~/notepad/todo.txt")
+    (find-file-noselect "~/notepad/cheat-sparen.txt"))
 
   ;; a scratch buffer to call my own.
 
@@ -526,6 +527,35 @@
 (use-package dumb-jump
   :hook
   (xref-backend-functions . dump-jump-xref-activate))
+
+;; this looks like the start of the note system i've wanted to write
+;; since forever.
+
+(use-package deft
+  :defer t
+  :config
+  (setopt deft-directory
+	  (expand-file-name
+	   "~/Library/Mobile Documents/com~apple~CloudDocs"))
+  (setopt deft-text-mode (seq-find 'fboundp '(markdown-mode text-mode)))
+  (setopt deft-extension
+        (assoc-default deft-text-mode '((markdown-mode . "md"))
+                       'eq "txt"))
+
+  ;; Completely override Deft's keybindings to be more like Dired and
+  ;; Gnus:
+  ;; (setq deft-mode-map (make-sparse-keymap))
+  ;; (define-key deft-mode-map (kbd "a") 'deft-new-file-named)
+  ;; (define-key deft-mode-map (kbd "d") 'deft-delete-file)
+  ;; (define-key deft-mode-map (kbd "g") 'deft-refresh)
+  ;; (define-key deft-mode-map (kbd "n") 'next-line)
+  ;; (define-key deft-mode-map (kbd "q") 'quit-window)
+  ;; (define-key deft-mode-map (kbd "p") 'previous-line)
+  ;; (define-key deft-mode-map (kbd "r") 'deft-rename-file)
+  ;; (define-key deft-mode-map (kbd "s") 'deft-filter)
+  ;; (define-key deft-mode-map (kbd "z") 'deft-filter-clear)
+  ;; (define-key deft-mode-map (kbd "<RET>") 'deft-complete)
+  )
 
 ;; use astyle to do formatting for c. i have an .astylerc set up with
 ;; options that match troi-c-style.

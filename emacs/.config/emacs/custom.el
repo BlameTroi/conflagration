@@ -5,7 +5,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-window astyle avy cmake-mode diminish dot-mode dumb-jump
+   '(ace-window astyle avy cmake-mode deft diminish dot-mode dumb-jump
 		exec-path-from-shell flymake-ruby form-feed-st
 		free-keys imenu-list inf-ruby marginalia
 		markdown-ts-mode nerd-icons-completion
