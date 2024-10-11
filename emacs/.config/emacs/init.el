@@ -14,13 +14,6 @@
 ;; and pull them into this init if they are worth keeping.
 
 
-;;; to do -- review and maybe include
-;; https://codeberg.org/ideasman42/emacs-default-font-presets
-
-;; to do -- pull the font face stuff out of custom.el
-;; (set-face-attribute 'default nil :font "CaskaydiaCove Nerd Font Mono" :height 160)
-;; '(default ((t (:family "FiraCode Nerd Font Mono" :foundry "nil" :slant normal :weight regular :height 190 :width normal)))))
-
 
 ;;;
 ;;; Code:
@@ -109,9 +102,9 @@
   ;; sheet is mandatory.
 
   (ignore-errors
-    (find-file-noselect "~/notepad/regexp.txt")
-    (find-file-noselect "~/notepad/todo.txt")
-    (find-file-noselect "~/notepad/cheat-sparen.txt"))
+    (find-file-noselect "~/Notepad/regexp.txt")
+    (find-file-noselect "~/Notepad/todo.txt")
+    (find-file-noselect "~/Notepad/cheat-sparen.txt"))
 
   ;; a scratch buffer to call my own.
 
