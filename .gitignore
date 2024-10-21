@@ -25,3 +25,5 @@ literate-config.el
 **/emacs/places
 **/emacs/auto-save-alist
 **/emacs/projects
+**/emacs/transient/**
+**/emacs/tldr/**

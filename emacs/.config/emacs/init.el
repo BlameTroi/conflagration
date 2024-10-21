@@ -10,23 +10,20 @@
 ;; leaks into (ugh) 'custom.el', but i don't like it. it's good for
 ;; discovery, but i don't think its maintainable.
 ;;
-;; i expect to periodically go through custom.el and review changes
+;; i expect to periodically go through 'custom.el' and review changes
 ;; and pull them into this init if they are worth keeping.
-
-
 
 ;;;
 ;;; Code:
 ;;;
 
 ;; i don't move my init around to foreign systems that don't have
-;; current emacs builds. no version checks for backwards compatability
-;; here!
+;; current emacs builds.
 
 (when (< emacs-major-version 29)
   (error "This configuration requires Emacs 29 or newer!"))
 
-;; i don't use terminal emacs. i do try to check display-graphic-p to
+;; i don't use terminal emacs. i do try to check 'display-graphic-p' to
 ;; guard some settings where i think it is needed, but a warning never
 ;; hurts.
 
@@ -34,11 +31,11 @@
   (message "This configuration assumes you are running a GUI Emacs, some things may break")
   (sleep-for 5))
 
-;; while use-package is a built in, you have to require it for some of
-;; the macro keywords to process. (this may no longer be needed, but
-;; it doesn't seem to hurt so i'll leave it in.)
-;;
-;; a rare case of setting options outside of a use-package here to
+;;;
+;;; scaffolding
+;;;
+
+;; a rare case of setting options outside of 'use-package' stanzas to
 ;; make sure they are done early.
 
 (eval-when-compile
@@ -46,8 +43,7 @@
 (setopt load-prefer-newer t)
 (setopt use-package-always-ensure t)
 
-;; if native compilation is available, go ahead and use it. my current
-;; (30.0.90) mac build does not have native compile built in.
+;; if native compilation is available, use it.
 
 (if (and (fboundp 'native-compile-available-p)
          (native-compile-available-p))
@@ -70,103 +66,150 @@
             ("melpa-stable" . 6)
             ("melpa" . 5))))
 
-;; i've been seeing inits with "use-package emacs" for collecting many
-;; settings and options. this seems like a good idea so i'm giving it
-;; at try.
+;;;
+;;; general emacs configuration
+;;;
+
+;; i do as much inside 'use-package' stanzas as i can. this resolves
+;; ()by removing) the debate about where to put a 'setopt'.
 
 (use-package emacs
 
-  ;; many of the setq and setopt directives can be lumped under
-  ;; :custom, remove "setopt" leaving just (variable-name value).
-  ;;
-  ;; mode setting and other executable directives belong under
-  ;; init:.
+  ;;;
+  ;;; begin :init
+  ;;;
 
   :init
 
-  ;; my additional elisp that doesn't need to be right in the init
-  ;; file. this is for work in progress, things that i might autoload,
-  ;; and things that aren't in (m)elpa.
-  ;;
-  ;; at the time of this writing, it's empty, but that may change.
+  ;; add the (usually empty )directory for my own elisp to the
+  ;; 'load-path'.
 
   (add-to-list
    'load-path
    (concat user-emacs-directory "troi-lisp"))
 
-  ;; i know the intelligentsia all use org, but i'm not one of them
-  ;; and i don't use org. it invites too much fiddling.
-  ;;
-  ;; for quick reference, find but do not switch to various things
-  ;; i want to access quickly ... i'm regexp impaired, so a cheat
-  ;; sheet is mandatory.
-
-  (ignore-errors
-    (find-file-noselect "~/Notepad/regexp.txt")
-    (find-file-noselect "~/Notepad/todo.txt")
-    (find-file-noselect "~/Notepad/cheat-sparen.txt"))
-
   ;; a scratch buffer to call my own.
 
-  (if (file-exists-p (concat user-emacs-directory "initial-scratch-message.txt"))
+  (if (file-exists-p
+       (concat user-emacs-directory
+	       "initial-scratch-message.txt"))
       (with-current-buffer (get-buffer "*scratch*")
         (delete-region (point-min) (point-max))
-	(insert-file-contents (concat user-emacs-directory "initial-scratch-message.txt"))
+	(insert-file-contents (concat user-emacs-directory
+				      "initial-scratch-message.txt"))
 	(set-buffer-modified-p nil))
     (setopt initial-scratch-message ";; nothing to see here, move along"))
 
   ;; this makes TAB in the minibuffer behave more like it does in a
   ;; shell.
+  ;; (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
 
-  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
-
-  ;; completion: i'm turning off consult and the other stuff from
-  ;; bedrock to see how things work with built in completion.
-
-  (fido-vertical-mode +1)
-
-
-  ;; get file system changes as they happen.
-
-  (global-auto-revert-mode +1)
-
-  ;; spruce up the display. in addition to column number mode
-  ;; here, don't forget to set display-line-numbers-width and
-  ;; mode-line-position-column-line-format. column in particular
-  ;; needs to be "%C" and not "%c" if you want counting to start
-  ;; from one the way god intended.
+  ;; i don't tend to use a mouse on my laptop, but enable the
+  ;; context menu anyway.
 
   (when (display-graphic-p)
     (context-menu-mode))
+
+  ;; i go back and forth on scroll bars.
+
   (when scroll-bar-mode
     (scroll-bar-mode -1))
+
+  ;; in addition to column number mode here, don't forget
+  ;; to set both the 'display-line-numbers-width' and the
+  ;; 'mode-line-position-column-line-format'.
+  ;;
+  ;; column in particular needs to be "%C" and not "%c" if
+  ;; you want counting to start from one the way the god's
+  ;; intended.
 
   (column-number-mode)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
+  ;; this keeps me from scrolling back to answer the 'which function
+  ;; am i in' question.
+
   (add-hook 'prog-mode-hook 'which-function-mode)
+
+  ;; better than hunting for the cursor is hl-line-mode
 
   (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
     (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
 
-  ;; enable the commands that are disabled (training wheels).
+  ;; this enables some of the commands that are disabled by default in
+  ;; emacs.
 
-  ;; allow horizontal scrolling with "M-x >"
-  (put 'scroll-left 'disabled nil)
-
-  ;; enable narrowing commands
-  (put 'narrow-to-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)       ; allow horizonal scrolling with C-x <>
+  (put 'narrow-to-region 'disabled nil)  ; narowing commands
   (put 'narrow-to-page 'disabled nil)
   (put 'narrow-to-defun 'disabled nil)
-
-  ;; enabled change region case commands
-  (put 'upcase-region 'disabled nil)
+  (put 'upcase-region 'disabled nil)     ; case change
   (put 'downcase-region 'disabled nil)
 
+  ;; visual line mode (with or without word wrap) vs truncation...
+  ;; i can't settle on how i want this configured yet.
+  ;;
+  ;; toggle the commenting of these two lines to switch.
+  ;; (truncate-lines t)
+  (add-hook 'text-mode-hook 'visual-line-mode)
+
+  ;; this is too ingrained to go back to the original emacs way.
+
+  (delete-selection-mode +1)
+
+  ;; keyboards and keybinds:
+  ;;
+  ;; in addition to changing caps lock to control, a standard (non mac)
+  ;; keyboard has on the bottom row:
+  ;;
+  ;; fn control os alt |spacebar| alt(gr) os menu control
+  ;;
+  ;; using karbiner i've remapped the bottom row and removed the
+  ;; need for the 'ns-*-modifier' remappings.
+  ;;
+  ;; fn       -> control
+  ;; control  -> fn
+  ;; option   -> command    (ie., super)
+  ;; command  -> alt
+  ;; spacebar -> unchanged
+  ;; command  -> unchanged
+  ;; option   -> unchanged
+
+  ;; use s-q to close emacs if i don't want to M-x
+  ;; save-buffers-kill-emacs.
+
+  (global-unset-key (kbd "C-x C-c"))
+
+  ;; the number of times i want a dired list instead of the dired smart
+  ;; buffer is zero.
+
+  (global-set-key (kbd "C-x C-d") 'dired)
+
+  ;; ditto with buffers.
+
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+  ;; i still C-x o, but not a often
+
+  (global-set-key (kbd "M-o") 'other-window)
+
+  ;; this is how i expect it to work.
+
+  (global-set-key "\M-z" 'zap-up-to-char)
+
+  ;; default search to regexp instead of string.
+
+  (global-set-key (kbd "C-s") 'isearch-forward-regexp)
+  (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
   ;;;
-  ;;; collecting all the loose setopt/setq from throughout the old
-  ;;; init.
+  ;;; end :init
+  ;;;
+
+
+
+  ;;;
+  ;;; begin :custom
   ;;;
 
   :custom
@@ -177,13 +220,6 @@
   (user-mail-address "BlameTroi@gmail.com")
   (auth-sources '("~/.authinfo.gpg"))
   (auth-source-cache-expiry nil)
-
-  ;; i am not liking visual-line-mode *most* of the time. but leaving
-  ;; it on again. as a default it can be toggled by flipping the
-  ;; comments on these two lines.
-
-  ;; (truncate-lines t)
-  (add-hook 'text-mode-hook 'visual-line-mode)
 
   ;; i'm used to line numbers from my mainframe days. i prefer that
   ;; they be uniform witdth. %C prints the column number starting from
@@ -197,111 +233,76 @@
   (scroll-conservatively 10000)
 
   ;; i've lost this battle, everthing comes at me with one space so
-  ;; we'll deal with it.
-  ;;
-  ;; at least we still have the oxford comma!
+  ;; we'll deal with it. at least we still have the oxford comma!
 
   (sentence-end-double-space nil)
 
-  ;; if i want multiple dired buffers i'll open them explicitly.
-
-  (dired-kill-when-opening-new-dired-buffer t)
+  ;; if the file has newlines, it should end with one.
+  (require-final-newline t)
 
   ;; when i open a new buffer in the same frame, or a minibuffer comes
-  ;; up, i'm generally going to want it selected. this doesn't work
-  ;; all the time, but it's a start.
+  ;; up, i'm generally going to want it selected.
+  ;;
+  ;; this doesn't work all the time, but it's a start.
 
   (switch-to-buffer-obey-display-actions t)
   (help-window-select t)
   (help-wndow-keep-selected t)
   (enable-recursive-minibuffers t)
 
+  ;; miscellany
+
   (use-dialog-box nil)
-
   (indicate-buffer-boundaries t)
-
   (apropos-sort-by-scores t)
-
   (blink-matching-delay 0.1)
-
   (delete-by-moving-to-trash t)
 
-  ;; macos better support notifications.
-
-  (auto-revert-avoid-polling t)
-
-  ;; completion. i didn't like orderless when i tried it so
-  ;; going back to alphabetical. i need to figure out how to
-  ;; get fuzzy matching. i think flex is what i want.
-  ;;
-  ;; overview at:
-  ;; https://www.masteringemacs.org/article/understanding-minibuffer-completion
+  ;; completion settings.
 
   (completions-detailed t)
   (completion-cycle-threshold 1)
   ;; (tab-always-indent 'complete)
   ;; completion styles was basic partial-completion emacs22
-  (completion-styles '(flex basic initials substring))
+  (completion-styles '(flex basic initials))
   ;; (completion-auto-help 'always)
   (completions-max-height 10)
   (completions-format 'vertical)
-  ;; (completions-group t)
+  (completions-group t)
   ;; (completions-group-sort 'alphabetical)
 
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;
-  ;; mac os specific changes
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;
+  ;; dired settings.
 
-  ;; mac os is a horse of an entirely different color! these are those
-  ;; things that are mac specific. the key remaps for various keys that
-  ;; the mac desktop wants are a work in progress. i don't gate these by
-  ;; operating system, but they could be if needed.
+  ;; (dired-kill-when-opening-new-dired-buffer t)
+  ;; (dired-auto-revert-buffer t)
+  ;; (dired-do-revert-buffer t)
 
-  ;; remap modifier keys.
-  ;;
-  ;; in addition to changing caps lock to control, a standard (non mac)
-  ;; keyboard has on the bottom row control fn os alt |spacebar| alt(gr)
-  ;; os menu control
-  ;;
-  ;; using karbiner i've changed the bottom row thusly:
-  ;;
-  ;; fn->control
-  ;; control->fn
-  ;; option->command
-  ;; command->alt
-  ;; spbr
-  ;; command->unchanged
-  ;; option->unchanged
-  ;;
-  ;; and so i don't need these anymore, as near as i can tell:
-  ;;
-  ;; (ns-alternate-modifier 'alt)
-  ;; (ns-command-modifier 'meta)
-  ;; (ns-function-modifier 'hyper)
-  ;; (ns-right-alternate-modifier 'super)
+  ;; hide commands in m-x which do not work in the current mode.  vertico
+  ;; commands are hidden in normal buffers. this setting is useful beyond
+  ;; vertico.
 
-  ;; hiding the menu bar merely dims it, its space appears to always
-  ;; be allocated due to the notch.
+  (read-extended-command-predicate #'command-completion-default-include-p)
 
-  (ns-auto-hide-menu-bar t)
+  ;;; mac os specific changes.
 
-  ;; i use treesitter for everything i can. make sure the grammars are
-  ;; built.
+  (ns-auto-hide-menu-bar t)           ; this gains no space on displays with the notch
 
-  ;; my experience is that levels 1-3 pretty much suck.
+  ;; to say that treesitter integration isn't seamless would be
+  ;; an understatement. 'treesit-auto' can build the grammars
+  ;; for languages as you need them.
 
-  (treesit-font-lock-level 4)
+  (treesit-font-lock-level 4)           ; levels 1-3 are useless
+  (major-mode-remap-alist               ; redirect to the treesitter enabled modes
+   '((c-mode . c-ts-mode)
+     (c++-mode . c++-ts-mode)
+     (ruby-mode . ruby-ts-mode)))
+  (c-ts-mode-indent-offset 8)           ; turns out i like tabs, who knew?
+  (c-ts-mode-indent-style 'linux)
 
-  ;; redirect to treesitter.
-
-  (major-mode-remap-alist '((c-mode . c-ts-mode)
-			    (c++-mode . c++-ts-mode)
-			    (ruby-mode . ruby-ts-mode)))
-
-  ;; i like big tabs and i can not lie.
-
-  (c-ts-mode-indent-offset 8)
-  (c-ts-mode-indent-style 'linux))
+  ;;;
+  ;;; end custom
+  ;;;
+  )
 
 ;;;
 ;;; themes and colors and related visuals
@@ -325,7 +326,7 @@
 ;; '(highlight ((t (:background "#00546e" :inverse-video nil))))
 ;; '(hl-line ((t (:inherit highlight :extend t :background "LightGoldenrod2" :foreground "black")))))
 
-;; one of the few themes i prefer over acme-theme. i need to tweak
+;; one of the few themes i prefer over 'acme-theme'. i need to tweak
 ;; some of the highlight/selection colors, and possibly the cursor
 ;; (it's pink right now), but it's quite usable.
 
@@ -335,16 +336,14 @@
   (mapc #'disable-theme custom-enabled-themes)
   (load-theme 'tomorrow-night-deepblue t))
 
-;; nerd-icons render better than all-the-icons in my opinion.
+;; 'nerd-icons' render better than 'all-the-icons'.
 
 (use-package nerd-icons)
-
 (use-package nerd-icons-dired
   :after nerd-icons
   :diminish
   :hook
   (dired-mode . nerd-icons-dired-mode))
-
 (use-package nerd-icons-completion
   :after nerd-icons marginalia
   :diminish
@@ -353,15 +352,55 @@
   (nerd-icons-completion-mode)
   (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
-
 (use-package nerd-icons-ibuffer
   :after nerd-icons
   :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
 ;;;
-;;; mostly stand alone use-package directives.
+;;; stand alone package configuration.
 ;;;
+
+(use-package tldr
+  :defer t)
+
+(use-package show-font
+  :defer t
+  :bind
+  (("C-c s f" . show-font-select-preview)
+   ("C-c s l" . show-font-list))
+  )
+
+(use-package autorevert
+  :config
+
+  ;; maybe only use for vc managed files? see magit-auto-rever-mode
+  ;; if i start using magit.
+
+  ;; revert buffers automatically when underlying files are changed.
+  (global-auto-revert-mode +1)
+
+  :custom
+
+  ;; macos better support notifications.
+  (auto-revert-avoid-polling t)
+
+  ;; auto revert dired buffers -- see also use-package dired
+  (global-auto-revert-non-file-buffers t)
+
+  ;; turn off auto revert messages?
+  (auto-revert-verbose nil)
+  )
+
+;; links in buffers become buttons.
+
+(use-package goto-addr
+  :hook
+  (((text-mode . goto-address-mode))
+   ((compilation-mode prog-mode eshell-mode) . goto-address-prog-mode))
+  :bind (:map goto-address-highlight-keymap
+              ("<RET>" . goto-address-at-point)
+              ("M-<RET>" . newline)))
 
 ;; some obvious rational things to have in any emacs.
 
@@ -373,7 +412,7 @@
   :diminish
   :init (which-key-mode));
 
-;; minibuffer history.
+;; remember where i was and what i did.
 
 (use-package savehist
   :defer t
@@ -384,32 +423,57 @@
             regexp-search-ring))
   (savehist-mode 1))
 
-;; and while we're being historical, remember position in
-;; files.
+;; and while we're being historical, remember our position in files.
 
 (use-package saveplace
   :config
-  (setopt save-place-limit 1000)
-  (save-place-mode))
+  (save-place-mode)
+  :custom
+  (save-place-limit 1000))
 
-;; sometimes a build of emacs doesn't grab the environment correctly, especially
-;; when run from a shortcut on macos. make sure the variables i count on are
-;; set to match a login shell.
+;; sometimes a build of emacs doesn't grab the environment correctly,
+;; especially when run from a shortcut on macos. make sure the
+;; variables that i count on are set to match my shell login.
 
 (use-package exec-path-from-shell
-  :init
-  (declare-function exec-path-from-shell-initialize "exec-path-from-shell" ())
-  (declare-function exec-path-from-shell-copy-envs "exec-path-from-shell")
+  :config
+  (declare-function
+   exec-path-from-shell-initialize "exec-path-from-shell" ())
+  (declare-function
+   exec-path-from-shell-copy-envs "exec-path-from-shell")
+
   (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-envs '("LIBRARY_PATH" "INFOPATH" "CPATH" "MANPATH" "CDPATH"))
+  (exec-path-from-shell-copy-envs
+   '("LIBRARY_PATH"
+     "INFOPATH"
+     "CPATH"
+     "MANPATH"
+     "CDPATH")))
 
-  ;; use gls if it's around. the macos supplied ls doesn't suppport all
-  ;; the options dired wants.
+;; for dired, use 'gls' if it's available. the 'ls' in macos and some
+;; other systems doesn't support all the options that 'dired' wants.
 
+(use-package dired
+  :after exec-path-from-shell
+  :ensure nil
+  :bind (:map dired-mode-map
+              ("C-c C-p" . wdired-change-to-wdired-mode))
+  ;;  :hook ((dired-mode . (lambda () (local-unset-key (kbd "C-t"))))) ; image-dired
+  :config
+  (setopt
+   dired-recursive-copies  'always
+   dired-isearch-filenames 'dwim)
   (when (executable-find "gls")
-    (setopt insert-directory-program "gls")))
+    ;; Use GNU ls when possible.
+    (setopt dired-use-ls-dired nil)
+    (setopt ls-lisp-use-insert-directory-program t)
+    (setopt insert-directory-program "gls")
+    (setopt dired-listing-switches "-alh --group-directories-first")
+    (setopt dired-kill-when-opening-new-dired-buffer t)
+    (setopt dired-auto-revert-buffer t)
+    (setopt dired-do-revert-buffer t)))
 
-;; documentation with info and eldoc. for some reason i'm missing
+;; documentation with 'info' and 'eldoc'. for some reason i'm missing
 ;; system info from homebrew. i should probably move this into my
 ;; zshenv.
 
@@ -420,7 +484,7 @@
 
 (use-package eldoc
   :diminish
-  :init (global-eldoc-mode))
+  :config (global-eldoc-mode))
 
 ;; i often use C-l for visual breaks.
 
@@ -434,18 +498,22 @@
   :diminish
   :hook (prog-mode . ws-butler-mode))
 
+;; 'so-long' handles long lines that are usually found in program
+;; source code where unneeded whitespace has been removed. forcing
+;; paragraph text direction is reported to also help by removing the
+;; checks and scans done for right to left languages.
+
 (use-package so-long
   :config
-  (global-so-long-mode))
+  (global-so-long-mode)
+  :custom
+  (bidi-paragraph-direction 'left-to-right))
 
-;;(with-eval-after-load 'eglot
-;; (add-to-list 'eglot-server-programs '((ruby-mode ruby-ts-mode) "ruby-lsp")))
-
-;; writeable grep buffer lets you change result lines and save the
+;; writeable 'grep' buffer lets you change result lines and save the
 ;; result to the replace the matched line.
 ;;
-;; i'm not sure i'll use this, i've been using grep as a navigation
-;; aid only, and not very often thanks to dumpjump and xref.
+;; i'm not sure i'll use this, i've been using 'grep' as a navigation
+;; aid only, and not very often thanks to 'dumpjump' and 'xref'.
 
 (use-package wgrep
   :ensure t
@@ -454,10 +522,7 @@
   :config
   (setopt wgrep-auto-save-buffer t))
 
-(use-package wgrep-ag
-  :after wgrep)
-
-;; imenu-list puts imenu in a sidebar. very handy.
+;; 'imenu-list' puts 'imenu' in a sidebar.
 
 (use-package imenu-list
   :diminish
@@ -466,9 +531,10 @@
   (imenu-list-focus-after-activation t)
   (imenu-list-auto-resize t))
 
-;; side-notes lets you have notes files (name is a convention) in
-;; any project or directory. the notes go into a side window like
-;; imenu-list.
+;; 'side-notes' lets you have notes files in any project or directory.
+;; the notes are opened in a side window like 'imenu-list'. searching
+;; for the notes files are done backward up the the directory path
+;; until one is found.
 
 (use-package side-notes
   :diminish
@@ -477,12 +543,11 @@
   (side-notes-file "side-notes.txt")
   (side-notes-secondary-file "~/general-side-notes.txt"))
 
-;; ztree is a tree command for emacs, producing an outline tree of the
-;; directories under the selected directory.
+;; 'ztree' is a tree command for emacs.
 
 (use-package ztree)
 
-;; dot-mode brings the vim '.' to emacs!
+;; 'dot-mode' brings the vim '.' to emacs.
 ;;
 ;; i may want to customize the keybinds. C-M-. conflicts with
 ;; xref-find-apropos.
@@ -505,24 +570,39 @@
   :bind (("C-x o" . ace-window)
 	 ("M-o" . ace-window)))
 
-;; smartparens, i should really learn to use this more and better.
+;; let's get better sorting of completion lists
 
-(use-package smartparens
-  :defer
-  :diminish "SP"
-  :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
-  :config
-  ;; load default config
-  (require 'smartparens-config))
+(use-package vertico
+  :ensure t
+  :init
+  (declare-function vertico-mode "vertico")
+  (vertico-mode))
 
-;; dumb-jump is a wonderful dwim for xref.
+(use-package vertico-directory
+  :ensure nil
+  :after vertico
+  :bind (:map vertico-map
+              ("M-DEL" . vertico-directory-delete-word)))
+
+;; smartparens. leaving off until i start doing some elisp or scheme
+;; work.
+;;
+;; (use-package smartparens
+;;   :defer
+;;   :diminish "SP"
+;;   :hook (prog-mode text-mode markdown-mode)
+;;   :config
+;;   (require 'smartparens-config))
+
+;; 'dumb-jump' is a dwim for 'xref'.
 
 (use-package dumb-jump
   :hook
   (xref-backend-functions . dump-jump-xref-activate))
 
-;; this looks like the start of the note system i've wanted to write
-;; since forever.
+;; i know the intelligentsia all use 'org', but i don't. 'org' invites
+;; too much fiddling. 'deft' provides a lightweight solution that
+;; provides the indexing and access i want.
 
 (use-package deft
   :defer t
@@ -531,125 +611,8 @@
 	  (expand-file-name "~/Notepad"))
   (setopt deft-text-mode (seq-find 'fboundp '(markdown-mode text-mode)))
   (setopt deft-extension
-        (assoc-default deft-text-mode '((markdown-mode . "md"))
-                       'eq "txt"))
-
-  ;; Completely override Deft's keybindings to be more like Dired and
-  ;; Gnus:
-  ;; (setq deft-mode-map (make-sparse-keymap))
-  ;; (define-key deft-mode-map (kbd "a") 'deft-new-file-named)
-  ;; (define-key deft-mode-map (kbd "d") 'deft-delete-file)
-  ;; (define-key deft-mode-map (kbd "g") 'deft-refresh)
-  ;; (define-key deft-mode-map (kbd "n") 'next-line)
-  ;; (define-key deft-mode-map (kbd "q") 'quit-window)
-  ;; (define-key deft-mode-map (kbd "p") 'previous-line)
-  ;; (define-key deft-mode-map (kbd "r") 'deft-rename-file)
-  ;; (define-key deft-mode-map (kbd "s") 'deft-filter)
-  ;; (define-key deft-mode-map (kbd "z") 'deft-filter-clear)
-  ;; (define-key deft-mode-map (kbd "<RET>") 'deft-complete)
-  )
-
-;; use astyle to do formatting for c. i have an .astylerc set up with
-;; options that match troi-c-style.
-
-(use-package reformatter
-  :after exec-path-from-shell)
-
-(use-package astyle
-  :after reformatter
-  :when (executable-find "astyle")
-  :diminish (astyle-on-save-mode . "as")
-  :hook
-  (c-ts-mode . astyle-on-save-mode)
-  (c++-ts-mode . astyle-on-save-mode))
-
-;;;
-;;; additional file modes
-;;;
-
-;; bsd make is built in, cmake is not.
-
-(use-package cmake-mode
-  :defer t)
-
-;; ninja is a make alternative. it runs like a bat out of hell but
-;; isn't meant to be manually configured. cmake builds the .ninja
-;; files.
-;;
-;; did i mention that it's like crazy fast?
-
-(use-package ninja-mode)
-
-;; i don't use markdown much, but if i have a file i'll accept it
-;; being formatted.
-
-(use-package markdown-ts-mode
-  :mode ("\\.md\\'" . markdown-ts-mode)
-  :defer 't
-  :config
-  (add-to-list 'treesit-language-source-alist
-	       '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
-  (add-to-list 'treesit-language-source-alist
-	       '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src")))
-
-;; going for a minimal ruby setup with a repl available. i've
-;; left some of the settings i found on the web as comments.
-
-(use-package ruby-ts-mode
-  :after treesit
-  :mode "\\.rb\\'"
-  :mode "Rakefile\\'"
-  :mode "Gemfile\\'")
-;;  :hook (ruby-ts-mode . subword-mode))
-;; :bind (:map ruby-ts-mode-map
-;;             ("C-c r b" . 'treesit-beginning-of-defun)
-;;             ("C-c r e" . 'treesit-end-of-defun))
-;; :custom
-;; (ruby-indent-level 2)
-;; (ruby-indent-tabs-mode nil))
-
-;; ruby repl
-;;
-;; not sure if i should add the following
-;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
-;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter-and-focus)
-;; (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
-
-(use-package inf-ruby
-  :defer t)
-
-;;;
-;;; keybinds not in :bind clauses
-;;;
-
-;; i don't think i change any from their expected usage, just
-;; replace what they do (ibuffer instead of buffer).
-
-;; s-q to close emacs if i don't want to M-x save-buffers-kill-emacs.
-
-(global-unset-key (kbd "C-x C-c"))
-
-;; the number of times i want a dired list instead of the dired smart
-;; buffer is zero.
-
-(global-set-key (kbd "C-x C-d") 'dired)
-
-;; ditto with buffers.
-
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-;; i still C-x o, but not a often
-
-(global-set-key (kbd "M-o") 'other-window)
-
-;; this is how i expect it to work.
-
-(global-set-key "\M-z" 'zap-up-to-char)
-
-;; default search to regexp instead of string.
-
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+        (assoc-default deft-text-mode '((markdown-mode . "md") (rst-mode . "rst"))
+                       'eq "txt")))
 
 ;;;
 ;;; functions
@@ -683,18 +646,10 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;; from a multi-window frame, tear off the current window and
 ;; put it in a new frame. this only works if there are multiple
 ;; windows in the current frame.
-
+;;
 ;; from https://stackoverflow.com/a/57318988 how to move a buffer to a
 ;; new frame. tear-off-window is usually bound to a mouse button but
 ;; i'm not a heavy mouse user so this function should do the job.
-
-;; it gets an error if the window is the sole window and doesn't
-;; actually close the old window, but that's probably because i'm
-;; trying to use tab-line-mode, but i'm starting to think that new
-;; frames fit my workflow better than tabs.
-
-;; i'll roll back tabs and see how i like using macos desktops
-;; instead.
 
 (defun troi/tear-off-window ()
   "Delete the selected window, and create a new frame displaying its buffer."
@@ -715,28 +670,113 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;;; programming mode common configuration and helpers
 ;;;
 
+;; use 'astyle' to do formatting for c. i have an '.astylerc' in my home
+;; for this.
+
+(use-package reformatter
+  :after exec-path-from-shell)
+
+(use-package astyle
+  :after reformatter
+  :when (executable-find "astyle")
+  :diminish (astyle-on-save-mode . "as")
+  :hook
+  (c-ts-mode . astyle-on-save-mode)
+  (c++-ts-mode . astyle-on-save-mode))
+
+;; magit, i can't escape it forever
+
+(use-package magit
+  :ensure t
+  :bind (("C-x g" . magit-status)))
+
+;; language: cmake
+;;
+;; bsd make is built in, cmake is not.
+
+(use-package cmake-mode
+  :defer t)
+
+;; language: ninja
+;;
+;; ninja is a make alternative. it runs like a bat out of hell but
+;; isn't meant to be manually configured. cmake builds the .ninja
+;; files.
+
+(use-package ninja-mode
+  :defer t)
+
+;; language: ruby
+;;
+;; i'm using ruby as i work through a text, and i also used it briefly
+;; in a programming languages course. here is a minimal configuration,
+;; followed by configurations that i could not get to coexist with c,
+;; which is my primary language.
+
+(use-package ruby-ts-mode
+  :defer t
+  :after treesit
+  :mode "\\.rb\\'"
+  :mode "Rakefile\\'"
+  :mode "Gemfile\\'")
+
+(use-package inf-ruby
+  :defer t)
+
+;; ruby configurations that don't work:
+;;
+;; my experience has been that these changes break 'eglot'
+;; and 'flymake' for c.
+;;
+;; :init -- (setopt eglot-stay-out-of '(flymake))
+;; :hook -- (ruby-ts-mode . eglot-ensure)
+;; :config -- ?
+;; (with-eval-after-load 'eglot
+;;   (add-to-list
+;;    'eglot-server-programs
+;;    '((ruby-mode ruby-ts-mode) "ruby-lsp")))
+;; going for a minimal ruby setup with a repl available. i've
+;; left some of the settings i found on the web as comments.
+;;  :hook (ruby-ts-mode . subword-mode))
+;; :bind (:map ruby-ts-mode-map
+;;             ("C-c r b" . 'treesit-beginning-of-defun)
+;;             ("C-c r e" . 'treesit-end-of-defun))
+;; :custom
+;; (ruby-indent-level 2)
+;; (ruby-indent-tabs-mode nil))
+;; ruby repl
+;;
+;; not sure if i should add the following
+;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter-and-focus)
+;; (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+;;
+;; (use-package flymake-ruby
+;;   :after flymake
+;;   :hook (ruby-mode . flymake-ruby-load)
+;;   (ruby-ts-mode . flymake-ruby-load)
+;;   )
+
+
 ;; discoverability via go to definition/references and xref seems to
-;; work best with eglot instead of the various tagging options.  less
-;; configuration and better dwim.
+;; work best with 'eglot' instead of the various tagging options.
 
 (use-package eglot
   :after exec-path-from-shell
-  :pin gnu
-  ;; :init
-  ;; this breaks flymake for c, but at one time it was needed for
-  ;; ruby. not sure if it still is, but i don't do much in the
-  ;; way of ruby.
-  ;; (setopt eglot-stay-out-of '(flymake))
+
   :hook
   (c-ts-mode . eglot-ensure)
   (c++-ts-mode . eglot-ensure)
   (f90-mode . eglot-ensure)
-  ;;  (ruby-ts-mode . eglot-ensure) ;; does not behave as expected
+
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
               ("C-c c r" . eglot-rename))
+
   :custom
-  ;; log size 0 disables logging which improves performance
+  ;; log size 0 disables logging effectively disables logging
+  ;; which improves performance. remove if debugging 'eglot'
+  ;; issues.
   (eglot-events-buffer-config '(:size 0 :format short))
   (eglot-autoshutdown t)
   (eglot-extend-to-xref t)
@@ -744,33 +784,26 @@ With PREFIX, move the line containing point to line PREFIX of the window."
                                        :documentRangeFormattingProvider
                                        :documentOnTypeFormattingProvider)))
 
-;; configure clangd for eglot to my preferences. i was able to avoid
-;; the maze of (apparently) cmake generated files for clangd with these
-;; options.
+;; configure 'clangd' for 'eglot' to my preferences without creating
+;; various configuration files from cmake. this is global, those files
+;; are project specific and i'd rather not create them if i don't need
+;; to.
 
 (with-eval-after-load 'eglot
   ;; (setopt completion-category-defaults nil)
-  (add-to-list 'eglot-server-programs
-               '((c-ts-mode c++-ts-mode)
-                 . ("clangd"
-                    "-j=4"
-                    "--log=error"
-                    "--background-index"
-                    "--clang-tidy"
-                    "--completion-style=detailed"
-                    "--pch-storage=memory"
-                    "--header-insertion=never"
-                    "--header-insertion-decorators=0"))))
+  (add-to-list
+   'eglot-server-programs
+   '((c-ts-mode c++-ts-mode)
+     . ("clangd"
+        "-j=4"                        ; concurrency
+        "--log=error"
+        "--background-index"
+        "--clang-tidy"                ; but i use 'astyle' to format.
+        "--completion-style=detailed"
+        "--pch-storage=memory"
+        "--header-insertion=never"
+        "--header-insertion-decorators=0"))))
 
-;; trying to get lsp for typescript working and this is helpful. i am
-;; explicit about the languages here even though that's most of the
-;; languages in the default value for 'treesit-auto-recipe-list' to
-;; document where things come from.
-
-;; i can not figure out why the 'declare-function' for
-;; 'treesit-auto-add-to-auto-mode-alist' doesn't suppress the
-;; "function might not be defined at run time" warning. it works fine
-;; for 'global-treesit-auto-mode-alist' from the same file.
 
 (use-package treesit-auto
   :after exec-path-from-shell
@@ -779,12 +812,51 @@ With PREFIX, move the line containing point to line PREFIX of the window."
   :config
   (declare-function treeset-auto-add-to-auto-mode-alist "treesit-auto" t t)
   (treesit-auto-add-to-auto-mode-alist
-   '(bash c commonlisp cpp go html java javascript json make markdown org python ruby toml typescript yaml))
+   '(bash
+     c
+     commonlisp
+     cpp
+     go
+     html
+     java
+     javascript
+     json
+     make
+     markdown
+     org
+     python
+     ruby
+     toml
+     typescript
+     yaml))
   (declare-function global-treesit-auto-mode "treesit-auto")
   (global-treesit-auto-mode))
 
-;; flymake isn't too intrusive, so i'm adding it for programming modes
-;; that i use enough to warrant it.
+;; language: markdown
+;;
+;; i usually just use plain text, but enough markdown is around
+;; to warrant a mode.
+
+(use-package markdown-ts-mode
+  :mode ("\\.md\\'" . markdown-ts-mode)
+  :defer t
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(markdown
+     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+     "split_parser"
+     "tree-sitter-markdown/src"))
+  (add-to-list
+   'treesit-language-source-alist
+   '(markdown-inline
+     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+     "split_parser"
+     "tree-sitter-markdown-inline/src")))
+
+
+;; 'flymake' is has been a good linter interface. 'eglot' seems to
+;; report issues from 'clang-tidy' through 'flymake'.
 
 (use-package flymake
   :after exec-path-from-shell
@@ -800,19 +872,35 @@ With PREFIX, move the line containing point to line PREFIX of the window."
               ("C-c ! l" . flymake-show-buffer-diagnostics)
               ("C-c ! L" . flymake-show-project-diagnostics)))
 
-;; ruby is a separate package and something isn't working right.
-
-;; (use-package flymake-ruby
-;;   :after flymake
-;;   :hook (ruby-mode . flymake-ruby-load)
-;;   (ruby-ts-mode . flymake-ruby-load)
-;;   )
-
 ;; this is needed to avoid false 'can not find/load' errors on
 ;; requires that occur before this point in the source.
 
 (with-eval-after-load 'flymake
   (setopt elisp-flymake-byte-compile-load-path load-path))
+
+
+;; flymake wants makefiles but i am using cmake, there are a few
+;; packages that attempt to address this. another option may be
+;; to just generate the makefiles manually with cmake at the
+;; command line.
+
+;; i'm not sure this is really helping, but we'll see.
+
+(use-package cmake-project
+  :defer
+  :config
+  ;; this function is from the project documentation. i've changed the
+  ;; hook to the ts functions.
+  (defun troi/maybe-cmake-project-mode ()
+    (if (or (file-exists-p "CMakeLists.txt")
+            (file-exists-p (expand-file-name "CMakeLists.txt" (car (project-roots (project-current))))))
+	(cmake-project-mode)))
+  (add-hook 'c-ts-mode-hook 'troi/maybe-cmake-project-mode)
+  (add-hook 'c++-ts-mode-hook 'troi/maybe-cmake-project-mode)
+  :custom
+  (cmake-project-default-build-dir-name "build/")
+  )
+
 
 ;;;
 ;;; touchpad touchiness
