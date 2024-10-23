@@ -4,18 +4,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ace-window astyle beacon cmake-mode cobol-mode deft diminish
-		dot-mode dumb-jump exec-path-from-shell flymake-guile
-		form-feed-st free-keys geiser-guile gnuplot
-		gnuplot-mode imenu-list inf-ruby json-mode
-		magit-file-icons magit-filenotify magit-todos
-		marginalia markdown-ts-mode nerd-icons-completion
-		nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
-		nerd-icons-ivy-rich ninja-mode show-font side-notes
-		smartparens tldr tomorrow-night-deepblue-theme
-		treesit-auto vertico wgrep-ag which-key ws-butler
-		yaml-mode ztree)))
+ '(package-selected-packages nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -17,6 +17,7 @@
 ;; pass 2, removing use-package emacs, i don't like splitting the
 ;;         customizations away from related mode settings.
 ;; pass 3, regroup and delete a lot of ideas to try comments.
+;; pass 4, simple completion configuration
 
 ;;;
 ;;; Code:
@@ -130,6 +131,10 @@
 
 (add-hook 'text-mode-hook 'visual-line-mode)
 
+  ;; Auto parenthesis matching
+  (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+
 ;; stragglers
 
 (setopt ns-auto-hide-menu-bar t)           ; this gains no space on displays with the notch
@@ -154,6 +159,7 @@
 (setopt scroll-margin 0)
 (setopt scroll-conservatively 100000)
 (setopt scroll-preserve-screen-position 1)
+(pixel-scroll-precision-mode)                         ; Smooth scrolling
 
 ;;;
 ;;; miscellany
@@ -338,7 +344,6 @@
 ;;; oddities with more complex configuration
 ;;;
 
-
 ;; 'so-long' handles long lines that are usually found in program
 ;; source code where unneeded whitespace has been removed. forcing
 ;; paragraph text direction is reported to also help by removing the
@@ -371,6 +376,81 @@
 ;;; completion
 ;;;
 
+;; bedrock and https://www.masteringemacs.org/article/understanding-minibuffer-completion
+
+(setopt enable-recursive-minibuffers t)
+(setopt completion-cycle-threshold 1)
+(setopt completions-detailed t)
+(setopt tab-always-indent 'complete)
+(setopt completion-styles '(basic initials substring)) ; might want flex?
+(setopt completion-auto-help 'always)
+(setopt completions-max-height 10)
+(setopt completions-detailed t)
+(setopt completions-format 'one-column)
+(setopt completions-group t)
+(setopt completion-auto-select 'second-tab)
+;; check help for completion-auto-select
+(setopt completion-auto-select t)
+
+(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
+
+(use-package vertico
+  :init
+  (vertico-mode))
+
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :bind (:map vertico-map
+              ("M-DEL" . vertico-directory-delete-word)))
+
+(use-package marginalia
+  :config
+  (marginalia-mode))
+
+(use-package corfu
+  :init
+  (global-corfu-mode)
+  :bind
+  (:map corfu-map
+        ("SPC" . corfu-insert-separator)
+        ("C-n" . corfu-next)
+        ("C-p" . corfu-previous)))
+
+(use-package corfu-popupinfo
+  :after corfu
+  :ensure nil
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :custom
+  (corfu-popupinfo-delay '(0.25 . 0.1))
+  (corfu-popupinfo-hide nil)
+  :config
+  (corfu-popupinfo-mode))
+
+(use-package corfu-terminal
+  :if (not (display-graphic-p))
+  :ensure t
+  :config
+  (corfu-terminal-mode))
+
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file))
+
+(use-package kind-icon
+  :if (display-graphic-p)
+  :after corfu
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+
+
+
+;;;
+;;; littering, paths not set elsewhere
+;;;
+
 
 
 ;;;
@@ -390,13 +470,167 @@
   :mode "Rakefile\\'"
   :mode "Gemfile\\'")
 
+;; language: markdown
+;;
+;; i usually just use plain text, but enough markdown is around
+;; to warrant a mode.
+
+(use-package markdown-ts-mode
+  :mode ("\\.md\\'" . markdown-ts-mode)
+  :defer t
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(markdown
+     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+     "split_parser"
+     "tree-sitter-markdown/src"))
+  (add-to-list
+   'treesit-language-source-alist
+   '(markdown-inline
+     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+     "split_parser"
+     "tree-sitter-markdown-inline/src")))
+
 
 
 ;;;
 ;;; larger programming mode packages and settings
 ;;;
 
-;; eglot, treesitter, flymake, &c., go here.
+;; treesitter is superior to pattern based modes, use it when
+;; it is available. treesit-auto can build grammars as needed.
+
+(setopt treesit-font-lock-level 4)           ; levels 1-3 are useless
+(setopt c-ts-mode-indent-offset 8)           ; turns out i like tabs, who knew?
+(setopt c-ts-mode-indent-style 'linux)
+(setopt standard-indent 8)
+
+;; some of these might require M-x treesit-install-language-grammar
+(setopt major-mode-remap-alist
+        '((yaml-mode . yaml-ts-mode)
+          (bash-mode . bash-ts-mode)
+          (js-mode . js-ts-mode)
+          (typescript-mode . typescript-ts-mode)
+          (json-mode . json-ts-mode)
+	  (c-mode . c-ts-mode)
+	  (c++-mode . c++-ts-mode)
+	  (c-or-c++-mode . c-or-c++-ts-mode)
+	  (ruby-mode . ruby-ts-mode)))
+
+(use-package treesit-auto
+  :after exec-path-from-shell
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (declare-function treeset-auto-add-to-auto-mode-alist "treesit-auto" t t)
+  (treesit-auto-add-to-auto-mode-alist
+   '(bash
+     c
+     commonlisp
+     cpp
+     go
+     html
+     java
+     javascript
+     json
+     make
+     markdown
+     org
+     python
+     ruby
+     toml
+     typescript
+     yaml))
+  (declare-function global-treesit-auto-mode "treesit-auto")
+  (global-treesit-auto-mode))
+
+;; use 'astyle' to do formatting for c. see '.astylerc'. my style is
+;; based on linux and k&r.
+
+(use-package reformatter
+  :after exec-path-from-shell)
+
+(use-package astyle
+  :after reformatter
+  :when (executable-find "astyle")
+  :diminish (astyle-on-save-mode . "as")
+  :hook
+  (c-ts-mode . astyle-on-save-mode)
+  (c++-ts-mode . astyle-on-save-mode))
+
+;; eglot for lsp support is much better than tag based solutions.
+
+(use-package eglot
+  :after exec-path-from-shell
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; i'm turning eglot on manually ;
+  ;; :hook			  ;;
+  ;; (c-ts-mode . eglot-ensure)	  ;;
+  ;; (c++-ts-mode . eglot-ensure) ;;
+  ;; (f90-mode . eglot-ensure)	  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  :bind (:map eglot-mode-map
+              ("C-c c a" . eglot-code-actions)
+              ("C-c c r" . eglot-rename))
+
+  :custom
+  ;; log size 0 disables logging effectively disables logging
+  ;; which improves performance. remove if debugging 'eglot'
+  ;; issues.
+  ;; log while getting clangd configured
+  (eglot-events-buffer-config '(:size 0 :format short))
+  (eglot-autoshutdown t)
+  (eglot-extend-to-xref t)
+  (eglot-ignored-server-capabilities '(:documentFormattingProvider
+                                       :documentRangeFormattingProvider
+                                       :documentOnTypeFormattingProvider)))
+
+;; configure 'clangd' for 'eglot' to my preferences. 'cmake' and
+;; 'compile_commands.json' are required in each project.
+
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   '((c-ts-mode c++-ts-mode)
+     . ("clangd"
+        "-j=4"))))                        ; concurrency
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; "--log=error"						 ;;
+        ;; "--background-index"						 ;;
+        ;; "--clang-tidy"                ; but i use 'astyle' to format. ;;
+        ;; "--completion-style=detailed"				 ;;
+        ;; "--pch-storage=memory"					 ;;
+        ;; "--header-insertion=never"					 ;;
+        ;; "--header-insertion-decorators=0"))))			 ;;
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 'flymake' is has been a good linter interface. 'eglot' seems to
+;; report issues from 'clang-tidy' through 'flymake'.
+
+(use-package flymake
+  :after exec-path-from-shell
+  :pin gnu
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; :hook			      ;;
+  ;; (c-ts-mode . flymake-mode)	      ;;
+  ;; (c++-ts-mode . flymake-mode)     ;;
+  ;; (emacs-lisp-mode . flymake-mode) ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  :custom (flymake-mode-line-lighter "FM")
+  :bind (:map flymake-mode-map
+	      ("M-n" . flymake-goto-next-error)
+	      ("M-p" . flymake-goto-prev-error)
+              ("C-c ! l" . flymake-show-buffer-diagnostics)
+              ("C-c ! L" . flymake-show-project-diagnostics)))
+
+;; this is needed to avoid false 'can not find/load' errors on
+;; requires that occur before this point in the source.
+
+(with-eval-after-load 'flymake
+  (setopt elisp-flymake-byte-compile-load-path load-path))
 
 
 
@@ -423,9 +657,9 @@
   :diminish
   :config
   (declare-function nerd-icons-completion-mode "nerd-icons-completion")
-  (nerd-icons-completion-mode))
-;; (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
-;; (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+  (nerd-icons-completion-mode)
+  (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
 (use-package nerd-icons-ibuffer
   :after nerd-icons
