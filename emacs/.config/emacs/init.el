@@ -13,11 +13,6 @@
 ;; i expect to periodically go through 'custom.el' and review changes
 ;; and pull them into this init if they are worth keeping.
 
-;; pass 1, reduce to a minimum usable init.
-;; pass 2, removing use-package emacs, i don't like splitting the
-;;         customizations away from related mode settings.
-;; pass 3, regroup and delete a lot of ideas to try comments.
-;; pass 4, simple completion configuration
 
 ;;;
 ;;; Code:
@@ -50,9 +45,11 @@
 (setopt load-prefer-newer t)
 (setopt use-package-always-ensure t)
 
+
 (if (and (fboundp 'native-compile-available-p)
          (native-compile-available-p))
     (setopt package-native-compile t))
+
 
 (with-eval-after-load 'package
   (defvar package-archives)
@@ -68,9 +65,15 @@
             ("melpa-stable" . 6)
             ("melpa" . 5))))
 
+
 ;; sometimes a build of emacs doesn't grab the environment correctly,
-;; especially when run from a shortcut on macos. make sure the
-;; variables that i count on are set to match my shell login.
+;; especially when run from a shortcut on macos. on the mac the
+;; application bundle has a plist that lists environment variables
+;; to copy. the only one in the current 'Info.plist' i care about
+;; is 'PATH'.
+;;
+;; therefore, always get the variables you want copied in using
+;; exec-path-from-shell.
 
 (use-package exec-path-from-shell
   :config
@@ -80,6 +83,7 @@
    exec-path-from-shell-copy-envs "exec-path-from-shell")
 
   (exec-path-from-shell-initialize)
+
   (exec-path-from-shell-copy-envs
    '("LIBRARY_PATH"
      "INFOPATH"
@@ -93,9 +97,33 @@
 ;;; sane defaults and establish some paths.
 ;;;
 
+;; no-littering should come as early as possible. as this is a single user
+;; emacs, i'm not feeling a need for lockfiles. it is possible to configure
+;; no-littering by changing the user-emacs-directory, but i'm not doing
+;; that yet. there is a full migration guide but let's just run like this
+;; for now to see what it does.
+;;
+;; https://github.com/emacscollective/no-littering/blob/main/migrate.org
+
+(use-package no-littering
+  :init
+  (require 'recentf)
+  (require 'no-littering)
+  (setopt make-backup-files nil)
+  (setopt auto-save-default nil)
+  (setopt create-lockfiles nil)
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory))
+
+
+;; this is usually empty.
+
 (add-to-list
  'load-path
  (concat user-emacs-directory "troi-lisp"))
+
+
+;; not a dashboard.
 
 (if (file-exists-p
      (concat user-emacs-directory
@@ -107,6 +135,7 @@
       (set-buffer-modified-p nil))
   (setopt initial-scratch-message ";; nothing to see here, move along"))
 
+
 ;;;
 ;;; visuals
 ;;;
@@ -117,22 +146,31 @@
 (when scroll-bar-mode
   (scroll-bar-mode -1))
 
+
 (column-number-mode)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (setopt display-line-numbers-width 4)
 (setopt mode-line-position-column-line-format '(" (%l,%C)")) ; %C based 1, %c based 0
 
+;; display function name in mode line
+
 (add-hook 'prog-mode-hook 'which-function-mode)
+
+
+;; hilight cursor line
 
 (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
   (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+
 
 ;; visual line mode is ok for text, use (truncate-lines t) for code.
 
 (add-hook 'text-mode-hook 'visual-line-mode)
 
-  ;; Auto parenthesis matching
-  (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+;; Auto parenthesis matching
+
+(add-hook 'prog-mode-hook 'electric-pair-mode)
 
 
 ;; stragglers
@@ -143,6 +181,7 @@
 (setopt blink-matching-delay 0.1)
 (setopt standard-indent 8)
 
+
 ;;;
 ;;; metadata
 ;;;
@@ -152,14 +191,16 @@
 (setopt auth-sources '("~/.authinfo.gpg"))
 (setopt auth-source-cache-expiry nil)
 
+
 ;;;
-;;; nice scrolling
+;;; nicer scrolling
 ;;;
 
 (setopt scroll-margin 0)
 (setopt scroll-conservatively 100000)
 (setopt scroll-preserve-screen-position 1)
 (pixel-scroll-precision-mode)                         ; Smooth scrolling
+
 
 ;;;
 ;;; miscellany
@@ -185,9 +226,13 @@
 
 (setopt confirm-kill-emacs 'y-or-n-p)
 
+
 ;;;
 ;;; restore useful but hidden commands
 ;;;
+
+;; 'put' is used because these are properties of the function
+;; name symbol.
 
 (put 'scroll-left 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
@@ -202,33 +247,46 @@
 ;;; global (re)keybinds
 ;;;
 
+;; grouping keybindings with their associated 'use-package' or
+;; 'require' makes a lot of sense, but some global bindings exist.
+;; most of the following are remappings to change the behavior of a
+;; key. for example, C-s will 'isearch-forward-regexp' instead of the
+;; usual 'isearch-forward'
+
+
 ;; this makes TAB in the minibuffer behave more like it does in a
 ;; shell.
 
 (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
 
-;; use s-q to close emacs if i don't want to M-x save-buffers-kill-emacs.
+
+;; on the mac s-q is the command-Q equivalent. use it to close
+;; emacs when not using M-x 'save-buffers-kill-emacs'.
 
 (global-unset-key (kbd "C-x C-c"))
 
-;; the number of times i want a the list instead of the mode is zero.
+
+;; the number of times i want the list instead of the smarter
+;; ui mode is zero.
 
 (global-set-key (kbd "C-x C-d") 'dired)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+
 
 ;; default search to regexp instead of string.
 
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
-;; movementish things
 
-;; ace-window should handle this now
-;; (global-set-key (kbd "M-o") 'other-window)
+;;;
+;;; movementish things
+;;;
 
 ;; to not through!
 
 (global-set-key "\M-z" 'zap-up-to-char)
+
 
 ;; 'dot-mode' brings the vim '.' to emacs. this has a keybind of
 ;; C-M-. which conflicts with xref-find-apropos.
@@ -239,7 +297,10 @@
   (declare-function global-dot-mode "dot-mode")
   (global-dot-mode t))
 
-;; jumping
+
+;;;
+;;; jumping
+;;;
 
 (use-package avy
   :demand t
@@ -266,7 +327,7 @@
 
 (use-package which-key
   :diminish
-  :init (which-key-mode))
+  :config (which-key-mode))
 
 (use-package ws-butler
   :diminish
@@ -298,7 +359,9 @@
 
 (use-package form-feed-st
   :diminish
-  :hook (prog-mode . form-feed-st-mode) (text-mode . form-feed-st-mode))
+  :hook
+  (prog-mode . form-feed-st-mode)
+  (text-mode . form-feed-st-mode))
 
 
 
@@ -306,8 +369,10 @@
 ;;; built ins that need more configuration
 ;;;
 
-;; for dired, use 'gls' if it's available. the 'ls' in macos and some
-;; other systems doesn't support all the options that 'dired' wants.
+
+;; for dired, use 'gls' if it's available. the default 'ls' in macos
+;; and some other systems doesn't support all the options that 'dired'
+;; wants.
 
 (use-package dired
   :after exec-path-from-shell
@@ -324,6 +389,7 @@
     (setopt dired-kill-when-opening-new-dired-buffer t)
     (setopt dired-auto-revert-buffer t)
     (setopt dired-do-revert-buffer t)))
+
 
 ;; documentation with 'info' and 'eldoc'. for some reason i'm missing
 ;; system info from homebrew. i should probably move this into my
@@ -344,16 +410,18 @@
 ;;; oddities with more complex configuration
 ;;;
 
+
 ;; 'so-long' handles long lines that are usually found in program
 ;; source code where unneeded whitespace has been removed. forcing
 ;; paragraph text direction is reported to also help by removing the
-;; checks and scans done for right to left languages.
+;; checks and scans for right to left languages.
 
 (use-package so-long
   :config
   (global-so-long-mode)
   :custom
   (bidi-paragraph-direction 'left-to-right))
+
 
 ;; 'imenu-list' puts 'imenu' in a sidebar.
 
@@ -363,6 +431,7 @@
   :custom
   (imenu-list-focus-after-activation t)
   (imenu-list-auto-resize t))
+
 
 ;; 'dumb-jump' is a dwim for 'xref'.
 
@@ -376,7 +445,11 @@
 ;;; completion
 ;;;
 
-;; bedrock and https://www.masteringemacs.org/article/understanding-minibuffer-completion
+
+;; see bedrock and https://www.masteringemacs.org/article/understanding-minibuffer-completion
+
+
+;; miscellaneous options
 
 (setopt enable-recursive-minibuffers t)
 (setopt completion-cycle-threshold 1)
@@ -392,7 +465,8 @@
 ;; check help for completion-auto-select
 (setopt completion-auto-select t)
 
-(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
+
+;; vertical interactive completion
 
 (use-package vertico
   :init
@@ -404,9 +478,15 @@
   :bind (:map vertico-map
               ("M-DEL" . vertico-directory-delete-word)))
 
+
+;; add descriptive notes 'in the margin' of various lists/uis.
+
 (use-package marginalia
   :config
   (marginalia-mode))
+
+
+;; completion in region functions
 
 (use-package corfu
   :init
@@ -433,10 +513,16 @@
   :config
   (corfu-terminal-mode))
 
+
+;; completion at point extensions
+
 (use-package cape
   :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
+
+
+;; add kind of item icons to marginalia notes (folder, file, etc).
 
 (use-package kind-icon
   :if (display-graphic-p)
@@ -444,20 +530,12 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-
 
 
 ;;;
-;;; littering, paths not set elsewhere
+;;; programming modes and supporting packages that require
+;;; no or light configuration.
 ;;;
-
-
-
-;;;
-;;; simple configuration programming modes and supporting packages
-;;;
-
-;; magit, i can't escape it forever
 
 (use-package magit)
 
@@ -469,11 +547,6 @@
   :mode "\\.rb\\'"
   :mode "Rakefile\\'"
   :mode "Gemfile\\'")
-
-;; language: markdown
-;;
-;; i usually just use plain text, but enough markdown is around
-;; to warrant a mode.
 
 (use-package markdown-ts-mode
   :mode ("\\.md\\'" . markdown-ts-mode)
@@ -495,16 +568,17 @@
 
 
 ;;;
-;;; larger programming mode packages and settings
+;;; programming mode packages that require more complex configuration.
 ;;;
 
-;; treesitter is superior to pattern based modes, use it when
-;; it is available. treesit-auto can build grammars as needed.
+;; treesitter is superior to pattern based modes, use it when it is
+;; available. use treesit-auto to build grammars when needed.
 
 (setopt treesit-font-lock-level 4)           ; levels 1-3 are useless
 (setopt c-ts-mode-indent-offset 8)           ; turns out i like tabs, who knew?
 (setopt c-ts-mode-indent-style 'linux)
 (setopt standard-indent 8)
+
 
 ;; some of these might require M-x treesit-install-language-grammar
 (setopt major-mode-remap-alist
@@ -517,6 +591,7 @@
 	  (c++-mode . c++-ts-mode)
 	  (c-or-c++-mode . c-or-c++-ts-mode)
 	  (ruby-mode . ruby-ts-mode)))
+
 
 (use-package treesit-auto
   :after exec-path-from-shell
@@ -545,6 +620,7 @@
   (declare-function global-treesit-auto-mode "treesit-auto")
   (global-treesit-auto-mode))
 
+
 ;; use 'astyle' to do formatting for c. see '.astylerc'. my style is
 ;; based on linux and k&r.
 
@@ -558,6 +634,7 @@
   :hook
   (c-ts-mode . astyle-on-save-mode)
   (c++-ts-mode . astyle-on-save-mode))
+
 
 ;; eglot for lsp support is much better than tag based solutions.
 
@@ -588,8 +665,10 @@
                                        :documentRangeFormattingProvider
                                        :documentOnTypeFormattingProvider)))
 
-;; configure 'clangd' for 'eglot' to my preferences. 'cmake' and
-;; 'compile_commands.json' are required in each project.
+
+;; configure the 'clangd' language server to my preferences. 'clangd'
+;; will need 'CMakeLists.txt' and 'compile_commands.json' in each
+;; project's root directory.
 
 (with-eval-after-load 'eglot
   (add-to-list
@@ -607,8 +686,9 @@
         ;; "--header-insertion-decorators=0"))))			 ;;
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; 'flymake' is has been a good linter interface. 'eglot' seems to
-;; report issues from 'clang-tidy' through 'flymake'.
+
+;; 'flymake' has been a good linter interface. 'eglot' seems to report
+;; issues from 'clang-tidy' through 'flymake'.
 
 (use-package flymake
   :after exec-path-from-shell
@@ -665,6 +745,7 @@
   :after nerd-icons
   :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
 
 
 ;;;
@@ -672,8 +753,9 @@
 ;;;
 
 ;;;
-;;; minimalism resisting the weight of org-mode
+;;; resisting the weight of 'org-mode' with 'deft' and 'side-notes'.
 ;;;
+
 
 ;; i know the intelligentsia all use 'org', but i don't. 'org' invites
 ;; too much fiddling. 'deft' provides a lightweight solution that
@@ -689,6 +771,7 @@
           (assoc-default deft-text-mode '((markdown-mode . "md") (rst-mode . "rst"))
 			 'eq "txt")))
 
+
 ;; 'side-notes' lets you have notes files in any project or directory.
 ;; the notes are opened in a side window like 'imenu-list'. searching
 ;; for the notes files are done backward up the the directory path
@@ -702,12 +785,15 @@
   (side-notes-secondary-file "~/general-side-notes.txt"))
 
 
+
 ;;;
 ;;; functions
 ;;;
 
 ;; collecting most function definitions here. i prefix my functions
-;; as troi/.
+;; as troi/. they could be stored in files in 'troi-lisp/' but i
+;; prefer them here.
+
 
 ;; this is not mine, i stole from tess o'connor's config.
 ;; C-l a few times also moves the line to the top.
@@ -720,16 +806,19 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 
 (global-set-key (kbd "C-c c") 'troi/clear)
 
-;; backups are a pain in the ass. sure, they are needed but let's
-;; segregate them by collecting them in one place
 
-(defun troi/backup-file-name (fpath)
-  "Return a new file path of FPATH, creating directories if needed."
-  (let* ((backup-root-dir "~/.tmp/emacs-backup/")
-         (backup-file-path (replace-regexp-in-string "//" "/" (concat backup-root-dir fpath "~") )))
-    (make-directory (file-name-directory backup-file-path) (file-name-directory backup-file-path))
-    backup-file-path))
-(setopt make-backup-file-name-function 'troi/backup-file-name)
+;; backups turned off ... trying 'no-littering'
+;; ;; backups are a pain in the ass. sure, they are needed but let's
+;; ;; segregate them by collecting them in one place
+;;
+;; (defun troi/backup-file-name (fpath)
+;;   "Return a new file path of FPATH, creating directories if needed."
+;;   (let* ((backup-root-dir "~/.tmp/emacs-backup/")
+;;          (backup-file-path (replace-regexp-in-string "//" "/" (concat backup-root-dir fpath "~") )))
+;;     (make-directory (file-name-directory backup-file-path) (file-name-directory backup-file-path))
+;;     backup-file-path))
+;; (setopt make-backup-file-name-function 'troi/backup-file-name)
+
 
 ;; from a multi-window frame, tear off the current window and
 ;; put it in a new frame. this only works if there are multiple
@@ -806,13 +895,13 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 
 ;; mac keyboards and keybinds:
 ;;
-;; in addition to changing caps lock to control, a standard (non mac)
-;; keyboard has on the bottom row:
+;; in addition to changing caps lock to control, a standard keyboard
+;; has on the bottom row:
 ;;
-;; fn control os alt |spacebar| alt(gr) os menu control
+;; fn control os alt spacebar alt(gr) os menu control
 ;;
-;; using karbiner i've remapped the bottom row and removed the
-;; need for the 'ns-*-modifier' remappings.
+;; using karbiner i've remapped the bottom row to remove the need for
+;; 'ns-*-modifier' remappings.
 ;;
 ;; fn       -> control
 ;; control  -> fn
