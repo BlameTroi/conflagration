@@ -5,18 +5,15 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-window astyle beacon cape cmake-mode cobol-mode corfu-terminal
-		deft diminish dot-mode dumb-jump exec-path-from-shell
-		flymake-guile form-feed-st free-keys geiser-guile
-		gnuplot gnuplot-mode imenu-list inf-ruby json-mode
-		kind-icon magit-file-icons magit-filenotify
-		magit-todos marginalia markdown-ts-mode
-		nerd-icons-completion nerd-icons-corfu
-		nerd-icons-dired nerd-icons-ibuffer
-		nerd-icons-ivy-rich ninja-mode no-littering show-font
-		side-notes smartparens tldr
-		tomorrow-night-deepblue-theme treesit-auto vertico
-		wgrep-ag which-key ws-butler yaml-mode ztree)))
+   '(ace-window astyle cape cmake-mode cobol-mode corfu-terminal deft
+		diminish dot-mode dumb-jump exec-path-from-shell
+		flymake-guile form-feed-st free-keys imenu-list
+		inf-ruby json-mode kind-icon magit-file-icons
+		marginalia markdown-ts-mode nerd-icons-completion
+		nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
+		nerd-icons-ivy-rich ninja-mode no-littering side-notes
+		smartparens tomorrow-night-deepblue-theme treesit-auto
+		vertico which-key ws-butler yaml-mode ztree)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

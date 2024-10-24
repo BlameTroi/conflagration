@@ -38,36 +38,6 @@
 ;;'(font-lock-comment-face ((t (:foreground "#005500" :slant oblique))))
 
 
-;;(use-package nano-theme
-;;  :config
-;;  (load-theme 'nano-light t))
-;;)
-
-;; icons and nerdish fonts. i was using all-the-icons but i find
-;; the nerd-xxx sets better.
-
-;; have not added corfu yet
-(when (display-graphic-p)
-  (global-prettify-symbols-mode t)
-  (use-package nerd-icons
-    :custom
-    (nerd-icons-font-family "Symbols Nerd Font Mono"))
-  (use-package nerd-icons-dired
-    :diminish
-    :after nerd-icons
-    :hook
-    (dired-mode . nerd-icons-dired-mode))
-  (use-package nerd-icons-ibuffer
-    :diminish
-    :after nerd-icons
-    :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
-  (use-package nerd-icons-completion
-    :after marginalia
-    :config
-    (nerd-icons-completion-mode)
-    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
-  )
-
 ;; faces -- text size and font selection.
 
 ;; TODO currently using the custom-set-face functions, but this needs
@@ -89,38 +59,5 @@
 ;; TODO: the above is the only way i can get acme-theme to show the highlight
 ;; line distinctly. changes in the theme file itself aren't taking. i opted to
 ;; make comments oblique as well.
-
-
-;; giving rainbow delimiters a try again. there is no global mode for
-;; this anymore, so it needs to be hooked to the programming modes.
-;; if doing it for all programming modes is causing problems, yank
-;; the hook here and use more specific hooks elsewhere.
-;; TODO: this is not very distinct with the acme theme.
-
-;; (use-package rainbow-delimiters
-;;   :defer t
-;;   :hook (prog-mode rainbow-delimiter-mode))
-
-
-;; hl-todo has a problem with the acme theme, it isn't distinct from
-;; a marked region. i've fixed that in customization but that needs to be
-;; extracted and done properly. TODO see the custom-set-faces earlier in
-;; this file.
-;;
-;; '(font-lock-comment-face ((t (:foreground "#005500" :slant oblique))))
-;;  '(hl-line ((t (:inherit highlight :extend t :background "LightGoldenrod2" :foreground "black"))))
-;;
-;; define colors for TODO keywords and get the keywords
-;; squared away to my preferences.
-
-(use-package hl-todo
-  :defer t
-  :hook (prog-mode . hl-todo-mode)
-  :bind (:map hl-todo-mode-map
-              ("C-c tp" . hl-todo-previous)
-              ("C-c tn" . hl-todo-next)
-              ("C-c to" . hl-todo-occur)
-              ("C-c ti" . hl-todo-insert)))
-
 
 ;; colorful.el ends here

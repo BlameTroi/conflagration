@@ -370,6 +370,13 @@
 ;;;
 
 
+;; in case i don't want .git to mark.
+
+(use-package project
+  :custom
+  (project-vc-extra-root-markers '(".projectile" ".project.el" "fpm.toml")))
+
+
 ;; for dired, use 'gls' if it's available. the default 'ls' in macos
 ;; and some other systems doesn't support all the options that 'dired'
 ;; wants.
@@ -653,13 +660,16 @@
               ("C-c c a" . eglot-code-actions)
               ("C-c c r" . eglot-rename))
 
+  ;; if debugging 'eglot' issues, comment out the fset
+  ;; and events-buffer-config lines.
+
+  :config
+  (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
+
   :custom
-  ;; log size 0 disables logging effectively disables logging
-  ;; which improves performance. remove if debugging 'eglot'
-  ;; issues.
-  ;; log while getting clangd configured
   (eglot-events-buffer-config '(:size 0 :format short))
   (eglot-autoshutdown t)
+  (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
   (eglot-ignored-server-capabilities '(:documentFormattingProvider
                                        :documentRangeFormattingProvider
