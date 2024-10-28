@@ -89,6 +89,8 @@
      "INFOPATH"
      "CPATH"
      "MANPATH"
+     "MallocNanoZone"
+     "CMAKE_GENERATOR"
      "CDPATH")))
 
 
@@ -139,6 +141,10 @@
 ;;;
 ;;; visuals
 ;;;
+
+;; ??? probably don't need these two lines.
+;; (set-language-environment "UTF-8")
+;; (set-default-coding-systems 'utf-8)
 
 (when (display-graphic-p)
   (context-menu-mode))
@@ -537,6 +543,15 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
+
+;; let's try orderless again
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
 
 
 ;;;
@@ -586,6 +601,9 @@
 (setopt c-ts-mode-indent-style 'linux)
 (setopt standard-indent 8)
 
+;; C-c C-c for comment region is redundant with M-;
+(require 'c-ts-mode)
+(keymap-unset c-ts-base-mode-map "C-c C-c")
 
 ;; some of these might require M-x treesit-install-language-grammar
 (setopt major-mode-remap-alist
@@ -685,7 +703,10 @@
    'eglot-server-programs
    '((c-ts-mode c++-ts-mode)
      . ("clangd"
-        "-j=4"))))                        ; concurrency
+        "-j=4"                   ; async index threads
+	"--log=error"            ; shorter logging
+	"--pch-storage=memory"   ; i have plenty
+	"--enable-config"))))    ; more detailed
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;; "--log=error"						 ;;
         ;; "--background-index"						 ;;

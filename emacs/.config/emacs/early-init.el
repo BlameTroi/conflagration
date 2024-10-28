@@ -68,8 +68,12 @@
 ;; but then moves the frame to it's own desktop or space or whatever
 ;; the really fullscreen mode is called on macos.
 
-(setq frame-resize-pixelwise t)
-(setq default-frame-alist '((fullscreen . fullboth)
+(setopt frame-resize-pixelwise t)
+(setopt window-resize-pixelwise t)
+(setopt initial-frame-alist '((fullscreen . fullboth)
+			    (ns-appearance . dark)
+			    (ns-transparent-titlebar . t)))
+(setopt default-frame-alist '((fullscreen . fullboth)
                             (ns-appearance . dark)
                             (ns-transparent-titlebar . t)))
 

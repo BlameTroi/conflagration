@@ -137,6 +137,7 @@ general-side-notes.txt
 literate-config.el
 
 # remove emacs runtime transient stuff
+**/emacs/var/**
 **/emacs/.cache/**
 **/emacs/eln-cache/**
 **/emacs/elpa/**
