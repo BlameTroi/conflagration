@@ -1,4 +1,4 @@
-;;; early-init.el --- troy brumley's early-init  -*- lexical-binding: t -*-
+;;; early-init.el --- troy brumley's early-init  -*- no-byte-compile: t; lexical-binding: t; -*-
 
 ;;; Commentary:
 

@@ -11,5 +11,3 @@
 
 ;; currently the customization interface is live and changes are loaded
 ;; at the end of 'init.el'.
-
-

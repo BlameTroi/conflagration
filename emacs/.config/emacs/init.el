@@ -1,4 +1,4 @@
-;;; init.el --- troy brumley's init.el -*- lexical-binding: t -*-
+;;; init.el --- troy brumley's init.el -*- no-byte-compile: t; lexical-binding: t; -*-
 
 ;;;
 ;;; Commentary:
@@ -369,6 +369,23 @@
   (prog-mode . form-feed-st-mode)
   (text-mode . form-feed-st-mode))
 
+;; tried it but global isn't global?
+;; global for included modes, that's a customization i don't want to
+;; do. back to form-feed-st.
+;; (use-package page-break-lines
+;;   :diminish
+;;   :config
+;;   (global-page-break-lines-mode))
+
+;; no touchpad
+
+(use-package disable-mouse
+  :config
+  (global-disable-mouse-mode)
+  :custom
+  (disable-mouse-mode-lighter "")
+  (global-disable-mouse-mode-lighter ""))
+
 
 
 ;;;
@@ -468,7 +485,7 @@
 (setopt completion-cycle-threshold 1)
 (setopt completions-detailed t)
 (setopt tab-always-indent 'complete)
-(setopt completion-styles '(basic initials substring)) ; might want flex?
+(setopt completion-styles '(prescient)) ; basic initials substring)) ; might want flex?
 (setopt completion-auto-help 'always)
 (setopt completions-max-height 10)
 (setopt completions-detailed t)
@@ -502,13 +519,31 @@
 ;; completion in region functions
 
 (use-package corfu
-  :init
-  (global-corfu-mode)
+  :ensure t
+  :defer t
+  :commands
+  (corfu-mode global-corfu-mode)
+
   :bind
   (:map corfu-map
         ("SPC" . corfu-insert-separator)
         ("C-n" . corfu-next)
-        ("C-p" . corfu-previous)))
+        ("C-p" . corfu-previous))
+
+  :hook ((prog-mode . corfu-mode)
+         (shell-mode . corfu-mode)
+         (eshell-mode . corfu-mode))
+
+  ;; :custom
+  ;; hide commands in m-x which do not apply to the current mode.
+  ;; (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; disable ispell completion function. as an alternative try `cape-dict'.
+  ;; (text-mode-ispell-word-completion nil)
+  ;; (tab-always-indent 'complete)
+
+  ;; Enable Corfu
+  :config
+  (global-corfu-mode))
 
 (use-package corfu-popupinfo
   :after corfu
@@ -546,11 +581,27 @@
 
 ;; let's try orderless again
 
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+;; (use-package orderless
+;;   :ensure t
+;;   :custom
+;;   (completion-styles '(orderless basic))
+;;   (completion-category-overrides '((file (styles basic partial-completion)))))
+
+;; and now let's try prescient
+
+(use-package prescient
+  :config
+  (prescient-persist-mode))
+(use-package corfu-prescient
+  :after corfu
+  :after prescient
+  :config
+  (corfu-prescient-mode))
+(use-package vertico-prescient
+  :after vertico
+  :after prescient
+  (vertico-prescient-mode))
+
 
 
 
@@ -560,6 +611,10 @@
 ;;;
 
 (use-package magit)
+
+(use-package diff-hl
+  :config
+  (global-diff-hl-mode))
 
 (use-package cmake-mode)
 
@@ -586,6 +641,21 @@
      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
      "split_parser"
      "tree-sitter-markdown-inline/src")))
+
+(use-package hl-todo
+  :hook
+  (prog-mode . hl-todo-mode)
+  (text-mode . hl-todo-mode)
+  :custom
+  (hl-todo-require-punctuation t)
+  (hl-todo-highlight-punctuation ":")
+  ;; these are recommended commands and bindings, need to check
+  ;; for conflicts and use-packagify
+  ;; (keymap-set hl-todo-mode-map "C-c p" #'hl-todo-previous)
+  ;; (keymap-set hl-todo-mode-map "C-c n" #'hl-todo-next)
+  ;; (keymap-set hl-todo-mode-map "C-c o" #'hl-todo-occur)
+  ;; (keymap-set hl-todo-mode-map "C-c i" #'hl-todo-insert)
+  )
 
 
 
@@ -666,15 +736,18 @@
 (use-package eglot
   :after exec-path-from-shell
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; i'm turning eglot on manually ;
-  ;; :hook			  ;;
-  ;; (c-ts-mode . eglot-ensure)	  ;;
-  ;; (c++-ts-mode . eglot-ensure) ;;
-  ;; (f90-mode . eglot-ensure)	  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  :commands (eglot
+             eglot-rename
+             eglot-ensure
+             eglot-rename
+             eglot-format-buffer)
+
+  :hook
+  (c-ts-mode . eglot-ensure)
+  (c++-ts-mode . eglot-ensure)
 
   :bind (:map eglot-mode-map
+	      ;;("C-c t" . troi/clear)
               ("C-c c a" . eglot-code-actions)
               ("C-c c r" . eglot-rename))
 
@@ -683,16 +756,16 @@
 
   :config
   (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
-
+  (setopt jsonrpc-event-hook nil)
   :custom
   (eglot-events-buffer-config '(:size 0 :format short))
   (eglot-autoshutdown t)
   (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
+  (eglot-report-progress nil)  ; Prevent minibuffer spam
   (eglot-ignored-server-capabilities '(:documentFormattingProvider
                                        :documentRangeFormattingProvider
                                        :documentOnTypeFormattingProvider)))
-
 
 ;; configure the 'clangd' language server to my preferences. 'clangd'
 ;; will need 'CMakeLists.txt' and 'compile_commands.json' in each
@@ -835,7 +908,7 @@ With PREFIX, move the line containing point to line PREFIX of the window."
   (interactive "P")
   (recenter (or prefix 0)))
 
-(global-set-key (kbd "C-c c") 'troi/clear)
+(global-set-key (kbd "C-c t") 'troi/clear)
 
 
 ;; backups turned off ... trying 'no-littering'
@@ -895,23 +968,23 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;; feelings about drag-the-scrollbar mouse scrolling, but i don't like
 ;; the mouse wheel in text editing.
 
-(add-to-list
- 'emacs-startup-hook
- (lambda ()
-   (global-set-key [wheel-up] 'ignore)
-   (global-set-key [double-wheel-up] 'ignore)
-   (global-set-key [triple-wheel-up] 'ignore)
-   (global-set-key [wheel-down] 'ignore)
-   (global-set-key [double-wheel-down] 'ignore)
-   (global-set-key [triple-wheel-down] 'ignore)
-   (global-set-key [wheel-left] 'ignore)
-   (global-set-key [double-wheel-left] 'ignore)
-   (global-set-key [triple-wheel-left] 'ignore)
-   (global-set-key [wheel-right] 'ignore)
-   (global-set-key [double-wheel-right] 'ignore)
-   (global-set-key [triple-wheel-right] 'ignore)
-   (mouse-wheel-mode -1)
-   (message "trackpad stuff set to ignore")))
+;; (add-to-list
+;;  'emacs-startup-hook
+;;  (lambda ()
+;;    (global-set-key [wheel-up] 'ignore)
+;;    (global-set-key [double-wheel-up] 'ignore)
+;;    (global-set-key [triple-wheel-up] 'ignore)
+;;    (global-set-key [wheel-down] 'ignore)
+;;    (global-set-key [double-wheel-down] 'ignore)
+;;    (global-set-key [triple-wheel-down] 'ignore)
+;;    (global-set-key [wheel-left] 'ignore)
+;;    (global-set-key [double-wheel-left] 'ignore)
+;;    (global-set-key [triple-wheel-left] 'ignore)
+;;    (global-set-key [wheel-right] 'ignore)
+;;    (global-set-key [double-wheel-right] 'ignore)
+;;    (global-set-key [triple-wheel-right] 'ignore)
+;;    (mouse-wheel-mode -1)
+;;    (message "trackpad stuff set to ignore")))
 
 
 ;; i keep brushing and confusing my touchpad. this moves the mouse out
