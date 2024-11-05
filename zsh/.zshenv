@@ -92,7 +92,7 @@ export CMAKE_GENERATOR="Ninja Multi-Config"
 # directories specified here.
 
 typeset -U CDPATH
-export cdpath=(~ ~/projects . $cdpath[@])
+export cdpath=(. ~/projects ~ $cdpath[@])
 #export CDPATH=.:~/projects:~
 
 

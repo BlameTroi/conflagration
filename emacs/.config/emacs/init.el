@@ -81,9 +81,7 @@
    exec-path-from-shell-initialize "exec-path-from-shell" ())
   (declare-function
    exec-path-from-shell-copy-envs "exec-path-from-shell")
-
   (exec-path-from-shell-initialize)
-
   (exec-path-from-shell-copy-envs
    '("LIBRARY_PATH"
      "INFOPATH"
@@ -141,6 +139,13 @@
 ;;;
 ;;; visuals
 ;;;
+
+;; pulling out of custom.el to control here:
+
+(set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 190)
+(set-face-attribute 'fixed-pitch nil :font "FiraCode Nerd Font Mono" :height 190)
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 230 :weight 'medium)
+
 
 ;; ??? probably don't need these two lines.
 ;; (set-language-environment "UTF-8")
@@ -265,6 +270,10 @@
 
 (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
 
+;; Make ESC quit prompts
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 
 ;; on the mac s-q is the command-Q equivalent. use it to close
 ;; emacs when not using M-x 'save-buffers-kill-emacs'.
@@ -369,22 +378,15 @@
   (prog-mode . form-feed-st-mode)
   (text-mode . form-feed-st-mode))
 
-;; tried it but global isn't global?
-;; global for included modes, that's a customization i don't want to
-;; do. back to form-feed-st.
-;; (use-package page-break-lines
-;;   :diminish
-;;   :config
-;;   (global-page-break-lines-mode))
 
 ;; no touchpad
-
-(use-package disable-mouse
-  :config
-  (global-disable-mouse-mode)
-  :custom
-  (disable-mouse-mode-lighter "")
-  (global-disable-mouse-mode-lighter ""))
+;; this causes problems if you want to use the system menu bar
+;; (use-package disable-mouse
+;;   :config
+;;   (global-disable-mouse-mode)
+;;   :custom
+;;   (disable-mouse-mode-lighter "")
+;;   (global-disable-mouse-mode-lighter ""))
 
 
 
@@ -519,8 +521,6 @@
 ;; completion in region functions
 
 (use-package corfu
-  :ensure t
-  :defer t
   :commands
   (corfu-mode global-corfu-mode)
 
@@ -557,7 +557,6 @@
 
 (use-package corfu-terminal
   :if (not (display-graphic-p))
-  :ensure t
   :config
   (corfu-terminal-mode))
 
@@ -602,13 +601,47 @@
   :after prescient
   (vertico-prescient-mode))
 
+
 
+;;;
+;;; templating via yasnippet
+;;;
+
+;; yasnippet -capf -classic-snippets -snippets yatemplate license-snippets gitignore-snippets
+
+(use-package git-modes)
+
+(use-package yasnippet-snippets)
+
+(use-package yasnippet-classic-snippets)
+
+(use-package license-snippets)
+
+(use-package gitignore-snippets)
+
+(use-package yasnippet
+  :ensure t
+  :hook ((text-mode
+          prog-mode
+	  conf-mode
+	  gitignore-mode
+          snippet-mode) . yas-minor-mode-on))
+  ;; :init
+  ;; (setq yas-snippet-dir "~/.emacs.d/snippets"))
+
+
+(use-package yasnippet-capf
+  :after yasnippet
+  :config
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
 
 ;;;
 ;;; programming modes and supporting packages that require
 ;;; no or light configuration.
 ;;;
+
+(use-package git-modes)
 
 (use-package magit)
 
@@ -627,7 +660,6 @@
 
 (use-package markdown-ts-mode
   :mode ("\\.md\\'" . markdown-ts-mode)
-  :defer t
   :config
   (add-to-list
    'treesit-language-source-alist
@@ -663,6 +695,7 @@
 ;;; programming mode packages that require more complex configuration.
 ;;;
 
+
 ;; treesitter is superior to pattern based modes, use it when it is
 ;; available. use treesit-auto to build grammars when needed.
 
@@ -671,11 +704,27 @@
 (setopt c-ts-mode-indent-style 'linux)
 (setopt standard-indent 8)
 
+
+;; auto-hide hides function bodies in some programming modes.
+;; my fork includes c-ts-mode, a one liner in spirit.
+
+(use-package auto-hide
+ :vc
+ (auto-hide :url "https://github.com/BlameTroi/auto-hide.el"
+            :branch "main")
+ :hook (c-ts-mode . hs-minor-mode)
+ :config
+ (global-auto-hide-mode))
+
+
 ;; C-c C-c for comment region is redundant with M-;
+
 (require 'c-ts-mode)
 (keymap-unset c-ts-base-mode-map "C-c C-c")
 
+
 ;; some of these might require M-x treesit-install-language-grammar
+
 (setopt major-mode-remap-alist
         '((yaml-mode . yaml-ts-mode)
           (bash-mode . bash-ts-mode)
@@ -757,6 +806,7 @@
   :config
   (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
   (setopt jsonrpc-event-hook nil)
+
   :custom
   (eglot-events-buffer-config '(:size 0 :format short))
   (eglot-autoshutdown t)
@@ -796,7 +846,6 @@
 
 (use-package flymake
   :after exec-path-from-shell
-  :pin gnu
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; :hook			      ;;
   ;; (c-ts-mode . flymake-mode)	      ;;
@@ -850,6 +899,10 @@
   :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
+(use-package hide-mode-line
+  :bind
+  ("C-c C-h" . hide-mode-line-mode))
+
 
 
 ;;;
@@ -866,7 +919,6 @@
 ;; provides the indexing and access i want.
 
 (use-package deft
-  :defer t
   :config
   (setopt deft-directory
 	  (expand-file-name "~/Notepad"))
@@ -968,23 +1020,23 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 ;; feelings about drag-the-scrollbar mouse scrolling, but i don't like
 ;; the mouse wheel in text editing.
 
-;; (add-to-list
-;;  'emacs-startup-hook
-;;  (lambda ()
-;;    (global-set-key [wheel-up] 'ignore)
-;;    (global-set-key [double-wheel-up] 'ignore)
-;;    (global-set-key [triple-wheel-up] 'ignore)
-;;    (global-set-key [wheel-down] 'ignore)
-;;    (global-set-key [double-wheel-down] 'ignore)
-;;    (global-set-key [triple-wheel-down] 'ignore)
-;;    (global-set-key [wheel-left] 'ignore)
-;;    (global-set-key [double-wheel-left] 'ignore)
-;;    (global-set-key [triple-wheel-left] 'ignore)
-;;    (global-set-key [wheel-right] 'ignore)
-;;    (global-set-key [double-wheel-right] 'ignore)
-;;    (global-set-key [triple-wheel-right] 'ignore)
-;;    (mouse-wheel-mode -1)
-;;    (message "trackpad stuff set to ignore")))
+(add-to-list
+ 'emacs-startup-hook
+ (lambda ()
+   (global-set-key [wheel-up] 'ignore)
+   (global-set-key [double-wheel-up] 'ignore)
+   (global-set-key [triple-wheel-up] 'ignore)
+   (global-set-key [wheel-down] 'ignore)
+   (global-set-key [double-wheel-down] 'ignore)
+   (global-set-key [triple-wheel-down] 'ignore)
+   (global-set-key [wheel-left] 'ignore)
+   (global-set-key [double-wheel-left] 'ignore)
+   (global-set-key [triple-wheel-left] 'ignore)
+   (global-set-key [wheel-right] 'ignore)
+   (global-set-key [double-wheel-right] 'ignore)
+   (global-set-key [triple-wheel-right] 'ignore)
+   (mouse-wheel-mode -1)
+   (message "trackpad stuff set to ignore")))
 
 
 ;; i keep brushing and confusing my touchpad. this moves the mouse out
@@ -1033,3 +1085,17 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-vc-selected-packages
+   '((auto-hide :url "https://github.com/BlameTroi/auto-hide.el" :branch
+		"main"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
