@@ -89,7 +89,8 @@
      "MANPATH"
      "MallocNanoZone"
      "CMAKE_GENERATOR"
-     "CDPATH")))
+     "CDPATH"
+     "ODIN_ROOT")))
 
 
 
@@ -225,7 +226,6 @@
 (setopt help-wndow-keep-selected t)
 (setopt enable-recursive-minibuffers t)
 
-(setopt delete-by-moving-to-trash t)
 
 (delete-selection-mode +1)
 (indent-tabs-mode +1)
@@ -233,7 +233,7 @@
 (setopt tab-always-indent 'complete)
 
 (setopt comment-empty-lines t)
-(setopt comment-style 'extra-line)
+;; (setopt comment-style 'extra-line)
 
 (setopt confirm-kill-emacs 'y-or-n-p)
 
@@ -341,6 +341,7 @@
 (use-package free-keys)
 
 (use-package which-key
+  :ensure nil
   :diminish
   :config (which-key-mode))
 
@@ -349,12 +350,13 @@
   :hook (prog-mode . ws-butler-mode))
 
 (use-package savehist
+  :ensure nil
   :config
   (setopt savehist-additional-variables
           '(compile-command
             kill-ring
             regexp-search-ring))
-  (savehist-mode 1))
+  :hook (after-init . savehist-mode))
 
 (use-package saveplace
   :config
@@ -398,6 +400,7 @@
 ;; in case i don't want .git to mark.
 
 (use-package project
+  :ensure nil
   :custom
   (project-vc-extra-root-markers '(".projectile" ".project.el" "fpm.toml")))
 
@@ -409,6 +412,7 @@
 (use-package dired
   :after exec-path-from-shell
   :ensure nil
+  :commands (dired)
   :config
   (setopt
    dired-recursive-copies  'always
@@ -417,10 +421,51 @@
     (setopt dired-use-ls-dired nil)
     (setopt ls-lisp-use-insert-directory-program t)
     (setopt insert-directory-program "gls")
-    (setopt dired-listing-switches "-alh --group-directories-first")
-    (setopt dired-kill-when-opening-new-dired-buffer t)
-    (setopt dired-auto-revert-buffer t)
-    (setopt dired-do-revert-buffer t)))
+    (setopt dired-listing-switches "-alh --group-directories-first"))
+  (setopt dired-recursive-copies 'always)
+  (setopt dired-recursive-deletes 'always)
+  (setopt dired-kill-when-opening-new-dired-buffer t)
+  (setopt delete-by-moving-to-trash t)
+  (setopt dired-dwim-target t)
+  (setopt dired-auto-revert-buffer t)
+  (setopt dired-do-revert-buffer t))
+
+
+(use-package trashed
+  :ensure t
+  :commands (trashed)
+  :config
+  (setq trashed-action-confirmer 'y-or-n-p)
+  (setq trashed-use-header-line t)
+  (setq trashed-sort-key '("Date deleted" . t))
+  (setq trashed-date-format "%Y-%m-%d %H:%M:%S"))
+
+;; this is from prot, but i name stuff i used with troi/
+(defun troi/keyboard-quit-dwim ()
+  "Do-What-I-Mean behaviour for a general `keyboard-quit'.
+
+The generic `keyboard-quit' does not do the expected thing when
+the minibuffer is open.  Whereas we want it to close the
+minibuffer, even without explicitly focusing it.
+
+The DWIM behaviour of this command is as follows:
+
+- When the region is active, disable it.
+- When a minibuffer is open, but not focused, close the minibuffer.
+- When the Completions buffer is selected, close it.
+- In every other case use the regular `keyboard-quit'."
+  (interactive)
+  (cond
+   ((region-active-p)
+    (keyboard-quit))
+   ((derived-mode-p 'completion-list-mode)
+    (delete-completion-window))
+   ((> (minibuffer-depth) 0)
+    (abort-recursive-edit))
+   (t
+    (keyboard-quit))))
+
+(define-key global-map (kbd "C-g") #'troi/keyboard-quit-dwim)
 
 
 ;; documentation with 'info' and 'eldoc'. for some reason i'm missing
@@ -433,11 +478,11 @@
   (Info-additional-directory-list '("/opt/homebrew/share/info")))
 
 (use-package eldoc
+  :ensure nil
   :diminish
   :config (global-eldoc-mode))
 
 
-
 ;;;
 ;;; oddities with more complex configuration
 ;;;
@@ -674,6 +719,11 @@
      "split_parser"
      "tree-sitter-markdown-inline/src")))
 
+;;
+;; experimenting with odin
+;;
+(require 'odin-mode)
+
 (use-package hl-todo
   :hook
   (prog-mode . hl-todo-mode)
@@ -794,6 +844,7 @@
   :hook
   (c-ts-mode . eglot-ensure)
   (c++-ts-mode . eglot-ensure)
+  (odin-mode . eglot-ensure)
 
   :bind (:map eglot-mode-map
 	      ;;("C-c t" . troi/clear)
@@ -802,11 +853,9 @@
 
   ;; if debugging 'eglot' issues, comment out the fset
   ;; and events-buffer-config lines.
-
   :config
   (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
   (setopt jsonrpc-event-hook nil)
-
   :custom
   (eglot-events-buffer-config '(:size 0 :format short))
   (eglot-autoshutdown t)
@@ -815,7 +864,8 @@
   (eglot-report-progress nil)  ; Prevent minibuffer spam
   (eglot-ignored-server-capabilities '(:documentFormattingProvider
                                        :documentRangeFormattingProvider
-                                       :documentOnTypeFormattingProvider)))
+                                       :documentOnTypeFormattingProvider))
+  )
 
 ;; configure the 'clangd' language server to my preferences. 'clangd'
 ;; will need 'CMakeLists.txt' and 'compile_commands.json' in each
@@ -827,19 +877,33 @@
    '((c-ts-mode c++-ts-mode)
      . ("clangd"
         "-j=4"                   ; async index threads
-	"--log=error"            ; shorter logging
+	"--log=info"             ;"error" or "verbose"
 	"--pch-storage=memory"   ; i have plenty
-	"--enable-config"))))    ; more detailed
+	"--enable-config"))))
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;; "--log=error"						 ;;
-        ;; "--background-index"						 ;;
-        ;; "--clang-tidy"                ; but i use 'astyle' to format. ;;
-        ;; "--completion-style=detailed"				 ;;
-        ;; "--pch-storage=memory"					 ;;
-        ;; "--header-insertion=never"					 ;;
-        ;; "--header-insertion-decorators=0"))))			 ;;
+;; "--log=error"						 ;;
+;; "--background-index"						 ;;
+;; "--clang-tidy"                ; but i use 'astyle' to format. ;;
+;; "--completion-style=detailed"				 ;;
+;; "--pch-storage=memory"					 ;;
+;; "--header-insertion=never"					 ;;
+;; "--header-insertion-decorators=0"))))			 ;;
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   '(odin-mode . ("ols"))))
+
+(require 'eglot-java)
+(add-hook 'java-mode-hook 'eglot-java-mode)
+(with-eval-after-load 'eglot-java
+  (define-key eglot-java-mode-map (kbd "C-c l n") #'eglot-java-file-new)
+  (define-key eglot-java-mode-map (kbd "C-c l x") #'eglot-java-run-main)
+  (define-key eglot-java-mode-map (kbd "C-c l t") #'eglot-java-run-test)
+  (define-key eglot-java-mode-map (kbd "C-c l N") #'eglot-java-project-new)
+  (define-key eglot-java-mode-map (kbd "C-c l T") #'eglot-java-project-build-task)
+  (define-key eglot-java-mode-map (kbd "C-c l R") #'eglot-java-project-build-refresh))
 
 ;; 'flymake' has been a good linter interface. 'eglot' seems to report
 ;; issues from 'clang-tidy' through 'flymake'.
@@ -939,6 +1003,14 @@
   :custom
   (side-notes-file "side-notes.txt")
   (side-notes-secondary-file "~/general-side-notes.txt"))
+
+;; eat terminal support for zsh and eshell
+;; zsh is by code in zshenv
+
+(use-package eat
+  :hook
+  (eshell-load . eat-eshell-mode)
+  (eshell-load . eat-eshell-visual-command-mode))
 
 
 

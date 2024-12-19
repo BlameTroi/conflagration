@@ -9,23 +9,8 @@
  '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(global-disable-mouse-mode t)
  '(global-disable-mouse-mode-lighter "")
- '(package-selected-packages
-   '(ace-window astyle auto-hide cape cmake-mode cobol-mode
-		corfu-prescient corfu-terminal deft diff-hl diminish
-		disable-mouse dot-mode dumb-jump eglot
-		exec-path-from-shell flymake-guile form-feed-st
-		free-keys git-modes gitignore-snippets hide-mode-line
-		hl-todo imenu-list inf-ruby json-mode kind-icon
-		license-snippets magit-file-icons marginalia
-		markdown-ts-mode nerd-icons-completion
-		nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
-		nerd-icons-ivy-rich ninja-mode no-littering orderless
-		page-break-lines side-notes smartparens
-		tempel-collection tomorrow-night-deepblue-theme
-		treesit-auto vertico-prescient which-key ws-butler
-		yaml-mode yasnippet yasnippet-capf
-		yasnippet-classic-snippets yasnippet-snippets
-		yatemplate ztree))
+ '(js-indent-level 8)
+ '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((auto-hide :url "https://github.com/BlameTroi/auto-hide.el" :branch
 		"main")))

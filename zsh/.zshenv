@@ -100,3 +100,6 @@ export cdpath=(. ~/projects ~ $cdpath[@])
 # turn off colored output.
 
 export NO_COLOR=1
+
+# ### dotnet ###
+#export DOTNET_ROOT = ~/.dotnet
