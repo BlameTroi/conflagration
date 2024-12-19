@@ -17,6 +17,9 @@ general-side-notes.txt
 literate-config.el
 
 # remove emacs runtime transient stuff
+# i've started using no-littering, should i pick and
+# choose from etc or not?
+**/emacs/share/**
 **/emacs/eln-cache/**
 **/emacs/elpa/**
 **/emacs/eshell/history
@@ -27,3 +30,4 @@ literate-config.el
 **/emacs/projects
 **/emacs/transient/**
 **/emacs/tldr/**
+**/emacs/var/**
