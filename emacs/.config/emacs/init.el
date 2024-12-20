@@ -116,6 +116,12 @@
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory))
 
+(use-package recentf
+  :custom
+  (recentf-max-menu-items 100)
+  (recentf-max-saved-items 100)
+  :init
+  (recentf-mode))
 
 ;; this is usually empty.
 
@@ -146,6 +152,12 @@
 (set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 190)
 (set-face-attribute 'fixed-pitch nil :font "FiraCode Nerd Font Mono" :height 190)
 (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 230 :weight 'medium)
+
+
+;; Choose some fonts
+;; (set-face-attribute 'default nil :family "Iosevka")
+;; (set-face-attribute 'variable-pitch nil :family "Iosevka Aile")
+
 
 
 ;; ??? probably don't need these two lines.
@@ -336,14 +348,14 @@
 
 (use-package diminish)
 
-(use-package bind-key)
-
 (use-package free-keys)
 
 (use-package which-key
   :ensure nil
   :diminish
   :config (which-key-mode))
+
+(use-package bind-key)
 
 (use-package ws-butler
   :diminish
@@ -895,15 +907,15 @@ The DWIM behaviour of this command is as follows:
    'eglot-server-programs
    '(odin-mode . ("ols"))))
 
-(require 'eglot-java)
-(add-hook 'java-mode-hook 'eglot-java-mode)
-(with-eval-after-load 'eglot-java
-  (define-key eglot-java-mode-map (kbd "C-c l n") #'eglot-java-file-new)
-  (define-key eglot-java-mode-map (kbd "C-c l x") #'eglot-java-run-main)
-  (define-key eglot-java-mode-map (kbd "C-c l t") #'eglot-java-run-test)
-  (define-key eglot-java-mode-map (kbd "C-c l N") #'eglot-java-project-new)
-  (define-key eglot-java-mode-map (kbd "C-c l T") #'eglot-java-project-build-task)
-  (define-key eglot-java-mode-map (kbd "C-c l R") #'eglot-java-project-build-refresh))
+;; (require 'eglot-java)
+;; (add-hook 'java-mode-hook 'eglot-java-mode)
+;; (with-eval-after-load 'eglot-java
+;;   (define-key eglot-java-mode-map (kbd "C-c l n") #'eglot-java-file-new)
+;;   (define-key eglot-java-mode-map (kbd "C-c l x") #'eglot-java-run-main)
+;;   (define-key eglot-java-mode-map (kbd "C-c l t") #'eglot-java-run-test)
+;;   (define-key eglot-java-mode-map (kbd "C-c l N") #'eglot-java-project-new)
+;;   (define-key eglot-java-mode-map (kbd "C-c l T") #'eglot-java-project-build-task)
+;;   (define-key eglot-java-mode-map (kbd "C-c l R") #'eglot-java-project-build-refresh))
 
 ;; 'flymake' has been a good linter interface. 'eglot' seems to report
 ;; issues from 'clang-tidy' through 'flymake'.
@@ -1011,6 +1023,49 @@ The DWIM behaviour of this command is as follows:
   :hook
   (eshell-load . eat-eshell-mode)
   (eshell-load . eat-eshell-visual-command-mode))
+
+
+(setopt org-confirm-babel-evaluate nil
+	org-src-fontify-natively t
+	org-src-tab-acts-natively t)
+
+
+
+;;Add frame borders and window dividers
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+;; These are the default values, but I keep them here for visibility.
+ (use-package spacious-padding)
+
+;;   :config
+;;   (setopt spacious-padding-widths
+;; 	  '( :internal-border-width 15
+;;              :header-line-width 4
+;;              :mode-line-width 6
+;;              :tab-width 4
+;;              :right-divider-width 30
+;;              :scroll-bar-width 8
+;;              :fringe-width 8)))
+;;
+;; ;; Read the doc string of `spacious-padding-subtle-mode-line' as it
+;; ;; is very flexible and provides several examples.
+;; ;; (setopt spacious-padding-subtle-mode-line
+;; ;; 	`( :mode-line-active 'default
+;; ;;            :mode-line-inactive vertical-border))
+;;
+ (spacious-padding-mode 1)
+
+;; Set a key binding if you need to toggle spacious padding.
+(define-key global-map (kbd "<f8>") #'spacious-padding-mode)
+
 
 
 
@@ -1156,18 +1211,3 @@ With PREFIX, move the line containing point to line PREFIX of the window."
 (load custom-file)
 
 (provide 'init)
-;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-vc-selected-packages
-   '((auto-hide :url "https://github.com/BlameTroi/auto-hide.el" :branch
-		"main"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
