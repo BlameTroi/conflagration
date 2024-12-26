@@ -141,6 +141,10 @@ alias du='du -h'
 # alias emacsclient='emacsclient -t'
 # alias killemacs='emacsclient -e "(save-buffers-kill-emacs)"'
 
+# don't shoot your toes off
+
+alias rm="echo use path to rm if you are sure about this! or try trash"
+
 
 # miscellaneous commands
 
