@@ -1,0 +1,2581 @@
+#+TITLE: Troy's Literate Config
+#+author: Troy Brumley
+#+email: BlameTroi@gmail.com
+#+language: en
+#+options: ':t toc:nil num:t author:t email:t
+#+startup: content
+#+macro: latest-export-date (eval (format-time-string "%F %T %z"))
+#+macro: word-count (eval (count-words (point-min) (point-max)))
+
+/This is my literate Emacs configuration file.
+There are many like it, but this one is mine./
+
+This is an attempt at a literate configuration rewrite of my current
+(2024) Emacs Lisp configuration.
+
+
+* The early-init.el file
+
+
+** The standard intro
+
+All Emacs Lisp files are expected to conform to certain standards.
+I'll try to honor them all with the exception that I will leave
+dangling closing parentheses in some of the code. This makes it easier
+to spot indentation and nesting errors across code blocks.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;;; early-init.el --- Troy Brumley's early-init.el -*- no-byte-compile: t; lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; Copyright (C) 2024-2025 Troy Brumley (aka Troi)
+
+;; Author: Troy Brumley <blametroi@gmail.com>
+
+;; All rights reserved.
+
+;; This file is NOT part of GNU Emacs. The author considers it to be
+;; in the public domain.
+;;
+;; This file is generated from an Org document. That file should be 
+;; found in the same directory as this in my "dotfiles" repository.
+
+;; I borrow liberally from Protesilaos "Prot" Stavrou's highly
+;; instructive literal configuration found on his website:
+;;
+;; https://protesilaos.com/emacs/dotemacs
+;;
+;; The clever bits in here are likely from his config. I have changed
+;; some names to avoid confusing myself, but I'm not trying to claim
+;; his code. Hopefully I've marked these well enough.
+
+;; The Emacs early initialization can include most anything that
+;; doesn't:
+;;
+;; 1) Require `use-package' or `require'.
+;; 2) Involve or change the visual frames and windows of Emacs.
+
+;;; Code:
+
+#+end_src
+
+
+** Garbage Collection
+
+Essentially turn off garbage collection for startup. We will turn it
+back on again when we're finished.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Turn off garbage collection during startup.
+
+(defvar troi/gc-cons-threshold gc-cons-threshold)
+(defvar troi/gc-cons-percentage gc-cons-percentage)
+(setopt gc-cons-threshold most-positive-fixnum)
+(setopt gc-cons-percentage 1.0)
+
+#+end_src
+
+This is probably no longer useful on modern systems, but having Emacs
+do a garbage collection if I leave Emacs shouldn't hurt. The hook for
+this is defined here, it will be activated later.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Force a garbage collection if I leave Emacs temporarily.
+
+(defun troi/gc-after-focus-change ()
+  "Run GC when frame loses focus."
+  (run-with-idle-timer
+   5 nil
+   (lambda () (unless (frame-focus-state) (garbage-collect)))))
+
+#+end_src
+
+
+** File and source control handlers
+
+Emacs has special handling for some file names. We touch enough files
+during startup that disabling that handler temporarily is worth while.
+
+Emacs defaults to being able to recognize/integrate with any source
+control system. I only use Git. As with the file name handler I remove
+all of the but Git. This change is permanent.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Turn of special file name handling during startup.
+
+(defvar troi/file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+;; The only vcs I use is Git. I save the original back-ends list
+;; but don't plan to restore it.
+
+(defvar troi/vc-handled-backends vc-handled-backends)
+(setopt vc-handled-backends '(Git))
+
+#+end_src
+
+
+** Obliterate the touch-pad
+
+I do almost all of my work on a MacBook (M2). The touch-pad on Macs is
+overly sensitive and has a bunch of gestures that I can't remember.
+Combined with my imprecise typing and tendency to rest my wrists on my
+keyboard I constantly find the pointer moving and jumping and firing
+various events.
+
+I needed to make some adjustment to the mouse/touch-pad sensitivity but
+couldn't find anything. There is the 'disable-mouse' package but it
+doesn't quite get do it right for me. And I ran into a couple of cases
+where it left me unable to use Emacs (some popup hidden behind the
+main frame).
+
+This function is heavy handed, but it works with the help of a few
+tweaks further on.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+(defun troi/bad-mouse-stop-that ()
+  "Disable the mouse/touch-pad.
+This function aggressively swats mouse/touchpad in an attempt
+to prevent the Mac track-pad from causing motion when I
+inevitably brush it. I am setting it twice, both in
+`emacs-startup-hook' and `after-init-hook' because I know of
+at least one package that needs `mouse-wheel-mode' turned off
+during init and because something else during init overwrites
+my `wheel-down' overrides."
+
+  (global-set-key [wheel-up] 'ignore)
+  (global-set-key [double-wheel-up] 'ignore)
+  (global-set-key [triple-wheel-up] 'ignore)
+  (global-set-key [wheel-down] 'ignore)
+  (global-set-key [double-wheel-down] 'ignore)
+  (global-set-key [triple-wheel-down] 'ignore)
+  (global-set-key [wheel-left] 'ignore)
+  (global-set-key [double-wheel-left] 'ignore)
+  (global-set-key [triple-wheel-left] 'ignore)
+  (global-set-key [wheel-right] 'ignore)
+  (global-set-key [double-wheel-right] 'ignore)
+  (global-set-key [triple-wheel-right] 'ignore)
+  (mouse-wheel-mode -1)
+  (message "track-pad stuff set to ignore"))
+
+#+end_src
+
+Originally I only invoked this function from `emacs-startup-hook'. I
+later discovered that `pixel-scroll-precision-mode' overwrites a few
+wheel/button combinations, but not all of them. It does this
+regardless of `mouse-wheel-mode'.
+
+This led to mouse scrolling being partially on in Org when using
+`visual-fill-column-mode'.
+
+On chance that something else during =init.el= might do something
+similar to this, I also add the function to the `after-init-hook'.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+(add-to-list
+ 'emacs-startup-hook #'troi/bad-mouse-stop-that)
+(add-to-list
+ 'after-init-hook #'troi/bad-mouse-stop-that)
+
+#+end_src
+
+
+** Move the mouse pointer out of the way
+
+And even after all of the above, the touchpad still responds to some
+accidental contact. The best solution I've found so far is to banish
+the mouse pointer to the lower right corner of my display, moved up a
+bit so it doesn't trigger the Mac start bar.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Park the mouse pointer in an inoffensive location.
+
+(mouse-avoidance-mode 'banish)
+(setopt mouse-avoidance-banish-position
+	'((frame-or-window . frame) (side . right) (side-pos . 1)
+	  (top-or-bottom . bottom) (top-or-bottom-pos . 15)))
+
+#+end_src
+
+
+** The keyboard layout and remapping
+
+The Mac keyboard layout is annoyingly different from a PC keyboard
+layout, and neither layout matches those that influenced the design of
+Emacs.
+
+Changing <CAPS LOCK> to be <CONTROL> in OS settings is something I do
+automatically on any system.
+
+Emacs has the ability to remap keys itself (see Customization Group
+`Ns') but I prefer doing that outside of Emacs.
+
+The bottom row of a 'standard' keyboard holds all the keys that might
+need remapping. Using 'Karbiner' I have remapped them as follows:
+
+| Original | Remapped             |
+|----------+----------------------|
+| fn       | control              |
+| control  | fn                   |
+| option   | command (or super)   |
+| command  | alt                  |
+| spacebar | unchanged            |
+| command  | unchanged            |
+| option   | unchanged            |
+|----------+----------------------|
+
+I had to retrain my fingers for using this mapping outside of Emacs,
+but it wasn't difficult.
+
+
+** Settings needed before the frame is created
+
+These all lump together without much in the way of obvious groupings
+that warrant their own section headers.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; These set the frame on my Mac to 'real' full-screen.
+
+(setopt frame-inhibit-implied-resize t)
+(setopt frame-resize-pixelwise t)
+(setopt window-resize-pixelwise t)
+(setopt initial-frame-alist '((fullscreen . fullboth)
+			      (ns-appearance . dark)
+			      (ns-transparent-titlebar . t)))
+(setopt default-frame-alist '((fullscreen . fullboth)
+                              (ns-appearance . dark)
+                              (ns-transparent-titlebar . t)))
+
+;; Use standard Emacs UI elements and not OS tailored ones.
+
+(setopt use-dialog-box nil)
+(setopt use-file-dialog nil)
+(setopt use-short-answers t)
+
+;; Quiet down the startup, I want to open up in *scratch*.
+
+(setopt inhibit-splash-screen t)
+(setopt inhibit-startup-screen t)
+(setq inhibit-x-resources t)       ; x includes windows registry and ns here
+(setopt inhibit-startup-echo-area-message user-login-name)
+(setopt inhibit-startup-buffer-menu t)
+
+;; I'm not sure I should stick with this, but for now I do.
+
+(setopt confirm-kill-processes nil)
+
+;; I leave the menu bar active but hidden. The scroll and tool
+;; bars are hidden.
+
+(menu-bar-mode)        ; it's tucked out of the way in MacOS
+(setopt ns-auto-hide-menu-bar t)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(context-menu-mode -1)
+
+#+end_src
+
+
+** Compiler warnings and use of native compilation
+
+This is a good place to turn off several warnings that are of no real
+use to me. Byte compiling and Native Compiling either work or they
+don't.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Silence warnings that aren't relevant during normal sessions.
+
+(setq byte-compile-warnings '(not obsolete))
+(setq warning-suppress-log-types '((comp) (bytecomp)))
+(setopt native-comp-async-report-warnings-errors 'silent)
+
+#+end_src
+
+Enable native compilation if it is available.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Enable native compilation if it is available.
+
+(if (and (fboundp 'native-compile-available-p)
+         (native-compile-available-p))
+    (setopt package-native-compile t)
+  (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28
+  (setq native-compile-prune-cache t)) ; Emacs 29
+
+#+end_src
+
+
+** Lest we forget
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Metadata and stragglers.
+
+(setopt user-full-name "Troy Brumley")
+(setopt user-mail-address "BlameTroi@gmail.com")
+(setopt auth-sources '("~/.authinfo.gpg"))
+(setopt auth-source-cache-expiry nil)
+
+#+end_src
+
+
+** Increase the inter-process communications buffer allocation.
+
+One last optimization is to increase the size of the inter-process
+communications buffer. Its default of 4k on some systems is too low. I
+believe the default is 16K on MacOS. It is not clear how large it can
+be, but this setting works.
+
+This improves performance of some `eshell' based commands. I don't
+know what it's maximum size can be on MacOS but I've never had a
+problem with this setting. In Linux the maximum is known to be
+~/proc/sys/fs/pipe-max-size~. Reading about this for the Mac says it
+starts at 16k and can be set up to 64k. It isn't clear what should
+happen when over allocated.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; The default is 4K or 16K. 64K is the max for a Mac.
+
+(setq read-process-output-max (* 64 1024))
+
+#+end_src
+
+
+** I don't like Customization writing to =init.el=
+
+Finally, I don't like the way the Emacs Easy Customization writes into
+the =init.el= file. Thankfully we can direct customizations to a
+separate file parallel to the init.
+
+The customization UI is a great tool for exploring and testing
+options, and useful changes can be persisted to the custom file.
+
+I don't load those customizations. I do review them and pull anything
+useful into my hand crafted configuration.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; The Customization Interface and file.
+
+(setopt custom-file (concat user-emacs-directory "i_dont_load_my_custom.el"))
+
+;; If you need to, uncomment the following line.
+;; (load custom-file)
+
+#+end_src
+
+
+** Move the Native Compile cache into a no-littering directory
+
+The no-littering package cleans up the .emacs.d (or .config/emacs ...)
+directory by adding etc/ and var/ sub-directories and moving a lot of
+state and settings under them.
+
+The eln-cache/ directory holds natively compiled packages.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; emacs collective's no littering recommendation
+
+(when (and (fboundp 'startup-redirect-eln-cache)
+           (fboundp 'native-comp-available-p)
+           (native-comp-available-p))
+  (startup-redirect-eln-cache
+   (convert-standard-filename
+    (expand-file-name  "var/eln-cache/" user-emacs-directory))))
+
+#+end_src
+
+
+** Set after init hooks to restore garbage collection settings
+
+The `emacs-startup-hook' runs after =init.el= and is a good place
+to restore handlers and garbage collection settings while also
+setting the hook for garbage collection on focus change.
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+;; Restore garbage collection and file name handler once startup
+;; completes. We also plug in the idle time garbage collection
+;; trigger.
+
+(add-hook
+ 'emacs-startup-hook
+ (lambda ()
+   ;; These were hard coded as 8 Mb and 20%.
+   (setopt gc-cons-threshold troi/gc-cons-threshold)
+   (setopt gc-cons-percentage troi/gc-cons-percentage)
+   (setq   file-name-handler-alist troi/file-name-handler-alist)
+   (message "gc-cons-threshold & file-name-handler-alist restored")
+   (when (boundp 'after-focus-change-function)
+     (add-function
+      :after after-focus-change-function
+      #'troi/gc-after-focus-change))))
+
+#+end_src
+
+
+** The standard outro
+
+#+begin_src emacs-lisp :tangle "new-early-init.el"
+
+(provide 'early-init)
+;;; File early-init.el ends here.
+#+end_src
+
+
+
+
+
+* The init.el file
+
+Here we finish tweaks to settings and load the packages that make this
+Emacs my Emacs.
+
+
+** The standard intro
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;;; init.el --- Troy Brumley's init.el -*- no-byte-compile: t; lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; Copyright (C) 2024-2025 Troy Brumley (aka Troi)
+
+;; Author: Troy Brumley <blametroi@gmail.com>
+
+;; All rights reserved.
+
+;; the same directory as this in my "dotfiles" repository.
+;; This file is NOT part of GNU Emacs. The author considers it to be
+;; in the public domain.
+;;
+;; This file is generated from an Org document. That file should be 
+;; found in the same directory as this in my "dotfiles" repository.
+
+;; I borrow liberally from Protesilaos "Prot" Stavrou's highly
+;; instructive literal configuration found on his website:
+;;
+;; https://protesilaos.com/emacs/dotemacs
+;;
+;; The clever bits in here are likely from his config. I have changed
+;; some names to avoid confusing myself, but I'm not trying to claim
+;; his code. Hopefully I've marked these well enough.
+
+;; The `init.el' file is run after `early-init.el'. Here we initialize
+;; Emacs 'the application'. Establish package repositories, themes,
+;; fonts, visual settings, and load and configure packages.
+
+;;; Code:
+
+#+end_src
+
+
+** Gates and guards.
+
+Many people's configs and most packages check Emacs versions
+and attempt to fall back gracefully if the release doesn't include
+some feature.
+
+I don't expect to move around to systems that old. Warnings are issued
+but the startup is allowed to continue.
+
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+
+;; Compatibility and requirements.
+
+(when (< emacs-major-version 29)
+  (error "This configuration requires Emacs 29 or newer!"))
+
+(when (not (display-graphic-p))
+  (message "This Emacs configuration assumes you are running a GUI, some things may break.")
+  (sleep-for 5))
+
+#+end_src
+
+
+** Package archive configuration
+
+This is a pretty standard end user setup for package archives. Emacs
+comes with the `gnu' and `nongnu' archives already configured. I add
+`melpa' and `melpa-stable' but assign priorities to favor the official
+archives first. Any `use-package' can set a `:pin' to a specific
+archive.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Packaging and Repositories.
+
+;; We have to `require' use-package if we're being compiled. This is
+;; also a good place to set some package load behavior defaults.
+
+(eval-when-compile
+  (require 'use-package))
+(setopt load-prefer-newer t)
+(setopt use-package-always-ensure t)
+(setopt package-native-compile t)
+
+;; This is separate from the compile tweaks in `early-init.el' to keep
+;; it closer to `use-package' setup.
+(setq native-comp-jit-compilation t)
+
+(with-eval-after-load 'package
+  (defvar package-archives)
+  (add-to-list
+   'package-archives
+   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (add-to-list
+   'package-archives
+   '("melpa" . "https://melpa.org/packages/") t)
+  (setopt package-archive-priorities
+          '(("gnu" . 10)
+            ("nongnu" . 9)
+            ("melpa-stable" . 6)
+            ("melpa" . 5))))
+
+#+end_src
+
+
+** Compile Angel
+
+The 'compile-angel' package improves the base native compilation
+support by byte and native compiling Emacs Lisp libraries. First time
+loading of a new package (or a fresh Emacs install) is a bit slow but
+once done, the compiles are generally done.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; 'compile-angel' opts for compiling most everything. It's still in
+;; early development so this section is likely to change.
+
+;; TODO: gate with native compile available check.
+(use-package compile-angel
+  :ensure t
+  :demand t
+  ;;:custom
+  ;;  (compile-angel-verbose nil)
+  :config
+  (setq compile-angel-excluded-files-regexps '("/cus-load\\.el$"
+                                               "/theme-loaddefs\\.el$"
+                                               "/loaddefs\\.el\\.gz$"
+                                               "/charprop\\.el$"
+                                               "/cl-loaddefs\\.el\\.gz$"
+					       "custom.el$"
+					       "savehist.el$"
+					       "recentf-save.el$"))
+  ;; (setq compile-angel-predicate-function
+  ;; 	(lambda (file)
+  ;;         (not (file-in-directory-p file "/opt/.*"))))
+
+  (compile-angel-on-load-mode)
+  (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode))
+
+#+end_src
+
+
+** If I used a dashboard, it would probably go here
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; not a dashboard.
+
+(setopt initial-scratch-message ";; nothing to see here, move along")
+
+#+end_src
+
+
+** Handy macros and functions
+
+Prot wrote a macro to basically comment out some Emacs Lisp code while
+leaving it as 'code' in the editor. Pretty cool.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Wrapper macro to "no-op" emacs-lisp code. This is from
+;; Prot's configuration.
+
+(defmacro troi-emacs-comment (&rest body)
+  "Determine what to do with BODY.
+If BODY contains an unquoted plist of the form (:eval t) then
+return BODY inside a `progn'.
+
+Otherwise, do nothing with BODY and return nil, with no side
+effects."
+  (declare (indent defun))
+  (let ((eval))
+    (dolist (element body)
+      (when-let* (((plistp element))
+                  (key (car element))
+                  ((eq key :eval))
+                  (val (cadr element)))
+        (setq eval val
+              body (delq element body))))
+    (when eval `(progn ,@body))))
+
+#+end_src
+
+
+** Reduce Emacs directory clutter
+
+The `no-littering' package attempts to reduce the clutter of
+`user-emacs-directory' by coercing various packages to use
+sub-directories `etc/' and `var/'. This needs to come as early as
+possible in =init.el= and so I put it closely after `package' and
+`use-package' are established.
+
+There is a full migration guide (that I have not read yet) at
+<https://github.com/emacscollective/no-littering/> but just adding
+this and deleting some stragglers I don't care about has been helpful.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; No littering to reduce directory clutter.
+
+;; NOTE: Yes, the two `require' calls in that order are deliberate and
+;; they seem to work. Without them, not so much.
+
+(use-package no-littering
+  :ensure t
+  :init
+  (require 'no-littering)
+  (require 'recentf)
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory))
+
+(use-package recentf
+  :ensure nil
+  :custom
+  (recentf-max-menu-items 100)
+  (recentf-max-saved-items 100)
+  :config
+  (recentf-mode))
+
+#+end_src
+
+
+** Get environment variables
+
+Getting shell environment variables on MacOS builds is not reliable.
+The packaging into a MacOS app requires that the desired variables are
+listed in a configuration plist.
+
+Unfortunately that hasn't been working consistently. Even when it does
+work, the variables are hard coded and not comprehensive.
+
+The `exec-path-from-shell' package lets me specify the variables I
+require.
+
+TODO: Consider a separate configuration file for a variable list.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Environment variables.
+
+;; Get the correct environment variable values as if this is a login
+;; shell. The variable list is hard coded and specific to my needs.
+
+(use-package exec-path-from-shell
+  :config
+  (declare-function
+   exec-path-from-shell-initialize "exec-path-from-shell" ())
+  (declare-function
+   exec-path-from-shell-copy-envs "exec-path-from-shell")
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-envs
+   '(
+     ;; Old style Makefile variables for C. I probably don't need
+     ;; these anymore.
+     "LIBRARY_PATH"
+     "CPATH"
+     "CDPATH"
+
+     ;; Environment variables specific to compile and build for any
+     ;; languages I'm working with.
+     "CMAKE_GENERATOR"
+     "ODIN_ROOT"
+
+     ;; Where is the documentation? I know MANPATH is not used on all
+     ;; operating systems, but it doesn't cause me problems to get it.
+     "INFOPATH"
+     "MANPATH"
+
+     ;; Apple's libc malloc library emits some informational warnings
+     ;; specific to particular allocation pools. They do me know good.
+     "MallocNanoZone"
+     )))
+
+#+end_src
+
+
+** Turn off backups, lock-files, and auto-save
+
+In the 21st Century computers and file systems are very reliable. And
+then there's the /Cloud/. Lock-files don't make sense for me since I'm
+always on a single user system.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; No safety net needed.
+
+(setopt make-backup-files nil)
+(setopt backup-inhibited nil) ; Is this redundant?
+(setopt create-lockfiles nil)
+(setopt auto-save-default nil)
+
+#+end_src
+
+
+** Directories and files
+
+Most directory assignment will be done with their related package
+setup. I've got `load-path' and some Org handled here directories in
+an attempt to keep new directory creation in one place.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Directories and files.
+
+;; Add to the `load-path'. So far this is just my scratch
+;; lisp directory.
+
+(add-to-list
+ 'load-path
+ (concat user-emacs-directory "troi-lisp"))
+
+;; Org mode files and directories.
+
+(setq org-dir (substitute-in-file-name "$HOME/org"))
+(if (not (file-directory-p org-dir))
+    (make-directory org-dir))
+(setq org-directory org-dir)
+(setq org-agenda-files '(org-directory))
+
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
+#+end_src
+
+
+** Dired
+
+This is as good a place as any to configure `dired'. On the Mac I have
+to force it to use the GNU `ls' as the built-in one does not support
+some options that `dired' needs.
+
+TODO: This is complete but it could be improved. Do I want the extras?
+      
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; for dired, use 'gls' if it's available. the default 'ls' in MacOS
+;; and some other systems doesn't support all the options that 'dired'
+;; wants.
+
+(use-package dired
+  :after exec-path-from-shell
+  :ensure nil
+  :commands (dired)
+  :config
+  (setopt
+   dired-recursive-copies  'always
+   dired-isearch-filenames 'dwim)
+  (when (executable-find "gls")    ; use GNU ls
+    (setopt dired-use-ls-dired nil)
+    (setopt ls-lisp-use-insert-directory-program t)
+    (setopt insert-directory-program "gls")
+    (setopt dired-listing-switches "-alh --group-directories-first"))
+  (setopt dired-recursive-copies 'always)
+  (setopt dired-recursive-deletes 'always)
+  (setopt dired-kill-when-opening-new-dired-buffer t)
+  (setopt delete-by-moving-to-trash t)
+  (setopt dired-dwim-target t)
+  (setopt dired-auto-revert-buffer t)
+  (setopt dired-do-revert-buffer t)
+  (setopt dired-free-space 'separate))
+
+(use-package wdired
+  :ensure nil
+  :commands (wdired-change-to-wdired-mode)
+  :config
+  (setq wdired-allow-to-change-permissions t)
+  (setq wdired-create-parent-directories t))
+
+#+end_src
+
+
+** History, location, and reversion
+
+I don't feel the need to persist whole Emacs sessions/layouts, but
+picking up where I left off in a file and keeping a command history
+make sense sense to me. I go back and forth on `auto-revert'.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; History and such.
+
+(use-package savehist
+  :ensure nil
+  :config
+  (setopt savehist-additional-variables
+          '(compile-command
+            kill-ring
+            regexp-search-ring))
+  (savehist-mode)
+  (setq history-length 100)
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history t))
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (save-place-mode)
+  :custom
+  (save-place-limit 1000))
+
+(use-package autorevert
+  :ensure nil
+  :config
+  (global-auto-revert-mode +1)
+  :custom
+  (auto-revert-avoid-polling t)
+  (global-auto-revert-non-file-buffers t)
+  (auto-revert-verbose t))
+
+#+end_src
+
+
+** Tool-tips
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Tool-tips (tooltip-mode)
+
+(use-package tooltip
+  :ensure nil
+  :hook (after-init . tooltip-mode)
+  :config
+  (setq tooltip-delay 0.5
+        tooltip-short-delay 0.5
+        tooltip-frame-parameters
+        '((name . "tooltip")
+          (internal-border-width . 10)
+          (border-width . 0)
+          (no-special-glyphs . t))))
+
+#+end_src
+
+
+** Highlighting and numbering
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Set up column numbers and row/column tracking in the
+;; mode line.
+
+(setopt apropos-sort-by-scores t)
+(setopt blink-matching-delay 0.1)
+
+;; Line numbering in programming modes is the way. Later I set the
+;; mode-line format so the format starts counting columns at 1.
+
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(setopt display-line-numbers-width 4)
+
+;; Highlight the cursor line.
+
+(setq global-hl-line-sticky-flag t)
+(global-hl-line-mode)
+
+#+end_src
+
+
+** Mode line related
+
+I don't do much to customize my mode line, but I am a fan of
+`diminish'.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Diminish mode indicators.
+
+(use-package diminish
+  :ensure t)
+
+;; I run with column information visible full time. And I count from
+;; one the way God intended.
+
+(column-number-mode)
+(setopt mode-line-position-column-line-format '(" (%l,%C)")) ; %C based 1, %c based 0
+
+;; Display function name in mode line.
+
+(which-function-mode)
+
+;; Highlight the cursor line.
+
+(global-hl-line-mode)
+
+;; I use this rarely.
+
+(use-package hide-mode-line
+  :ensure t
+  :defer t
+  :bind
+  ("C-c C-h" . hide-mode-line-mode))
+
+#+end_src
+
+
+** Theme
+
+The Acme theme is quite readable. I thought I'd want a dark theme, but
+this one surprised me.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Theme and some font/face.
+
+(setopt custom-safe-themes t)
+(use-package acme-theme
+  :ensure t
+  :config
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'acme t)
+  (setopt acme-theme-black-fg t)
+  (custom-set-faces
+   '(hl-line ((t (
+                  :inherit highlight
+                  :extend t
+                  :background "LightGoldenrod2"
+                  :foreground "black"))))
+   '(compilation-error ((t (:background "gray80" :foreground "Red"))))
+   '(flymake-error ((t (:underline (:color "Red" :style wave :position nil)))))
+   '(font-lock-comment-face ((t (:foreground "#707070" :slant oblique))))
+   '(font-lock-comment-face ((t (:foreground "#005500" :slant oblique))))))
+
+;; Pulling out of custom.el to control here.
+
+(set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 190)
+(set-face-attribute 'fixed-pitch nil :font "FiraCode Nerd Font Mono" :height 190)
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 230 :weight 'medium)
+;; Choose some fonts
+;; (set-face-attribute 'default nil :family "Iosevka")
+;; (set-face-attribute 'variable-pitch nil :family "Iosevka Aile")
+
+#+end_src
+
+
+** Colors and faces for Org and others
+
+Colors for the general. I need to review these and come up with my own
+palette.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; This is a straight copy and paste from Prot's config. Someday I'll
+;; tune these to my preferences.
+
+(setq light-mode nil)
+(if light-mode
+    (setq
+     ;; TODO States
+     todo-color "DarkOrange"
+     in-progress-color "DeepSkyBlue3"
+     blocked-color "Firebrick1"
+     done-color "Green3"
+     wont-do-color "Green3"
+     ;; Tags
+     critical-color "red1"
+     easy-color "turquoise4"
+     medium-color "turquoise4"
+     hard-color "turquoise4"
+     work-color "royalblue1"
+     home-color "mediumPurple2"
+     )
+  (setq
+   ;; TODO States
+   todo-color "GoldenRod"
+   in-progress-color "Cyan"
+   blocked-color "Red"
+   done-color "LimeGreen"
+   wont-do-color "LimeGreen"
+   ;; Tags
+   critical-color "red1"
+   easy-color "cyan3"
+   medium-color "cyan3"
+   hard-color "cyan3"
+   work-color "royalblue1"
+   home-color "mediumPurple1"
+   )
+  )
+
+#+end_src
+
+
+** Icons
+
+I group all the icon package loads here but several are dependent upon
+later packages so their `use-package' forms will include `:after'.
+
+I'm sure I'll soon learn what happens when I reference a package as a
+dependency and never load that package.
+
+There are two major icon sets that can see. I'm used to the Nerd Icon
+family.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Icons
+
+;; The Nerd Icons. Not that these depend upon having the Nerd Fonts on
+;; your system.
+
+(use-package nerd-icons
+  :ensure t)
+
+(use-package nerd-icons-dired
+  :ensure t
+  :after (dired nerd-icons)
+  :diminish
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
+(use-package nerd-icons-completion
+  :after (corfu vertico marginalia nerd-icons)
+  :diminish
+  :config
+  (declare-function nerd-icons-completion-mode "nerd-icons-completion")
+  (nerd-icons-completion-mode)
+  (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(use-package nerd-icons-ibuffer
+  :after (nerd-icons ibuffer)
+  :diminish
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
+(use-package nerd-icons-corfu
+  :after (nerd-icons corfu))
+
+;; Add kind of item icons to marginalia notes (folder, file, etc).
+
+(use-package kind-icon
+  :ensure t
+  :after (corfu marginalia vertico)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;; add descriptive notes 'in the margin' of various lists/uis.
+
+(use-package marginalia
+  :config
+  (marginalia-mode))
+
+#+end_src
+
+
+** Org mode
+
+I'll start with a "minimal" setup and grow it from there. Org is far
+from my main Emacs application, but we'll grab it first.
+
+I want to get the org packages early in the initialization. I
+don't know for sure if any of my later packages might cause Org
+to initialize. To be sure we have the current Org (which often
+releases multiple times per Emacs release), access them now and
+force loads if needed.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Is there such a thing as a basic or minimal Org configuration?
+
+(use-package org
+  :ensure t
+  :pin gnu
+  :custom
+  (org-confirm-babel-evaluate nil) 
+  (org-src-fontify-natively t)     
+  (org-src-tab-acts-natively t)    
+  (org-src-preserve-indentation t) 
+  :config
+  (setq org-return-follows-link nil)
+  (setq org-loop-over-headlines-in-active-region 'start-level)
+  (setq org-modules '(ol-info))
+  (setq org-use-sub-superscripts '{})
+  (setq org-highlight-latex-and-related nil)
+  (setq org-fontify-quote-and-verse-blocks t)
+  (setq org-fontify-whole-block-delimiter-line t)
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority ?C)
+  (setq org-default-priority ?B)
+  (setq org-priority-faces nil)
+  ;; TODO: is there a better way to do this?
+  ;; TODO: move what can be moved into :custom.
+  (setq org-log-done 'time)
+  (setq org-todo-keywords
+  	'((sequence "TODO(t)" "DOING(i@/!)" "BLOCKED(b@/!)"
+  		    "|"
+  		    "DONE(d@/!)" "WONT-DO(w@/!)" )))
+  (setq org-capture-templates
+  	'(
+          ("t" "TODO Item"
+           entry (file "~/org/todos.org")
+           "* TODO [#B] %? %^g\n"
+           :empty-lines 0)
+
+          ("j" "Journal Entry"
+           entry (file+datetree "~/org/journal.org")
+           "* %?"
+           :empty-lines 1)
+
+          ("n" "Note"
+           entry (file+headline "~/org/notes.org" "Random Notes")
+           "** %?"
+           :empty-lines 0)
+          ))
+  (setq org-tag-alist
+  	'(
+          (:startgroup . nil)
+          ("easy" . ?e)
+          ("medium" . ?m)
+          ("difficult" . ?d)
+          (:endgroup . nil)
+
+          (:startgroup . nil)
+          ("@work" . ?w)
+          ("@home" . ?h)
+          ("@anywhere" . ?a)
+          (:endgroup . nil)
+
+          ("CRITICAL" . ?c)
+          ))
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-todo-keyword-faces
+  	`(
+          ("TODO"        . (:weight bold :foreground ,todo-color        ))
+          ("IN-PROGRESS" . (:weight bold :foreground ,in-progress-color ))
+          ("BLOCKED"     . (:weight bold :foreground ,blocked-color     ))
+          ("DONE"        . (:weight bold :foreground ,done-color        ))
+          ("WONT-DO"     . (:weight bold :foreground ,wont-do-color     ))
+          )
+  	)
+  (setq org-tag-faces
+  	`(
+          ("CRITICAL" . (:weight bold :foreground ,critical-color ))
+          ("easy"     . (:weight bold :foreground ,easy-color     ))
+          ("medium"   . (:weight bold :foreground ,medium-color   ))
+          ("hard"     . (:weight bold :foreground ,hard-color     ))
+          ("@work"    . (:weight bold :foreground ,work-color     ))
+          ("@home"    . (:weight bold :foreground ,home-color     ))
+          )
+  	)
+  )
+
+;; TODO: set up for my use...
+;; (setq org-structure-template-alist
+;; 	        '(
+;; 	  ("C" . "comment")
+;; 	  ("q" . "quote")
+;; 	  ("c" . "center")
+;; 	  ("v" . "verse")
+;;          ("x" . "example")
+;; 
+;; 	  ("a" . "export ASCII")
+;;          ("X" . "export")
+;; 
+;; 	  ("s" . "src")
+;;          ("e" . "src emacs-lisp")
+;; 
+;;          ("t" . "src emacs-lisp :tangle FILENAME")
+;;          ("E" . "src emacs-lisp :results value code :lexical t")
+;;          ("T" . "src emacs-lisp :tangle FILENAME :mkdirp yes")
+;; 	  ))
+
+#+end_src
+
+
+** Org eye candy
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Load `org-modern' and `org-bullets' but do not enable them here. I
+;; find outline editing easier without these turned on but there may
+;; come a time when have them on all the time.
+
+(use-package org-modern
+  :ensure t
+  :defer t)
+
+(use-package org-bullets
+  :ensure t
+  :defer t)
+
+#+end_src
+
+
+** Org babel
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Specialized support for the odd language or whatever else comes up.
+
+(use-package ob-sml
+  :ensure t)
+
+(use-package ob-typescript
+  :ensure t)
+
+#+end_src
+
+
+** Org key-binds
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Org related key-binds.
+
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cc" 'org-capture)
+
+#+end_src
+
+
+** Dictionary
+
+I believe this is independent of the flyspell dictionary but
+I need to do more work.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Dictionary.
+
+(use-package dictionary
+  :ensure nil
+  ;;    :bind ("C-c d" . dictionary-search)
+  :config
+  (setq dictionary-server "dict.org"
+        dictionary-default-popup-strategy "lev"
+        dictionary-create-buttons nil
+        dictionary-use-single-buffer t))
+
+#+end_src
+
+
+** Spelling
+
+Flyspell for those times I want to spell check prose. I am also
+considering grammar checking.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Spell check with flyspell.
+
+(use-package flyspell
+  :ensure nil
+  ;;     :bind
+  ;;     ( :map flyspell-mode-map
+  ;;       ("C-;" . nil)
+  ;;       :map flyspell-mouse-map
+  ;;       ("<mouse-3>" . flyspell-correct-word)
+  ;;       :map ctl-x-x-map
+  ;;       ("s" . flyspell-mode)) ; C-x x s
+  :config
+  (setq flyspell-issue-message-flag nil)
+  (setq flyspell-issue-welcome-flag nil)
+  (setq ispell-program-name "aspell")
+  (setq ispell-dictionary "en_US"))
+
+#+end_src
+
+
+** Deft notes
+
+Deft is a light weight free format notes application. I like it for
+many of the things other people do with Org.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; 'deft' is a light weight free format note application.
+
+(use-package deft
+  :config
+  (setopt deft-directory
+  	  (expand-file-name "~/Notepad"))
+  (setopt deft-text-mode (seq-find 'fboundp '(markdown-mode text-mode)))
+  (setopt deft-extension
+          (assoc-default deft-text-mode '((markdown-mode . "md") (rst-mode . "rst"))
+  			 'eq "txt")))
+
+#+end_src
+
+
+** Side notes
+
+Side-notes lets you have notes files in any project or directory. the
+notes are opened in a side window like 'imenu-list'. Searching for the
+notes files are done backward up the the directory path until one is
+found.
+
+I use these as scratch paper and they are excluded from Git by my
+.gitignore.
+
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; I use side-notes as scratch paper in project directories. The notes
+;; files aren't stored in Git, I have them excluded in my .gitignore.
+
+(use-package side-notes
+  :diminish
+  :bind ("M-s n" . side-notes-toggle-notes)
+  :custom
+  (side-notes-file "side-notes.txt")
+  (side-notes-secondary-file "~/general-side-notes.txt"))
+
+#+end_src
+
+
+** Info, eldoc, and help configuration
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; documentation with 'info' and 'eldoc'. for some reason I'm missing
+;; system info from Homebrew. i should probably move this into my
+;; zshenv.
+
+(use-package info
+  :after exec-path-from-shell
+  :custom
+  (Info-additional-directory-list '("/opt/homebrew/share/info")))
+
+(use-package eldoc
+  :ensure nil
+  :diminish
+  :config (global-eldoc-mode))
+
+;; `man' (man-pages)
+
+(use-package man
+  :ensure nil
+  :commands (man)
+  :config
+  (setq Man-notify-method 'pushy)) ; does not obey `display-buffer-alist'
+
+#+end_src
+
+
+** so-long mode speeds up abusively long line handling
+
+'so-long' handles long lines that are usually found in program source
+code where unneeded white-space has been removed. forcing paragraph
+text direction is reported to also help by removing the checks and
+scans for right to left languages.
+
+#+begin_src emacs-lisp :tangle "new-init.el" 
+;; Improve processing of excessively long lines. Forcing left-to-right
+;; instead of allowing for right-to-left is apparently a significant
+;; improvement for long lines.
+
+(use-package so-long
+  :config
+  (global-so-long-mode)
+  :custom
+  (bidi-paragraph-direction 'left-to-right))
+
+#+end_src
+
+
+** Treemacs
+
+'Treemacs' is a side bar file navigation tool.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Treemacs seems useful.
+
+(use-package treemacs
+  :ensure t
+  :after nerd-icons
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t t"   . treemacs)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-nerd-icons
+  :after treemacs
+  :ensure t)
+
+#+end_src
+
+
+** Completion and mini-buffer
+
+The mini-buffer does most of the heavy lifting of user interaction.
+There are a myriad of packages for presentation, formatting, styles of
+completion (what is offered, and in what order).
+
+It can all be very confusing.
+
+But after you've used Emacs with a tricked out mini-buffer, going back
+to using just built-in support is a no-go.
+
+These are all part of the built-in completion framework that `corfu'
+and others build upon.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; completion styles
+
+(use-package minibuffer
+  :ensure nil
+  :config
+
+   ; Also see `completion-category-overrides'.
+  (setq completion-styles '(basic substring initials flex prescient))
+
+  ;; Reset all the per-category defaults so that (i) we use the
+  ;; standard `completion-styles' and (ii) can specify our own styles
+  ;; in the `completion-category-overrides' without having to
+  ;; explicitly override everything.
+  (setq completion-category-defaults nil)
+
+  ;; A non-exhaustive list of known completion categories:
+  ;;
+  ;; - `bookmark'
+  ;; - `buffer'
+  ;; - `charset'
+  ;; - `coding-system'
+  ;; - `color'
+  ;; - `command' (e.g. `M-x')
+  ;; - `customize-group'
+  ;; - `environment-variable'
+  ;; - `expression'
+  ;; - `face'
+  ;; - `file'
+  ;; - `function' (the `describe-function' command bound to `C-h f')
+  ;; - `info-menu'
+  ;; - `imenu'
+  ;; - `input-method'
+  ;; - `kill-ring'
+  ;; - `library'
+  ;; - `minor-mode'
+  ;; - `multi-category'
+  ;; - `package'
+  ;; - `project-file'
+  ;; - `symbol' (the `describe-symbol' command bound to `C-h o')
+  ;; - `theme'
+  ;; - `unicode-name' (the `insert-char' command bound to `C-x 8 RET')
+  ;; - `variable' (the `describe-variable' command bound to `C-h v')
+  ;; - `consult-grep'
+  ;; - `consult-isearch'
+  ;; - `consult-kmacro'
+  ;; - `consult-location'
+  ;; - `embark-keybinding'
+
+  (setq completion-category-overrides
+        '((file (styles . (basic partial-completion prescient)))
+          (bookmark (styles . (basic substring)))
+          (library (styles . (basic substring)))
+          (embark-keybinding (styles . (basic substring)))
+          (imenu (styles . (basic substring prescient)))
+          (consult-location (styles . (basic substring prescient)))
+          (kill-ring (styles . (emacs22 prescient)))
+          (eglot (styles . (emacs22 substring prescient))))))
+
+;; Built-in completion dials and switches.
+
+;; TODO: ordering with use package above.
+(setq completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+;; (setq-default case-fold-search t)   ; For general regexp
+(setq read-file-name-completion-ignore-case t)
+
+(setopt completion-cycle-threshold 1)
+(setopt completions-detailed t)
+(setopt completion-auto-help 'always)
+(setopt completions-max-height 7)
+(setopt completions-format 'one-column)
+(setopt completions-group t)
+(setopt completion-auto-select 'second-tab)
+
+(use-package mb-depth
+  :ensure nil
+  :hook (after-init . minibuffer-depth-indicate-mode))
+
+(use-package minibuf-eldef
+  :ensure nil
+  :hook (after-init . minibuffer-electric-default-mode)
+  :config
+  (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
+
+#+end_src
+
+
+** Corfu
+
+'Corfu' provides COmpletion in Region FUnctions and popups support.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; COmpletion in Region FUnctions:
+
+;; Corfu offers popup support both terminal and GUI use, but I do not
+;; use the terminal.
+
+(use-package corfu
+  :ensure t
+  :commands
+  (corfu-mode global-corfu-mode)
+  :bind
+  (:map corfu-map
+        ("SPC" . corfu-insert-separator)
+        ("C-n" . corfu-next)
+        ("C-p" . corfu-previous))
+  :hook ((prog-mode . corfu-mode)
+         (shell-mode . corfu-mode)
+         (eshell-mode . corfu-mode))
+  :custom
+  ;; This hides commands in m-x which do not apply to the current mode.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  :config
+  (global-corfu-mode))
+
+(use-package corfu-popupinfo
+  :after corfu
+  :ensure nil          ; This is part of the corfu package.
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :custom
+  (corfu-popupinfo-delay '(0.25 . 0.1))
+  (corfu-popupinfo-hide nil)
+  :config
+  (corfu-popupinfo-mode))
+
+;; Completion At Point Extensions:
+
+(use-package cape
+  :ensure t
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file))
+
+#+end_src
+
+
+** Vertico
+
+Vertical interactive completion. There are man options for completion
+presentation. This is the one I see most frequently in current
+configurations and it seems lighter weight than others.
+
+I don't use it well, but it works for me.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; VERtical Interactive COmpletion.
+
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
+
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :bind (:map vertico-map
+              ("M-DEL" . vertico-directory-delete-word)))
+
+#+end_src
+
+
+** Prescient
+
+The currently /en vogue/ completion candidate selection and sorting
+packages are Orderless and Prescient. I've been happy with both but
+Prescient strives to require the minimum of configuration. It
+succeeds. 
+
+Prot's base configuration does a lot of interesting things with
+Orderless and I need to review those, but for now ... Prescient.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Prescient completion candidate sorting and selection.
+
+(use-package prescient
+  :ensure t
+  :config
+  (prescient-persist-mode))
+
+(use-package corfu-prescient
+  :ensure t
+  :after (prescient corfu)
+  :config
+  (corfu-prescient-mode))
+
+(use-package vertico-prescient-mode
+  :ensure nil
+  :after (prescient vertico)
+  (vertico-prescient-mode))
+
+#+end_src
+
+
+** Key binds
+
+Grouping keybindings with their associated 'use-package' or 'require'
+makes a lot of sense, but then again so does having them all in one
+place. I'm putting global bindings here and will investigate pulling
+others here as well. `use-package' allows multiple `use-package'
+blocks for a package, so the bind sections could be moved here.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Key binds
+
+;; This makes TAB in the minibuffer behave more like it does in a
+;; shell.
+(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
+
+;; Make ESC quit prompts.
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; On the Mac s-q is the command-Q equivalent. I use it to close Emacs
+;; when I don't use M-x 'save-buffers-kill-emacs'.
+(global-unset-key (kbd "C-x C-c"))
+
+;; The number of times I want a dumb list instead of the smart UI for
+;; buffers and directories is zero.
+(global-set-key (kbd "C-x C-d") 'dired)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; Default search to regexp instead of string. TODO: Provide a toggle
+;; or string option.
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+
+;; Zap 'to' not 'through'. This is the way.
+(global-set-key "\M-z" 'zap-up-to-char)
+
+;; TODO: are these the bindings I want for these? 
+;;("M-c" . capitalize-dwim)
+;;("M-l" . downcase-dwim) ; "lower" case
+;;("M-u" . upcase-dwim)
+;;("M-=" . count-words) ;; was count-words-region
+
+;; ("C-M-d" . up-list) ; confusing name for what looks like "down" to me
+;; ("<C-M-backspace>" . backward-kill-sexp)
+;; Keymap for buffers (Emacs28)
+;; :map ctl-x-x-map
+;; ("f" . follow-mode)  ; override `font-lock-update'
+;; ("r" . rename-uniquely)
+;; ("l" . visual-line-mode)
+
+#+end_src
+
+
+** Bookmarks and Registers
+
+Bookmarks and registers are closely related and use much the same
+interface as registers.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Built-in bookmarking framework.
+
+(use-package bookmark
+  :ensure nil
+  :commands (bookmark-set bookmark-jump bookmark-bmenu-list)
+  :hook (bookmark-bmenu-mode . hl-line-mode)
+  :config
+  (setq bookmark-save-flag 1))          ; persist bookmark updates 
+
+;; Registers, named holders.
+
+(use-package register
+  :ensure nil
+  :defer t
+  :config
+  (setq register-preview-delay 0.8
+        register-preview-function #'register-preview-default)
+
+  (with-eval-after-load 'savehist
+    (add-to-list 'savehist-additional-variables 'register-alist)))
+
+#+end_src
+
+
+** Movement and navigation
+
+Most of the time I still use the arrow keys but I am trying to use
+smarter movement commands. Here are some packages that help.
+
+TODO: move to key-bind section.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Movement and navigation.
+
+(use-package avy
+  :demand t
+  :bind (("C-c j" . avy-goto-line)
+         ("s-j"   . avy-goto-char-timer)))
+
+(use-package ace-window
+  :demand t
+  :after avy
+  :bind (("C-x o" . ace-window)
+  	 ("M-o" . ace-window)))
+
+(use-package dumb-jump
+  :hook
+  (xref-backend-functions . dump-jump-xref-activate))
+
+#+end_src
+
+
+** Eglot
+
+Eglot is the Emacs built-in support for the Language Server Protocol
+(LSP). It strives for minimal configuration and succeeds, but there is
+some assumed knowledge that I didn't have that caused some head
+banging at times.
+
+Here is the main configuration of Eglot, independent of language mode.
+Wiring a language mode to use Eglot is done in each language mode
+section. If a language server is available the server is added to
+Eglot's server mappings.
+
+In a language mode buffer that can use Eglot/LSP, M-x eglot or
+M-x eglot-ensure will start Eglot for that buffer's project.
+
+Do not add eglot-ensure to all programming modes. The behavior is
+unpredictable if there is no LSP support installed for some modes, and
+others do not even have a language server.
+
+While Eglot is built-in, it gets relatively frequent updates. Like
+Org, make sure to have the latest from the GNU package archive.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Eglot
+
+(use-package eglot
+  :ensure t
+  :pin gnu
+
+  ;; We can start up language servers as sub-processes, be sure we can
+  ;; find the executables.
+  :after exec-path-from-shell
+
+  :commands (eglot
+  	     eglot-ensure
+  	     eglot-code-actions
+             eglot-rename
+             eglot-format-buffer)
+
+  :hook
+  (c-ts-mode . eglot-ensure)
+  (c++-ts-mode . eglot-ensure)
+  (odin-mode . eglot-ensure)
+
+  :bind (:map eglot-mode-map
+              ("C-c c a" . eglot-code-actions)
+              ("C-c c r" . eglot-rename))
+
+  ;; if debugging 'eglot' issues, comment out the fset and
+  ;; events-buffer-config lines.
+  :config
+  (fset #'jsonrpc--log-event #'ignore)  ; performance boost-don't log every event
+  (setopt jsonrpc-event-hook nil)
+
+  :custom
+  (eglot-events-buffer-config '(:size 0 :format short))
+  (eglot-autoshutdown t)
+  (eglot-send-changes-idle-time 0.1)
+  (eglot-extend-to-xref t)
+  (eglot-report-progress nil)  ; Prevent minibuffer spam
+  (eglot-ignored-server-capabilities
+   '(:documentFormattingProvider
+     :documentRangeFormattingProvider
+     :documentOnTypeFormattingProvider)))
+
+#+end_src
+
+
+** Treesitter
+
+There are packages and/or built-in modes for every language I care
+about other than mainframe assembly, mainframe JCL, and ARM assembly.
+The old style modes use regexp based parsing which can be slow, error
+prone, and "touchy". They frequently rely on tag files for code
+navigation.
+
+Treesitter is the "next new thing". It's a smarter parser system that
+uses precompiled grammar definitions to work with language mode
+packages that use it instead of relying on regexp based parsing.
+
+I use the "ts" modes when I can.
+
+NOTE: The Emacs and Treesitter development groups are independent and
+      aren't in sync and sometimes a new release of Emacs or
+      Treesitter will not match the ABI of the other. Be prepared to
+      pin the Treesitter release to match Emacs as Emacs is going to
+      lag behind Treesitter updates.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Treesitter
+
+;; There isn't much configuration to do for Treesitter. The
+;; customization options are minimal and it's just "always there."
+
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-font-lock-level 4)) ; levels 1-3 are useless
+
+;; some of these might require M-x treesit-install-language-grammar
+
+(setopt major-mode-remap-alist
+        '((yaml-mode . yaml-ts-mode)
+          (bash-mode . bash-ts-mode)
+          (js-mode . js-ts-mode)
+          (typescript-mode . typescript-ts-mode)
+          (json-mode . json-ts-mode)
+  	  (c-mode . c-ts-mode)
+  	  (c++-mode . c++-ts-mode)
+  	  (c-or-c++-mode . c-or-c++-ts-mode)
+  	  (ruby-mode . ruby-ts-mode)))
+
+(use-package treesit-auto
+  :after exec-path-from-shell
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (declare-function treeset-auto-add-to-auto-mode-alist "treesit-auto" t t)
+  (treesit-auto-add-to-auto-mode-alist
+   '(bash
+     c
+     commonlisp
+     cpp
+     go
+     html
+     java
+     javascript
+     json
+     make
+     markdown
+     org
+     python
+     ruby
+     toml
+     typescript
+     yaml))
+  (declare-function global-treesit-auto-mode "treesit-auto")
+  (global-treesit-auto-mode))
+
+#+end_src
+
+
+** Frame borders and dividers
+
+Add frame borders and window dividers to give a bit of clear space
+between UI elements and the edge of the physical screen.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Add frame borders and window dividers to give me a bit of
+;; separation from the edge of the screen.
+
+(modify-all-frames-parameters
+ '((right-divider-width . 5)
+   (internal-border-width . 5)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+#+end_src
+
+
+** "Tear off" a window and move it to a new frame
+
+I usually run with only one maximized frame with two windows at most.
+But there are times when multiple frames are warranted. This function
+takes a window from a multi-window frame and puts it in a new frame.
+
+This only works if there are multiple windows in the current frame.
+
+The original function is from https://stackoverflow.com/a/57318988
+_How to move a buffer to a new frame_.
+ 
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Utility function to move a window to a new frame.
+
+(defun troi/tear-off-window ()
+  "Move a sub-window to a new frame.
+From a multi-window frame, tear off the current window and put
+it in a new frame."
+  (interactive)
+  (let ((wc (count-windows)))
+    (if (< wc 2)
+  	(message "only one window")
+      (let* ((window (selected-window))
+  	     (buf (window-buffer window))
+  	     (frame (make-frame)))
+  	(select-frame frame)
+  	(switch-to-buffer buf)
+  	(delete-window window)))))
+
+;; TODO: move key-binds
+(bind-key "C-x 5t" #'troi/tear-off-window)
+
+#+end_src
+
+
+** Flymake
+
+Flymake is a built-in linting and error reporting system. Eglot
+prefers Flymake. As with Treesit and Eglot, there isn't much
+configuration needed to be usable.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Flymake
+
+;; 'flymake' has been a good linter interface. 'eglot' reports issues
+;; from 'clang-tidy' through 'flymake'.
+
+(use-package flymake
+  :after (exec-path-from-shell odin-mode)
+
+  :hook
+  (c-ts-mode . flymake-mode)
+  (c++-ts-mode . flymake-mode)
+  (emacs-lisp-mode . flymake-mode)
+  (odin-mode . flymake-mode)
+
+  :custom
+  (flymake-mode-line-lighter "FM")
+  :bind
+  (:map flymake-mode-map
+  	("M-n" . flymake-goto-next-error)
+  	("M-p" . flymake-goto-prev-error)
+        ("C-c ! l" . flymake-show-buffer-diagnostics)
+        ("C-c ! L" . flymake-show-project-diagnostics)))
+
+;; This is needed to avoid false 'can not find/load' errors on
+;; requires that occur before this point in the source.
+(with-eval-after-load 'flymake
+  (setopt elisp-flymake-byte-compile-load-path load-path))
+
+#+end_src
+
+
+** Project
+
+I don't adequately use 'project', and 'projectile' would be wasted on
+me.
+That said, the idea of a directory and its children being a project
+group makes sense.
+
+'project' uses source control artifacts to identify projects, but I
+don't always use source control for small projects. Adding other
+possible markers is easy. 'fpm.toml' is the Fortran Project Manager.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; `project'
+
+(use-package project
+  :ensure nil
+  :config
+  (setopt project-switch-commands
+          '((project-find-file "Find file")
+            (project-find-regexp "Find regexp")
+            (project-find-dir "Find directory")
+            (project-dired "Root dired")
+            (project-vc-dir "VC-Dir")
+            (project-shell "Shell")
+            (keyboard-quit "Quit")))
+  (setq project-vc-extra-root-markers
+	'(".projectile" ".project.el" "fpm.toml"))
+  (setq project-key-prompt-style t) ; Emacs 30
+  (advice-add #'project-switch-project
+	      :after #'troi-common-clear-minibuffer-message))
+
+#+end_src
+
+
+** Diffs
+
+You never know when you'll need a reminder of what exactly you changed.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; `ediff'
+
+(use-package ediff
+  :ensure nil
+  :commands (ediff-buffers ediff-files ediff-buffers3 ediff-files3)
+
+  :init
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+  :config
+  (setq ediff-keep-variants nil)
+  (setq ediff-make-buffers-readonly-at-startup nil)
+  (setq ediff-merge-revisions-with-ancestor t)
+  (setq ediff-show-clashes-only t))
+
+;;;###autoload
+(defun troi-common-clear-minibuffer-message (&rest _)
+  "Print an empty message to clear the echo area.
+Use this as advice :after a noisy function."
+  (message ""))
+
+;; `diff-mode'
+(use-package diff-mode
+  :ensure nil
+  :defer t
+  :config
+  (setq diff-default-read-only t))
+
+(use-package diff-hl
+  :config
+  (global-diff-hl-mode))
+
+#+end_src
+
+
+** Git and version control
+
+Emacs has built-in version control that is probably sufficient for my
+needs. It provides a consistent abstraction layer of many of the
+standard version control systems. I was loading up 'magit' but I am
+not using it. I do my work from the control line.
+
+Remember that I remove support from 'vc' for all backends except Git
+in 'early-init.el'.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Version control framework (vc.el, vc-git.el, and more)
+
+(use-package vc
+  :ensure nil
+  :init
+  (setq vc-follow-symlinks t)
+  :config
+  ;; Those offer various types of functionality, such as blaming,
+  ;; viewing logs, showing a dedicated buffer with changes to affected
+  ;; files.
+  (require 'vc-annotate)
+  (require 'vc-dir)
+  (require 'vc-git)
+  (require 'add-log)
+  (require 'log-view)
+
+  ;; This one is for editing commit messages.
+  (require 'log-edit)
+  (setq log-edit-confirm 'changed)
+  (setq log-edit-keep-buffer nil)
+  (setq log-edit-require-final-newline t)
+  (setq log-edit-setup-add-author nil)
+
+  (setq vc-find-revision-no-save t)
+  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
+  (setq vc-git-log-switches '("--stat"))
+  (setq vc-git-print-log-follow t)
+  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
+  (setq vc-git-root-log-format
+        `("%d %h %ai %an: %s"
+          ;; The first shy group matches the characters drawn by --graph.
+          ;; We use numbered groups because `log-view-message-re' wants the
+          ;; revision number to be group 1.
+          ,(concat "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?"
+                   "\\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) "
+                   "\\(?4:[0-9]\\{4\\}-[0-9-]\\{4\\}[0-9\s+:-]\\{16\\}\\) "
+                   "\\(?3:.*?\\):")
+          ((1 'log-view-message)
+           (2 'change-log-list nil lax)
+           (3 'change-log-name)
+           (4 'change-log-date))))
+
+  (setq vc-git-log-edit-summary-target-len 50)
+  (setq vc-git-log-edit-summary-max-len 70))
+
+#+end_src
+
+
+** Parentheses and Structured Editing
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Auto parenthesis matching
+
+(add-hook 'prog-mode-hook 'electric-pair-mode)
+
+#+end_src
+
+
+** Smoother scrolling
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; nicer scrolling
+
+(setopt scroll-margin 0)
+(setopt scroll-conservatively 100000)
+(setopt scroll-preserve-screen-position 1)
+;; DO NOT USE (pixel-scroll-precision-mode) DO NOT USE
+#+end_src
+
+
+** Buffer switching behavior
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+(setopt switch-to-buffer-obey-display-actions t)
+(setopt help-window-select t)
+(setopt help-window-keep-selected t)
+(setopt enable-recursive-minibuffers t)
+(setopt confirm-kill-emacs 'y-or-n-p)
+
+#+end_src
+
+
+** Enable disabled commands
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; The Emacs gods don't think we should have access to commands
+;; that might confuse us. They mark them disabled and issue an
+;; 'are you sure' warning.
+
+;; 'put' is used because these are properties of the function
+;; name symbol.
+
+(put 'scroll-left 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-defun 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+#+end_src
+
+
+** Auto-hide code blocks
+
+'auto-hide' hides function bodies in some programming modes. My fork
+includes c-ts-mode, a one liner in spirit. The PR was accepted and
+merged, but it hadn't moved to an archive the last time I checked
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Hide (fold) function bodies.
+
+(use-package auto-hide
+  :vc
+  (auto-hide :url "https://github.com/BlameTroi/auto-hide.el"
+             :branch "main")
+  :hook (prog-mode . hs-minor-mode))
+
+#+end_src
+
+
+** Loose small language modes
+
+I'm a programmer. I never liked fancy titles or job descriptions that
+really don't mean much. I'm also multilingual. Currently I do most of
+my programming in C, but I like Scheme, Fortran, and Pascal. I am
+learning Odin.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Random 'no' configuration required modes
+
+(use-package cmake-mode)
+
+(use-package ninja-mode)
+
+(use-package git-modes)
+
+#+end_src
+
+
+** C
+
+I've never bothered to learn C++, and I'm not going to, but C
+and other lower level languages are my preference.
+
+I surprised myself by discovering that I actually prefer real
+tabs in source. I know this won't go over with others, but I
+program for me and not those others.
+
+While `c-ts-mode' claims to be independent of the original `c'
+support in Emacs, it seems that it sometimes pulls things out
+of that mode or steals a setting name for its own use.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; C (not C++, C!)
+
+(setopt standard-indent 8)
+
+;; Just set a few options and wire in 'clangd'.
+(with-eval-after-load 'c-ts-mode
+  (setopt c-ts-mode-enable-doxygen t)
+  (setopt c-ts-mode-indent-offset 8)
+  (setopt c-ts-mode-indent-style 'linux)
+  (keymap-unset c-ts-base-mode-map "C-c C-c")) ; redundant 'comment-region'
+
+;; Configure the 'clangd' language server to my preferences.
+;; 'clangd' uses 'CMakeLists.txt' and 'compile_commands.json'
+;; to determine what to analyze. There are default settings
+;; in my local config as well.
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   '((c-ts-mode c++-ts-mode)
+     . ("clangd"
+        "-j=4"                   ; async index threads
+  	"--log=info"             ; or "error" or "verbose"
+  	"--pch-storage=memory"   ; i have plenty
+  	"--enable-config"))))
+
+;; Some other clangd options:
+;; "--log=error"						 ;;
+;; "--background-index"						 ;;
+;; "--clang-tidy"                ; but i use 'astyle' to format. ;;
+;; "--completion-style=detailed"				 ;;
+;; "--header-insertion=never"					 ;;
+;; "--header-insertion-decorators=0"
+
+;; I use 'astyle' to format C. The configuration goes in .astylerc
+;; in my home directory. My formatting is based on the 'linux'
+;; and 'k&r' styles.
+
+(use-package reformatter
+  :ensure t
+  :after exec-path-from-shell)
+
+(use-package astyle
+  :ensure t
+  :after reformatter
+  :when (executable-find "astyle")
+  :diminish (astyle-on-save-mode . "as")
+  :hook
+  (c-ts-mode . astyle-on-save-mode)
+  (c++-ts-mode . astyle-on-save-mode))
+
+#+end_src
+
+
+** Odin
+
+Odin is a relatively new language and it does not have a strong
+presence in the Emacs ecosystem. There isn't a Treesitter grammar
+for it yet. The 'ols' language server is still in its early
+stages and sometimes I have to restart 'eglot' to clear errors.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Odin.
+
+;; Odin mode isn't available as a package yet.
+
+(require 'odin-mode)
+
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   '(odin-mode . ("ols"))))
+
+#+end_src
+
+
+** Cobol
+
+The old stand-by is still in use. I'm not doing new development
+in it but there are things I might want to compile. There is at
+least one LSP available. There is a VS Code extension to check if
+I end up wanting more capabilities. There are multiple Treesitter
+grammars on GitHub but there is nothing that uses it for Emacs
+yet.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Cobol.
+
+(use-package cobol-mode
+  :ensure t
+  :defer t
+  :mode ("\\.cob\\'" "\\.cbl\\'" "\\.cpy\\'"))
+
+#+end_src
+
+
+** Fortran
+
+I spent several months working with Modern Fortran in 2023 and it was
+quite enjoyable. The Fortran community doesn't have many Emacs users
+but I was able to use it with Eglot. Eglot will use 'fortls' with no
+configuration and it works well.
+
+I have the beginnings of a formatter on GitHub but haven't finished it
+and packaged it.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Fortran.
+
+;; No setup required. The built-in 'fortran-mode' works with
+;; Modern Fortran (f90 file extension). 
+
+#+end_src
+
+
+** Typescript
+
+I need to use Typescript for a compiler book I'm working through
+but I haven't set this up in Emacs yet.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Typescript.
+
+;; To be provided.
+
+#+end_src
+
+
+** Assembler
+
+I'll want ARM assembler support for that compiler book mentioned
+for Typescript. I might also set up Hercules and go back to my
+mother tongue of S/360-70 assembly.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Assembler.
+
+;; ARM to be provided.
+
+;; IBM to be provided.
+
+#+end_src
+
+
+** Sml
+
+Standard ML (SML) was fun in a course I took. I would like to get
+a REPL set up for it (a la Geiser).
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; SML.
+
+;; There is a sml-ts-mode but I haven't used it, this setup
+;; worked well enough, but upgrading is an option if I get back
+;; to functional programming.
+
+;; The 'smlnj' and 'smlfmt' executables are available from
+;; 'brew'.
+
+(use-package sml-mode
+  :defer t
+  :ensure nil
+  :mode "\\.sml\\'"
+  :interpreter "sml")
+
+(use-package sml-basis
+  :ensure t
+  :after sml-mode)
+
+(use-package smlfmt
+  :ensure t
+  :after sml-mode)
+
+#+end_src
+
+
+** Guile or Chez
+
+I've started out with Guile but I'm switching over to Chez as I work
+through _The Scheme Programming Language_. 
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Guile or Chez scheme.
+
+;; There is LSP support for scheme in the 'lsp-mode' ecosystem,
+;; but I don't see it under 'eglot' yet. There is a 'geiser-chez'
+;; package but no matching 'flymake'.
+
+(use-package geiser-chez
+  :ensure t
+  :defer t
+  :custom
+  (geiser-chez-binary "chez"))
+
+;; (use-package geiser-guile
+;;   :ensure t
+;;   :defer t)
+;; 
+;; (use-package flymake-guile
+;;   :ensure t
+;;   :after geiser-guile)
+
+#+end_src
+
+
+** Text editing
+
+Let's catch all the settings missed so far and some of the helper
+packages.
+
+TODO: the search-whitespace-regexp, how do I turn it off temporarily?
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Text display and editing.
+
+(use-package isearch
+  :ensure nil
+  :demand t
+  :config
+  ;; "find one two" would find "one two" "one hi there two" etc.
+  ;; one `setq' here to make it obvious these are a group.
+  (setq search-whitespace-regexp ".*?"
+        isearch-lax-whitespace t
+        isearch-regexp-lax-whitespace nil)
+
+  (setq isearch-lazy-count t)
+  (setq isearch-lazy-highlight t)
+  (setq isearch-repeat-on-direction-change t)
+  (setq isearch-wrap-pause t)
+  
+  (setq search-highlight t)
+  
+  (setq lazy-count-prefix-format "(%s/%s) ")
+  (setq lazy-count-suffix-format nil)
+  (setq lazy-highlight-initial-delay 0.5)
+  (setq lazy-highlight-no-delay-length 4)
+  
+  (add-hook 'occur-mode-hook #'hl-line-mode)
+  
+  ) ;; use-package isearch
+
+#+end_src
+
+
+** regular expression builder
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+(use-package re-builder
+  :ensure nil
+  :commands (re-builder regexp-builder)
+  :config
+  (setq reb-re-syntax 'read))
+
+#+end_src
+
+
+** xref
+
+#+begin_src
+(use-package xref
+  :ensure nil
+  :commands (xref-find-definitions xref-go-back)
+  :config
+  ;; All those have been changed for Emacs 28
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
+  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
+  (setq xref-file-name-display 'project-relative))
+
+#+end_src
+
+
+** grep
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+(use-package grep
+  :ensure nil
+  :after exec-path-from-shell
+  :commands (grep lgrep rgrep)
+  :config
+  (setq grep-save-buffers nil)
+  (setq grep-use-headings t) ; Emacs 30
+
+  (let ((executable (or (executable-find "rg") "grep"))
+        (rgp (string-match-p "rg" grep-program)))
+    (setq grep-program executable)
+    (setq grep-template
+          (if rgp
+              "/usr/bin/rg -nH --null -e <R> <F>"
+            "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
+    (setq xref-search-program (if rgp 'ripgrep 'grep))))
+
+#+end_src
+
+
+** 'wgrep' (remove once on Emacs 31)
+
+Writable grep buffers. The `wgrep' package will be obsolete in
+Emacs 31.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; wgrep (writable grep)
+;; See the `grep-edit-mode' for the new built-in feature.
+
+(unless (>= emacs-major-version 31)
+  (use-package wgrep
+    :ensure t
+    :after grep
+    :bind
+    ( :map grep-mode-map
+      ("e" . wgrep-change-to-wgrep-mode)
+      ("C-x C-q" . wgrep-change-to-wgrep-mode)
+      ("C-c C-c" . wgrep-finish-edit))
+    :config
+    (setq wgrep-auto-save-buffer t)
+    (setq wgrep-change-readonly-file t)))
+
+#+end_src
+
+
+** Settings odds and ends.
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+;; Text and other settings that haven't fit anywhere else yet.
+
+;; Line widths. The `visual-fill-column' package 'narrows' the
+;; display when you're using a single window on a wide screen so
+;; if you are wrapping text it will wrap at the fill column and
+;; not the edge of the screen.
+
+(setq-default tab-width 8)
+(setq-default indent-tabs-mode t)
+
+(use-package visual-fill-column
+  :ensure t
+  :commands (visual-fill-column-mode))
+
+;; visual line mode is OK for text, use (truncate-lines t) for
+;; code.
+
+(setq-default fill-column 70)
+;; (add-hook 'text-mode-hook 'visual-line-mode)
+
+;; More odds and ends.
+
+(delete-selection-mode +1)
+(indent-tabs-mode +1)
+(setopt tab-always-indent 'complete)
+(setopt comment-empty-lines t)
+(setopt require-final-newline t)
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; Parentheses (show-paren-mode)
+(use-package paren
+  :ensure nil
+  :hook (prog-mode . show-paren-local-mode)
+  :config
+  (setq show-paren-style 'parenthesis)
+  (setq show-paren-when-point-in-periphery nil)
+  (setq show-paren-when-point-inside-paren nil)
+  (setq show-paren-context-when-offscreen 'overlay)) ; Emacs 29
+
+;; Plain text (text-mode)
+(use-package text-mode
+  :ensure nil
+  :mode "\\`\\(README\\|CHANGELOG\\|COPYING\\|LICENSE\\)\\'"
+  :hook
+  (text-mode . turn-on-auto-fill)
+  :config
+  (setq sentence-end-double-space nil)
+  (setq sentence-end-without-period nil)
+  (setq colon-double-space nil)
+  (setq use-hard-newlines nil)
+  (setq adaptive-fill-mode t))
+
+(use-package which-key
+  :ensure nil
+  :diminish
+  :config (which-key-mode))
+
+(use-package bind-key
+  :ensure nil)
+
+(use-package ws-butler
+  :ensure t
+  :diminish
+  :hook (prog-mode . ws-butler-mode))
+
+;; i often use C-l for visual breaks.
+
+(use-package form-feed-st
+  :diminish
+  :hook
+  (prog-mode . form-feed-st-mode)
+  (text-mode . form-feed-st-mode))
+
+#+end_src
+
+
+** The standard outro
+
+#+begin_src emacs-lisp :tangle "new-init.el"
+
+(provide 'init)
+;;; File init.el ends here.
+#+end_src
