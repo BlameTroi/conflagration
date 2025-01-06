@@ -552,6 +552,9 @@ once done, the compiles are generally done.
   ;;:custom
   ;;  (compile-angel-verbose nil)
   :config
+  (diminish 'compile-angel-on-load-mode "")
+  (diminish 'compile-angel-on-save-mode "")
+  (diminish 'compile-angel-on-save-local-mode "")
   (setq compile-angel-excluded-files-regexps '("/cus-load\\.el$"
                                                "/theme-loaddefs\\.el$"
                                                "/loaddefs\\.el\\.gz$"
