@@ -1,0 +1,37 @@
+InlayHints:
+        BlockEnd: Yes
+        Designators: Yes
+        Enabled: Yes
+        ParameterNames: No
+        DeducedTypes: Yes
+        TypeNameLimit: 24
+
+Hover:
+        ShowAKA: Yes
+
+Diagnostics:
+        ClangTidy:
+                Add: modernize*
+                Add: readability*
+                Add: llvm-include-order
+                Add: misc-misplaced-const
+                Add: misc-use-internal-linkage
+                Add: misc-definitions-in-headers
+                Add: misc-include-cleaner
+                Add: misc-internal-linkage
+                Add: performance*
+                Add: bugprone-assert-side-effect
+                Add: bugprone-integer-division
+                Add: bugprone-macro-parentheses
+                Add: bugprone-misplaced-operator-in-strlen-in-alloc
+                Add: bugprone-multi-level-implicit-pointer-conversion
+                Add: bugprone-redundant-branch-condition
+                Add: bugprone-reserved-identifier
+                Add: bugprone-sizeof-expression
+                Add: bugprone-suspicious-memset-usage
+                Add: bugprone-suspicious-semicolon
+                Add: bugprone-suspicious-string-compare
+
+Index:
+        StandardLibrary: yes
+        Background: Build
