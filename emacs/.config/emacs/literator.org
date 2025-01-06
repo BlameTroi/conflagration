@@ -548,6 +548,7 @@ once done, the compiles are generally done.
 (use-package compile-angel
   :ensure t
   :demand t
+  :diminish
   ;;:custom
   ;;  (compile-angel-verbose nil)
   :config
@@ -1812,6 +1813,7 @@ NOTE: The Emacs and Treesitter development groups are independent and
   	  (ruby-mode . ruby-ts-mode)))
 
 (use-package treesit-auto
+  :ensure t
   :after exec-path-from-shell
   :custom
   (treesit-auto-install 'prompt)
@@ -2005,6 +2007,7 @@ Use this as advice :after a noisy function."
   (setq diff-default-read-only t))
 
 (use-package diff-hl
+  :ensure t
   :config
   (global-diff-hl-mode))
 

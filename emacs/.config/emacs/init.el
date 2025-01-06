@@ -12,7 +12,7 @@
 ;; This file is NOT part of GNU Emacs. The author considers it to be
 ;; in the public domain.
 ;;
-;; This file is generated from an Org document. That file should be 
+;; This file is generated from an Org document. That file should be
 ;; found in the same directory as this in my "dotfiles" repository.
 
 ;; I borrow liberally from Protesilaos "Prot" Stavrou's highly
@@ -75,6 +75,7 @@
 (use-package compile-angel
   :ensure t
   :demand t
+  :diminish
   ;;:custom
   ;;  (compile-angel-verbose nil)
   :config
@@ -439,10 +440,10 @@ effects."
   :ensure t
   :pin gnu
   :custom
-  (org-confirm-babel-evaluate nil) 
-  (org-src-fontify-natively t)     
-  (org-src-tab-acts-natively t)    
-  (org-src-preserve-indentation t) 
+  (org-confirm-babel-evaluate nil)
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
+  (org-src-preserve-indentation t)
   :config
   (setq org-return-follows-link nil)
   (setq org-loop-over-headlines-in-active-region 'start-level)
@@ -525,13 +526,13 @@ effects."
 ;; 	  ("c" . "center")
 ;; 	  ("v" . "verse")
 ;;          ("x" . "example")
-;; 
+;;
 ;; 	  ("a" . "export ASCII")
 ;;          ("X" . "export")
-;; 
+;;
 ;; 	  ("s" . "src")
 ;;          ("e" . "src emacs-lisp")
-;; 
+;;
 ;;          ("t" . "src emacs-lisp :tangle FILENAME")
 ;;          ("E" . "src emacs-lisp :results value code :lexical t")
 ;;          ("T" . "src emacs-lisp :tangle FILENAME :mkdirp yes")
@@ -842,7 +843,7 @@ effects."
 ;; Zap 'to' not 'through'. This is the way.
 (global-set-key "\M-z" 'zap-up-to-char)
 
-;; TODO: are these the bindings I want for these? 
+;; TODO: are these the bindings I want for these?
 ;;("M-c" . capitalize-dwim)
 ;;("M-l" . downcase-dwim) ; "lower" case
 ;;("M-u" . upcase-dwim)
@@ -863,7 +864,7 @@ effects."
   :commands (bookmark-set bookmark-jump bookmark-bmenu-list)
   :hook (bookmark-bmenu-mode . hl-line-mode)
   :config
-  (setq bookmark-save-flag 1))          ; persist bookmark updates 
+  (setq bookmark-save-flag 1))          ; persist bookmark updates
 
 ;; Registers, named holders.
 
@@ -960,6 +961,7 @@ effects."
   	  (ruby-mode . ruby-ts-mode)))
 
 (use-package treesit-auto
+  :ensure t
   :after exec-path-from-shell
   :custom
   (treesit-auto-install 'prompt)
@@ -1096,6 +1098,7 @@ Use this as advice :after a noisy function."
   (setq diff-default-read-only t))
 
 (use-package diff-hl
+  :ensure t
   :config
   (global-diff-hl-mode))
 
@@ -1312,7 +1315,7 @@ Use this as advice :after a noisy function."
 ;; (use-package geiser-guile
 ;;   :ensure t
 ;;   :defer t)
-;; 
+;;
 ;; (use-package flymake-guile
 ;;   :ensure t
 ;;   :after geiser-guile)
@@ -1333,16 +1336,16 @@ Use this as advice :after a noisy function."
   (setq isearch-lazy-highlight t)
   (setq isearch-repeat-on-direction-change t)
   (setq isearch-wrap-pause t)
-  
+
   (setq search-highlight t)
-  
+
   (setq lazy-count-prefix-format "(%s/%s) ")
   (setq lazy-count-suffix-format nil)
   (setq lazy-highlight-initial-delay 0.5)
   (setq lazy-highlight-no-delay-length 4)
-  
+
   (add-hook 'occur-mode-hook #'hl-line-mode)
-  
+
   ) ;; use-package isearch
 
 (use-package re-builder
