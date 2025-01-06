@@ -16,6 +16,10 @@ general-side-notes.txt
 # and not the tangled config
 literate-config.el
 
+# some wiring
+!new-inits
+!old-inits
+
 # remove emacs runtime transient stuff
 # i've started using no-littering, should i pick and
 # choose from etc or not?

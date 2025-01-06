@@ -7,6 +7,20 @@
 #+macro: latest-export-date (eval (format-time-string "%F %T %z"))
 #+macro: word-count (eval (count-words (point-min) (point-max)))
 
+#+begin_center
+       This a first pass at reducing Protesilaos' comprehensive
+       literate configuration down to something I can work with
+       to merge with my own pre-literate configuration. See his
+         original at https://github.com/protesilaos/dotfiles.
+
+        There are some renames in here to match my style, some
+      partially merged stuff from my config, and some deletions
+            of things I won't (or don't know how to) use.
+
+           I'm keeping this around for reference. My actual
+                 configuration is in 'literator.org'.
+#+end_center
+
 /This is my literate Emacs configuration file.
 There are many like it, but this one is mine./
 
@@ -52,7 +66,7 @@ configuration files.
 #+begin_src emacs-lisp :tangle no :results none
 
 ;; evaluate this or use C-c C-v t
-(org-babel-tangle)  
+(org-babel-tangle)
 
 #+end_src
 
@@ -60,7 +74,7 @@ You can find the original inspiration for this at:
 
 + Website: <https://protesilaos.com/emacs/dotemacs>
 
-  
+
 * The early initialisation of Emacs (=early-init.el=)
 :PROPERTIES:
 :CUSTOM_ID: h:7b7b5898-09f7-4128-8af0-4041f67cb729
@@ -471,7 +485,7 @@ different purpose.
   development (new or maintenance) packages. Several of
   Protesilaos' custom libraries land here as well. I have a TODO:
   to move them.
-  
+
 #+begin_src emacs-lisp :tangle "bad-init.el"
 
 (mapc
@@ -809,7 +823,7 @@ A TODO: is to make this variable list customizable.
 ;;
 ;; Enter `exec-path-from-shell'. It copies environment variables from
 ;; the shell into the Emacs process.
-;; 
+;;
 ;; This list isn't comprehensive. As I find a variable missing, I add
 ;; it to the list.
 
@@ -1242,7 +1256,7 @@ configuration modules but you have to hard code the ~require~.
   ;;; Theme setup and related
 
     (require 'bad-emacs-acme-theme)
-  
+
 #+end_src
 
 
@@ -1391,7 +1405,7 @@ Also unbind or repurpose some of the default key bindings.
     ("C-x C-b" . ibuffer)
     ("C-s" . isearch-forward-regexp)
     ("C-r" . isearch-backward-regexp)
-    
+
     :map prog-mode-map
     ;; ("C-M-d" . up-list) ; confusing name for what looks like "down" to me
     ;; ("<C-M-backspace>" . backward-kill-sexp)
@@ -1428,7 +1442,7 @@ up here:
    may also be set up elsewhere and described in that context.
    Here I only cover the basic parent modes.
 #+end_quote
-   
+
 #+begin_src emacs-lisp :tangle "bad-emacs-modules/bad-emacs-essentials.el"
 
 (use-package troi-common
@@ -1452,7 +1466,7 @@ various keys.
 (use-package troi-simple
   :ensure nil
   :demand t
-  
+
   :bind
   ( ("ESC ESC" . troi-simple-keyboard-quit-dwim)
     ("C-g" . troi-simple-keyboard-quit-dwim)
@@ -1777,7 +1791,7 @@ styles and a brief description of what Prot does with
   are encountered in the given order.
 
   (troi: this is the style I find most natural)
-  
+
 - initials :: Completion of acronyms and initialisms.
 
 - orderless :: This is a separate package with more extensive
@@ -2010,7 +2024,7 @@ Several small minibuffer tweaks.
   the file system path we wish to visit.
 
   I may want to turn this off. We'll see.
-  
+
 #+begin_src emacs-lisp :tangle "bad-emacs-modules/bad-emacs-completion.el"
 
 (use-package rfn-eshadow
@@ -2326,7 +2340,7 @@ of settings will go smoothly.
   ;; (read-extended-command-predicate #'command-completion-default-include-p)
   ;; disable ispell completion function. as an alternative try `cape-dict'.
   ;; (text-mode-ispell-word-completion nil)
-  
+
   )
 
 #+end_src
@@ -2457,7 +2471,7 @@ configuration to use it regardless of setting.
     ;; or root '/' directory, Vertico will clear the old path to keep
     ;; only your current input.
 ;;    (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
-  
+
   )
 
 (use-package vertico-directory
@@ -2821,14 +2835,14 @@ work well with ~dired~.
   :ensure nil
   :commands (dired)
   :config
-  
+
   (when (executable-find "gls")    ; use GNU ls
     (setopt dired-use-ls-dired nil)
     (setopt ls-lisp-use-insert-directory-program t)
     (setopt insert-directory-program "gls")
     ;; my old options (setopt dired-listing-switches "-alh --group-directories-first")
     )
-    
+
   (setq dired-listing-switches
         "-aGFhlv --group-directories-first --time-style=long-iso"))
 
@@ -2878,7 +2892,7 @@ Minor tweaks.
   ;;  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
     (add-hook 'dired-mode-hook #'hl-line-mode)
   )
-  
+
 #+end_src
 
 
@@ -2907,7 +2921,7 @@ that provide useful extras for Dired.
   (setq dired-create-destination-dirs 'ask) ; Emacs 27
   (setq dired-vc-rename-file t)             ; Emacs 27
   (setq dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir)))) ; Emacs 28
-) 
+)
 
 (use-package dired-x
   :ensure nil
@@ -3224,7 +3238,7 @@ since it is related.
   )
 
 #+end_src
- 
+
 
 *** The =bad-emacs-window.el= section key bindings
 :PROPERTIES:
@@ -3758,9 +3772,9 @@ produced below the code block.
 There are many types of blocks:
 
 - =#+BEGIN_QUOTE= :: Treat the contents as a block quote.
-  
+
 - =#+BEGIN_VERSE= :: Honor line breaks, as in verse.
-  
+
 - =#+BEGIN_EXPORT= :: Evaluate the code for a target (like =html=
   or =latex=).
 
@@ -3896,7 +3910,7 @@ time, todo lists, etc). Views may be customized and filtered.
                  (interactive)
                  (org-agenda nil "A"))))
   :config
-  
+
 ;; Custom agenda blocks
 
   (setq org-agenda-format-date #'troi-org-agenda-format-date-aligned)

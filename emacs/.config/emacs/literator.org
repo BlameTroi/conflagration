@@ -38,7 +38,7 @@ to spot indentation and nesting errors across code blocks.
 ;; This file is NOT part of GNU Emacs. The author considers it to be
 ;; in the public domain.
 ;;
-;; This file is generated from an Org document. That file should be 
+;; This file is generated from an Org document. That file should be
 ;; found in the same directory as this in my "dotfiles" repository.
 
 ;; I borrow liberally from Protesilaos "Prot" Stavrou's highly
@@ -447,7 +447,7 @@ Emacs my Emacs.
 ;; This file is NOT part of GNU Emacs. The author considers it to be
 ;; in the public domain.
 ;;
-;; This file is generated from an Org document. That file should be 
+;; This file is generated from an Org document. That file should be
 ;; found in the same directory as this in my "dotfiles" repository.
 
 ;; I borrow liberally from Protesilaos "Prot" Stavrou's highly
@@ -756,7 +756,7 @@ to force it to use the GNU `ls' as the built-in one does not support
 some options that `dired' needs.
 
 TODO: This is complete but it could be improved. Do I want the extras?
-      
+
 #+begin_src emacs-lisp :tangle "new-init.el"
 ;; for dired, use 'gls' if it's available. the default 'ls' in MacOS
 ;; and some other systems doesn't support all the options that 'dired'
@@ -1076,10 +1076,10 @@ force loads if needed.
   :ensure t
   :pin gnu
   :custom
-  (org-confirm-babel-evaluate nil) 
-  (org-src-fontify-natively t)     
-  (org-src-tab-acts-natively t)    
-  (org-src-preserve-indentation t) 
+  (org-confirm-babel-evaluate nil)
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
+  (org-src-preserve-indentation t)
   :config
   (setq org-return-follows-link nil)
   (setq org-loop-over-headlines-in-active-region 'start-level)
@@ -1162,13 +1162,13 @@ force loads if needed.
 ;; 	  ("c" . "center")
 ;; 	  ("v" . "verse")
 ;;          ("x" . "example")
-;; 
+;;
 ;; 	  ("a" . "export ASCII")
 ;;          ("X" . "export")
-;; 
+;;
 ;; 	  ("s" . "src")
 ;;          ("e" . "src emacs-lisp")
-;; 
+;;
 ;;          ("t" . "src emacs-lisp :tangle FILENAME")
 ;;          ("E" . "src emacs-lisp :results value code :lexical t")
 ;;          ("T" . "src emacs-lisp :tangle FILENAME :mkdirp yes")
@@ -1347,7 +1347,7 @@ code where unneeded white-space has been removed. forcing paragraph
 text direction is reported to also help by removing the checks and
 scans for right to left languages.
 
-#+begin_src emacs-lisp :tangle "new-init.el" 
+#+begin_src emacs-lisp :tangle "new-init.el"
 ;; Improve processing of excessively long lines. Forcing left-to-right
 ;; instead of allowing for right-to-left is apparently a significant
 ;; improvement for long lines.
@@ -1566,7 +1566,7 @@ I don't use it well, but it works for me.
 The currently /en vogue/ completion candidate selection and sorting
 packages are Orderless and Prescient. I've been happy with both but
 Prescient strives to require the minimum of configuration. It
-succeeds. 
+succeeds.
 
 Prot's base configuration does a lot of interesting things with
 Orderless and I need to review those, but for now ... Prescient.
@@ -1628,7 +1628,7 @@ blocks for a package, so the bind sections could be moved here.
 ;; Zap 'to' not 'through'. This is the way.
 (global-set-key "\M-z" 'zap-up-to-char)
 
-;; TODO: are these the bindings I want for these? 
+;; TODO: are these the bindings I want for these?
 ;;("M-c" . capitalize-dwim)
 ;;("M-l" . downcase-dwim) ; "lower" case
 ;;("M-u" . upcase-dwim)
@@ -1658,7 +1658,7 @@ interface as registers.
   :commands (bookmark-set bookmark-jump bookmark-bmenu-list)
   :hook (bookmark-bmenu-mode . hl-line-mode)
   :config
-  (setq bookmark-save-flag 1))          ; persist bookmark updates 
+  (setq bookmark-save-flag 1))          ; persist bookmark updates
 
 ;; Registers, named holders.
 
@@ -1878,7 +1878,7 @@ This only works if there are multiple windows in the current frame.
 
 The original function is from https://stackoverflow.com/a/57318988
 _How to move a buffer to a new frame_.
- 
+
 #+begin_src emacs-lisp :tangle "new-init.el"
 ;; Utility function to move a window to a new frame.
 
@@ -2290,7 +2290,7 @@ and packaged it.
 ;; Fortran.
 
 ;; No setup required. The built-in 'fortran-mode' works with
-;; Modern Fortran (f90 file extension). 
+;; Modern Fortran (f90 file extension).
 
 #+end_src
 
@@ -2359,7 +2359,7 @@ a REPL set up for it (a la Geiser).
 ** Guile or Chez
 
 I've started out with Guile but I'm switching over to Chez as I work
-through _The Scheme Programming Language_. 
+through _The Scheme Programming Language_.
 
 #+begin_src emacs-lisp :tangle "new-init.el"
 ;; Guile or Chez scheme.
@@ -2377,7 +2377,7 @@ through _The Scheme Programming Language_.
 ;; (use-package geiser-guile
 ;;   :ensure t
 ;;   :defer t)
-;; 
+;;
 ;; (use-package flymake-guile
 ;;   :ensure t
 ;;   :after geiser-guile)
@@ -2409,16 +2409,16 @@ TODO: the search-whitespace-regexp, how do I turn it off temporarily?
   (setq isearch-lazy-highlight t)
   (setq isearch-repeat-on-direction-change t)
   (setq isearch-wrap-pause t)
-  
+
   (setq search-highlight t)
-  
+
   (setq lazy-count-prefix-format "(%s/%s) ")
   (setq lazy-count-suffix-format nil)
   (setq lazy-highlight-initial-delay 0.5)
   (setq lazy-highlight-no-delay-length 4)
-  
+
   (add-hook 'occur-mode-hook #'hl-line-mode)
-  
+
   ) ;; use-package isearch
 
 #+end_src
