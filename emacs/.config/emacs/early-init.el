@@ -11,7 +11,7 @@
 ;; This file is NOT part of GNU Emacs. The author considers it to be
 ;; in the public domain.
 ;;
-;; This file is generated from an Org document. That file should be 
+;; This file is generated from an Org document. That file should be
 ;; found in the same directory as this in my "dotfiles" repository.
 
 ;; I borrow liberally from Protesilaos "Prot" Stavrou's highly

@@ -7,12 +7,12 @@
  '(package-selected-packages
    '(acme-theme astyle auto-hide cape cmake-mode cobol-mode compile-angel
 		corfu-prescient deft diff-hl diminish dumb-jump
-		exec-path-from-shell form-feed-st geiser-chez
-		git-modes hide-mode-line kind-icon marginalia
+		exec-path-from-shell form-feed-st git-modes
+		hide-mode-line kind-icon marginalia
 		nerd-icons-completion nerd-icons-corfu
 		nerd-icons-dired nerd-icons-ibuffer ninja-mode
 		no-littering ob-sml ob-typescript org-bullets
-		org-modern side-notes sml-basis smlfmt
+		org-modern side-notes sml-basis smlfmt srfi
 		treemacs-nerd-icons treesit-auto vertico
 		visual-fill-column wgrep ws-butler)))
 (custom-set-faces

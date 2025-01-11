@@ -1303,25 +1303,47 @@ Use this as advice :after a noisy function."
   :ensure t
   :after sml-mode)
 
-;; Guile or Chez scheme.
+;; Guile or Chez scheme? Nah, Chicken!
 
-;; There is LSP support for scheme in the 'lsp-mode' ecosystem,
-;; but I don't see it under 'eglot' yet. There is a 'geiser-chez'
-;; package but no matching 'flymake'.
+;; NOTE: If Geiser sees a 'geiser-somescheme' in your load-path,
+;;       it becomes available leading to popups about which
+;;       scheme to run. Removing non-active schemes for now.
 
-(use-package geiser-chez
-  :ensure t
-  :defer t
-  :custom
-  (geiser-chez-binary "chez"))
+;;(use-package geiser-chez
+;;  :ensure t
+;;  :defer t
+;;  :custom
+;;  (geiser-chez-binary "chez"))
 
 ;; (use-package geiser-guile
 ;;   :ensure t
-;;   :defer t)
-;;
+;;   :defer t
+;;   :config
+;;   (add-to-list 'geiser-implementations-alist
+;; 	       '(((regexp "\\.scm$") guile)
+;; 		((regexp "\\.ss$") chez)
+;; 		((regexp "\\.rkt$") racket))))
+;; 
 ;; (use-package flymake-guile
 ;;   :ensure t
 ;;   :after geiser-guile)
+
+;; (use-package geiser-chicken
+;;   :ensure t
+;;   :defer t
+;;   :config
+;;   (add-to-list 'geiser-implementations-alist
+;; 	       '(((regexp "\\.scm$") chicken)
+;; 		 ((regexp "\\.ss$") chez))))
+
+;; I don't know if I want to get the non elpa-ed flymake or not.
+
+(require 'chicken)
+(require 'flymake-chicken)
+
+;(use-package scheme-mode
+;  ensure: nil
+;  :hook (scheme-mode ))
 
 ;; Text display and editing.
 

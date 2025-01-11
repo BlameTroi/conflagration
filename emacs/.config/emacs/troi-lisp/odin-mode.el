@@ -1,11 +1,23 @@
-;;; odin-mode.el --- A minor mode for odin
+;;; odin-mode.el - A mode for Odin -*- lexical-binding: t; -*-
+
+;;; Commentary:
 
 ;; Author: Ethan Morgan
 ;; Keywords: odin, language, languages, mode
 ;; Package-Requires: ((emacs "24.1"))
 ;; Homepage: https://github.com/glassofethanol/odin-mode
 
-;; This file is NOT part of GNU Emacs.
+;; Copyright unknown.
+
+;; Last update by: Troy Brumley <blametroi@gmail.com>
+
+;; No rights reserved.
+
+;; So far this just matches the original from github but I have
+;; added the standard intro and outro comments.
+
+;; This file is NOT part of GNU Emacs. The last maintainer considers
+;; it to be in the public domain.
 
 ;;; Code:
 
@@ -305,6 +317,4 @@
 (add-to-list 'auto-mode-alist '("\\.odin\\'" . odin-mode))
 
 (provide 'odin-mode)
-
-
 ;;; odin-mode.el ends here

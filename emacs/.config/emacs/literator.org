@@ -2356,31 +2356,72 @@ a REPL set up for it (a la Geiser).
 #+end_src
 
 
-** Guile or Chez
+** Guile or Chez or Chicken or ???
 
 I've started out with Guile but I'm switching over to Chez as I work
-through _The Scheme Programming Language_.
+through _The Scheme Programming Language_ and Chicken as I work
+through _Simply Scheme:Introducing Computer Science_. I also have
+Racket installed but am keeping it out of Emacs. It has good support
+for _Simply Scheme_ and _SICP_.
+
+Both _SS_ and _SICP_ have their own definitions that they lay over
+Scheme for pedagogical purposes. Unlike some people, I don't see this
+as a "bad thing" but it presented some challenges. Neither Guile nor
+Chez would work with the support files for _SS_. Racket should handle
+both but it's big and gaudy. Chicken works with _SS_, and I'll deal
+with _SICP_ when the time comes.
+
+LSP, what to do about LSP? There is LSP support for scheme in the
+'lsp-mode' ecosystem, but I don't see it under 'eglot' yet. It may
+just work, but I'll not bother with it now. There is a 'geiser-chez'
+package but no matching 'flymake'. 'flymake-chicken' exists but it's
+not in an archive. I don't know if I need/want it yet.
+
+/I'm having problems with geiser and it looks as if it and chicken
+aren't quite meshing. I'll try some other options./
 
 #+begin_src emacs-lisp :tangle "new-init.el"
-;; Guile or Chez scheme.
+;; Guile or Chez scheme? Nah, Chicken!
 
-;; There is LSP support for scheme in the 'lsp-mode' ecosystem,
-;; but I don't see it under 'eglot' yet. There is a 'geiser-chez'
-;; package but no matching 'flymake'.
+;; NOTE: If Geiser sees a 'geiser-somescheme' in your load-path,
+;;       it becomes available leading to popups about which
+;;       scheme to run. Removing non-active schemes for now.
 
-(use-package geiser-chez
-  :ensure t
-  :defer t
-  :custom
-  (geiser-chez-binary "chez"))
+;;(use-package geiser-chez
+;;  :ensure t
+;;  :defer t
+;;  :custom
+;;  (geiser-chez-binary "chez"))
 
 ;; (use-package geiser-guile
 ;;   :ensure t
-;;   :defer t)
-;;
+;;   :defer t
+;;   :config
+;;   (add-to-list 'geiser-implementations-alist
+;; 	       '(((regexp "\\.scm$") guile)
+;; 		((regexp "\\.ss$") chez)
+;; 		((regexp "\\.rkt$") racket))))
+;; 
 ;; (use-package flymake-guile
 ;;   :ensure t
 ;;   :after geiser-guile)
+
+;; (use-package geiser-chicken
+;;   :ensure t
+;;   :defer t
+;;   :config
+;;   (add-to-list 'geiser-implementations-alist
+;; 	       '(((regexp "\\.scm$") chicken)
+;; 		 ((regexp "\\.ss$") chez))))
+
+;; I don't know if I want to get the non elpa-ed flymake or not.
+
+(require 'chicken)
+(require 'flymake-chicken)
+
+;(use-package scheme-mode
+;  ensure: nil
+;  :hook (scheme-mode ))
 
 #+end_src
 
