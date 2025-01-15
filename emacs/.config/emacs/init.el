@@ -68,59 +68,9 @@
             ("melpa-stable" . 6)
             ("melpa" . 5))))
 
-;; 'compile-angel' opts for compiling most everything. It's still in
-;; early development so this section is likely to change.
-
-;; TODO: gate with native compile available check.
-(use-package compile-angel
-  :ensure t
-  :demand t
-  :diminish
-  ;;:custom
-  ;;  (compile-angel-verbose nil)
-  :config
-  (diminish 'compile-angel-on-load-mode "")
-  (diminish 'compile-angel-on-save-mode "")
-  (diminish 'compile-angel-on-save-local-mode "")
-  (setq compile-angel-excluded-files-regexps '("/cus-load\\.el$"
-                                               "/theme-loaddefs\\.el$"
-                                               "/loaddefs\\.el\\.gz$"
-                                               "/charprop\\.el$"
-                                               "/cl-loaddefs\\.el\\.gz$"
-					       "custom.el$"
-					       "savehist.el$"
-					       "recentf-save.el$"))
-  ;; (setq compile-angel-predicate-function
-  ;; 	(lambda (file)
-  ;;         (not (file-in-directory-p file "/opt/.*"))))
-
-  (compile-angel-on-load-mode)
-  (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode))
-
 ;; not a dashboard.
 
 (setopt initial-scratch-message ";; nothing to see here, move along")
-
-;; Wrapper macro to "no-op" emacs-lisp code. This is from
-;; Prot's configuration.
-
-(defmacro troi-emacs-comment (&rest body)
-  "Determine what to do with BODY.
-If BODY contains an unquoted plist of the form (:eval t) then
-return BODY inside a `progn'.
-
-Otherwise, do nothing with BODY and return nil, with no side
-effects."
-  (declare (indent defun))
-  (let ((eval))
-    (dolist (element body)
-      (when-let* (((plistp element))
-                  (key (car element))
-                  ((eq key :eval))
-                  (val (cadr element)))
-        (setq eval val
-              body (delq element body))))
-    (when eval `(progn ,@body))))
 
 ;; No littering to reduce directory clutter.
 
@@ -230,13 +180,6 @@ effects."
   (setopt dired-do-revert-buffer t)
   (setopt dired-free-space 'separate))
 
-(use-package wdired
-  :ensure nil
-  :commands (wdired-change-to-wdired-mode)
-  :config
-  (setq wdired-allow-to-change-permissions t)
-  (setq wdired-create-parent-directories t))
-
 ;; History and such.
 
 (use-package savehist
@@ -317,14 +260,6 @@ effects."
 
 (global-hl-line-mode)
 
-;; I use this rarely.
-
-(use-package hide-mode-line
-  :ensure t
-  :defer t
-  :bind
-  ("C-c C-h" . hide-mode-line-mode))
-
 ;; Theme and some font/face.
 
 (setopt custom-safe-themes t)
@@ -354,46 +289,9 @@ effects."
 ;; (set-face-attribute 'default nil :family "Iosevka")
 ;; (set-face-attribute 'variable-pitch nil :family "Iosevka Aile")
 
-;; This is a straight copy and paste from Prot's config. Someday I'll
-;; tune these to my preferences.
-
-(setq light-mode nil)
-(if light-mode
-    (setq
-     ;; TODO States
-     todo-color "DarkOrange"
-     in-progress-color "DeepSkyBlue3"
-     blocked-color "Firebrick1"
-     done-color "Green3"
-     wont-do-color "Green3"
-     ;; Tags
-     critical-color "red1"
-     easy-color "turquoise4"
-     medium-color "turquoise4"
-     hard-color "turquoise4"
-     work-color "royalblue1"
-     home-color "mediumPurple2"
-     )
-  (setq
-   ;; TODO States
-   todo-color "GoldenRod"
-   in-progress-color "Cyan"
-   blocked-color "Red"
-   done-color "LimeGreen"
-   wont-do-color "LimeGreen"
-   ;; Tags
-   critical-color "red1"
-   easy-color "cyan3"
-   medium-color "cyan3"
-   hard-color "cyan3"
-   work-color "royalblue1"
-   home-color "mediumPurple1"
-   )
-  )
-
 ;; Icons
 
-;; The Nerd Icons. Not that these depend upon having the Nerd Fonts on
+;; The Nerd Icons. Note that these depend upon having the Nerd Fonts on
 ;; your system.
 
 (use-package nerd-icons
@@ -407,7 +305,7 @@ effects."
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package nerd-icons-completion
-  :after (corfu vertico marginalia nerd-icons)
+  :after (vertico marginalia nerd-icons)
   :diminish
   :config
   (declare-function nerd-icons-completion-mode "nerd-icons-completion")
@@ -420,10 +318,13 @@ effects."
   :diminish
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
-(use-package nerd-icons-corfu
-  :after (nerd-icons corfu))
-
 ;; Add kind of item icons to marginalia notes (folder, file, etc).
+
+(use-package kind-icon
+  :ensure t
+  :after (marginalia vertico))
+
+;; add descriptive notes 'in the margin' of various lists/uis.
 
 (use-package kind-icon
   :ensure t
@@ -437,113 +338,12 @@ effects."
   :config
   (marginalia-mode))
 
-;; Is there such a thing as a basic or minimal Org configuration?
+;; Minimal Org: make sure we have the current release but
+;; otherwise there is little that I customize.
 
 (use-package org
   :ensure t
-  :pin gnu
-  :custom
-  (org-confirm-babel-evaluate nil)
-  (org-src-fontify-natively t)
-  (org-src-tab-acts-natively t)
-  (org-src-preserve-indentation t)
-  :config
-  (setq org-return-follows-link nil)
-  (setq org-loop-over-headlines-in-active-region 'start-level)
-  (setq org-modules '(ol-info))
-  (setq org-use-sub-superscripts '{})
-  (setq org-highlight-latex-and-related nil)
-  (setq org-fontify-quote-and-verse-blocks t)
-  (setq org-fontify-whole-block-delimiter-line t)
-  (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?C)
-  (setq org-default-priority ?B)
-  (setq org-priority-faces nil)
-  ;; TODO: is there a better way to do this?
-  ;; TODO: move what can be moved into :custom.
-  (setq org-log-done 'time)
-  (setq org-todo-keywords
-  	'((sequence "TODO(t)" "DOING(i@/!)" "BLOCKED(b@/!)"
-  		    "|"
-  		    "DONE(d@/!)" "WONT-DO(w@/!)" )))
-  (setq org-capture-templates
-  	'(
-          ("t" "TODO Item"
-           entry (file "~/org/todos.org")
-           "* TODO [#B] %? %^g\n"
-           :empty-lines 0)
-
-          ("j" "Journal Entry"
-           entry (file+datetree "~/org/journal.org")
-           "* %?"
-           :empty-lines 1)
-
-          ("n" "Note"
-           entry (file+headline "~/org/notes.org" "Random Notes")
-           "** %?"
-           :empty-lines 0)
-          ))
-  (setq org-tag-alist
-  	'(
-          (:startgroup . nil)
-          ("easy" . ?e)
-          ("medium" . ?m)
-          ("difficult" . ?d)
-          (:endgroup . nil)
-
-          (:startgroup . nil)
-          ("@work" . ?w)
-          ("@home" . ?h)
-          ("@anywhere" . ?a)
-          (:endgroup . nil)
-
-          ("CRITICAL" . ?c)
-          ))
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-todo-keyword-faces
-  	`(
-          ("TODO"        . (:weight bold :foreground ,todo-color        ))
-          ("IN-PROGRESS" . (:weight bold :foreground ,in-progress-color ))
-          ("BLOCKED"     . (:weight bold :foreground ,blocked-color     ))
-          ("DONE"        . (:weight bold :foreground ,done-color        ))
-          ("WONT-DO"     . (:weight bold :foreground ,wont-do-color     ))
-          )
-  	)
-  (setq org-tag-faces
-  	`(
-          ("CRITICAL" . (:weight bold :foreground ,critical-color ))
-          ("easy"     . (:weight bold :foreground ,easy-color     ))
-          ("medium"   . (:weight bold :foreground ,medium-color   ))
-          ("hard"     . (:weight bold :foreground ,hard-color     ))
-          ("@work"    . (:weight bold :foreground ,work-color     ))
-          ("@home"    . (:weight bold :foreground ,home-color     ))
-          )
-  	)
-  )
-
-;; TODO: set up for my use...
-;; (setq org-structure-template-alist
-;; 	        '(
-;; 	  ("C" . "comment")
-;; 	  ("q" . "quote")
-;; 	  ("c" . "center")
-;; 	  ("v" . "verse")
-;;          ("x" . "example")
-;;
-;; 	  ("a" . "export ASCII")
-;;          ("X" . "export")
-;;
-;; 	  ("s" . "src")
-;;          ("e" . "src emacs-lisp")
-;;
-;;          ("t" . "src emacs-lisp :tangle FILENAME")
-;;          ("E" . "src emacs-lisp :results value code :lexical t")
-;;          ("T" . "src emacs-lisp :tangle FILENAME :mkdirp yes")
-;; 	  ))
-
-;; Load `org-modern' and `org-bullets' but do not enable them here. I
-;; find outline editing easier without these turned on but there may
-;; come a time when have them on all the time.
+  :defer t)
 
 (use-package org-modern
   :ensure t
@@ -552,31 +352,6 @@ effects."
 (use-package org-bullets
   :ensure t
   :defer t)
-
-;; Specialized support for the odd language or whatever else comes up.
-
-(use-package ob-sml
-  :ensure t)
-
-(use-package ob-typescript
-  :ensure t)
-
-;; Org related key-binds.
-
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(define-key global-map "\C-cc" 'org-capture)
-
-;; Dictionary.
-
-(use-package dictionary
-  :ensure nil
-  ;;    :bind ("C-c d" . dictionary-search)
-  :config
-  (setq dictionary-server "dict.org"
-        dictionary-default-popup-strategy "lev"
-        dictionary-create-buttons nil
-        dictionary-use-single-buffer t))
 
 ;; Spell check with flyspell.
 
@@ -648,29 +423,13 @@ effects."
   :custom
   (bidi-paragraph-direction 'left-to-right))
 
-;; Treemacs seems useful.
-
-(use-package treemacs
-  :ensure t
-  :after nerd-icons
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t t"   . treemacs)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(use-package treemacs-nerd-icons
-  :after treemacs
-  :ensure t)
-
 ;; completion styles
 
 (use-package minibuffer
   :ensure nil
   :config
 
-   ; Also see `completion-category-overrides'.
+					; Also see `completion-category-overrides'.
   (setq completion-styles '(basic substring initials flex prescient))
 
   ;; Reset all the per-category defaults so that (i) we use the
@@ -713,14 +472,12 @@ effects."
   ;; - `embark-keybinding'
 
   (setq completion-category-overrides
-        '((file (styles . (basic partial-completion prescient)))
+        '((file (styles . (basic partial-completion )))
           (bookmark (styles . (basic substring)))
           (library (styles . (basic substring)))
-          (embark-keybinding (styles . (basic substring)))
-          (imenu (styles . (basic substring prescient)))
-          (consult-location (styles . (basic substring prescient)))
-          (kill-ring (styles . (emacs22 prescient)))
-          (eglot (styles . (emacs22 substring prescient))))))
+          (imenu (styles . (basic substring )))
+          (kill-ring (styles . (emacs22)))
+          (eglot (styles . (emacs22 substring))))))
 
 ;; Built-in completion dials and switches.
 
@@ -895,8 +652,8 @@ effects."
   	 ("M-o" . ace-window)))
 
 (use-package dumb-jump
-  :hook
-  (xref-backend-functions . dump-jump-xref-activate))
+  :config
+   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 ;; Eglot
 
@@ -1066,7 +823,7 @@ it in a new frame."
             (project-shell "Shell")
             (keyboard-quit "Quit")))
   (setq project-vc-extra-root-markers
-	'(".projectile" ".project.el" "fpm.toml"))
+	'(".projectile" ".project.el" ".project" "fpm.toml"))
   (setq project-key-prompt-style t) ; Emacs 30
   (advice-add #'project-switch-project
 	      :after #'troi-common-clear-minibuffer-message))
@@ -1105,54 +862,22 @@ Use this as advice :after a noisy function."
   :config
   (global-diff-hl-mode))
 
-;; Version control framework (vc.el, vc-git.el, and more)
-
-(use-package vc
-  :ensure nil
-  :init
-  (setq vc-follow-symlinks t)
-  :config
-  ;; Those offer various types of functionality, such as blaming,
-  ;; viewing logs, showing a dedicated buffer with changes to affected
-  ;; files.
-  (require 'vc-annotate)
-  (require 'vc-dir)
-  (require 'vc-git)
-  (require 'add-log)
-  (require 'log-view)
-
-  ;; This one is for editing commit messages.
-  (require 'log-edit)
-  (setq log-edit-confirm 'changed)
-  (setq log-edit-keep-buffer nil)
-  (setq log-edit-require-final-newline t)
-  (setq log-edit-setup-add-author nil)
-
-  (setq vc-find-revision-no-save t)
-  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
-  (setq vc-git-log-switches '("--stat"))
-  (setq vc-git-print-log-follow t)
-  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
-  (setq vc-git-root-log-format
-        `("%d %h %ai %an: %s"
-          ;; The first shy group matches the characters drawn by --graph.
-          ;; We use numbered groups because `log-view-message-re' wants the
-          ;; revision number to be group 1.
-          ,(concat "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?"
-                   "\\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) "
-                   "\\(?4:[0-9]\\{4\\}-[0-9-]\\{4\\}[0-9\s+:-]\\{16\\}\\) "
-                   "\\(?3:.*?\\):")
-          ((1 'log-view-message)
-           (2 'change-log-list nil lax)
-           (3 'change-log-name)
-           (4 'change-log-date))))
-
-  (setq vc-git-log-edit-summary-target-len 50)
-  (setq vc-git-log-edit-summary-max-len 70))
-
 ;; Auto parenthesis matching
 
 (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+(use-package paredit
+  :ensure t
+  :hook
+  (emacs-lisp-mode . paredit-mode)
+  (scheme-mode . paredit-mode))
+
+(use-package paredit-menu
+  :ensure t
+  :after paredit)
+
+(use-package paredit-everywhere
+  :ensure t)
 
 ;; nicer scrolling
 
@@ -1221,7 +946,6 @@ Use this as advice :after a noisy function."
   	"--log=info"             ; or "error" or "verbose"
   	"--pch-storage=memory"   ; i have plenty
   	"--enable-config"))))
-
 ;; Some other clangd options:
 ;; "--log=error"						 ;;
 ;; "--background-index"						 ;;
@@ -1289,61 +1013,38 @@ Use this as advice :after a noisy function."
 ;; The 'smlnj' and 'smlfmt' executables are available from
 ;; 'brew'.
 
-(use-package sml-mode
-  :defer t
-  :ensure nil
-  :mode "\\.sml\\'"
-  :interpreter "sml")
-
-(use-package sml-basis
-  :ensure t
-  :after sml-mode)
-
-(use-package smlfmt
-  :ensure t
-  :after sml-mode)
+;; (use-package sml-mode
+;;   :defer t
+;;   :ensure nil
+;;   :mode "\\.sml\\'"
+;;   :interpreter "sml")
+;; 
+;; (use-package sml-basis
+;;   :ensure t
+;;   :after sml-mode)
+;; 
+;; (use-package smlfmt
+;;   :ensure t
+;;   :after sml-mode)
 
 ;; Guile or Chez scheme? Nah, Chicken!
 
-;; NOTE: If Geiser sees a 'geiser-somescheme' in your load-path,
-;;       it becomes available leading to popups about which
-;;       scheme to run. Removing non-active schemes for now.
+(use-package geiser
+  :ensure t)
 
-;;(use-package geiser-chez
-;;  :ensure t
-;;  :defer t
-;;  :custom
-;;  (geiser-chez-binary "chez"))
+(use-package geiser-chicken
+  :ensure t
+  :hook
+  (geiser-repl-mode . electric-pair-local-mode)
+  :config
+  (setq geiser-connection-timeout 500)
+  :custom
+  (geiser-repl-startup-time 500)
+  (geiser-implementations-alist
+   '((((regexp "\\.scm$") chicken)
+      ((regexp "\\.ss$") chicken)))))
 
-;; (use-package geiser-guile
-;;   :ensure t
-;;   :defer t
-;;   :config
-;;   (add-to-list 'geiser-implementations-alist
-;; 	       '(((regexp "\\.scm$") guile)
-;; 		((regexp "\\.ss$") chez)
-;; 		((regexp "\\.rkt$") racket))))
-;; 
-;; (use-package flymake-guile
-;;   :ensure t
-;;   :after geiser-guile)
-
-;; (use-package geiser-chicken
-;;   :ensure t
-;;   :defer t
-;;   :config
-;;   (add-to-list 'geiser-implementations-alist
-;; 	       '(((regexp "\\.scm$") chicken)
-;; 		 ((regexp "\\.ss$") chez))))
-
-;; I don't know if I want to get the non elpa-ed flymake or not.
-
-(require 'chicken)
 (require 'flymake-chicken)
-
-;(use-package scheme-mode
-;  ensure: nil
-;  :hook (scheme-mode ))
 
 ;; Text display and editing.
 
@@ -1395,22 +1096,6 @@ Use this as advice :after a noisy function."
               "/usr/bin/rg -nH --null -e <R> <F>"
             "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
     (setq xref-search-program (if rgp 'ripgrep 'grep))))
-
-;; wgrep (writable grep)
-;; See the `grep-edit-mode' for the new built-in feature.
-
-(unless (>= emacs-major-version 31)
-  (use-package wgrep
-    :ensure t
-    :after grep
-    :bind
-    ( :map grep-mode-map
-      ("e" . wgrep-change-to-wgrep-mode)
-      ("C-x C-q" . wgrep-change-to-wgrep-mode)
-      ("C-c C-c" . wgrep-finish-edit))
-    :config
-    (setq wgrep-auto-save-buffer t)
-    (setq wgrep-change-readonly-file t)))
 
 ;; Text and other settings that haven't fit anywhere else yet.
 

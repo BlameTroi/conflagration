@@ -13,9 +13,9 @@ There are many like it, but this one is mine./
 This is an attempt at a literate configuration rewrite of my current
 (2024) Emacs Lisp configuration.
 
+/It's gotten too big, as always, so trimming out a *lot* of stuff./
 
 * The early-init.el file
-
 
 ** The standard intro
 
@@ -424,6 +424,7 @@ setting the hook for garbage collection on focus change.
 
 
 
+
 * The init.el file
 
 Here we finish tweaks to settings and load the packages that make this
@@ -533,86 +534,12 @@ archive.
 #+end_src
 
 
-** Compile Angel
-
-The 'compile-angel' package improves the base native compilation
-support by byte and native compiling Emacs Lisp libraries. First time
-loading of a new package (or a fresh Emacs install) is a bit slow but
-once done, the compiles are generally done.
-
-/I'm seeing some unexpected slowdowns and I don't know if
-`compile-angel' is the culprit but I can turn it off for now while
-researching./
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; 'compile-angel' opts for compiling most everything. It's still in
-;; early development so this section is likely to change.
-
-;; TODO: gate with native compile available check.
-;; (use-package compile-angel
-;;   :ensure t
-;;   :demand t
-;;   :diminish
-;;   ;;:custom
-;;   ;;  (compile-angel-verbose nil)
-;;   :config
-;;   (diminish 'compile-angel-on-load-mode "")
-;;   (diminish 'compile-angel-on-save-mode "")
-;;   (diminish 'compile-angel-on-save-local-mode "")
-;;   (setq compile-angel-excluded-files-regexps '("/cus-load\\.el$"
-;;                                                "/theme-loaddefs\\.el$"
-;;                                                "/loaddefs\\.el\\.gz$"
-;;                                                "/charprop\\.el$"
-;;                                                "/cl-loaddefs\\.el\\.gz$"
-;; 					       "custom.el$"
-;; 					       "savehist.el$"
-;; 					       "recentf-save.el$"))
-;;   ;; (setq compile-angel-predicate-function
-;;   ;; 	(lambda (file)
-;;   ;;         (not (file-in-directory-p file "/opt/.*"))))
-;; 
-;;   (compile-angel-on-load-mode)
-;;   (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode))
-
-#+end_src
-
-
 ** If I used a dashboard, it would probably go here
 
 #+begin_src emacs-lisp :tangle "new-init.el"
 ;; not a dashboard.
 
 (setopt initial-scratch-message ";; nothing to see here, move along")
-
-#+end_src
-
-
-** Handy macros and functions
-
-Prot wrote a macro to basically comment out some Emacs Lisp code while
-leaving it as 'code' in the editor. Pretty cool.
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Wrapper macro to "no-op" emacs-lisp code. This is from
-;; Prot's configuration.
-
-(defmacro troi-emacs-comment (&rest body)
-  "Determine what to do with BODY.
-If BODY contains an unquoted plist of the form (:eval t) then
-return BODY inside a `progn'.
-
-Otherwise, do nothing with BODY and return nil, with no side
-effects."
-  (declare (indent defun))
-  (let ((eval))
-    (dolist (element body)
-      (when-let* (((plistp element))
-                  (key (car element))
-                  ((eq key :eval))
-                  (val (cadr element)))
-        (setq eval val
-              body (delq element body))))
-    (when eval `(progn ,@body))))
 
 #+end_src
 
@@ -788,13 +715,6 @@ TODO: This is complete but it could be improved. Do I want the extras?
   (setopt dired-do-revert-buffer t)
   (setopt dired-free-space 'separate))
 
-(use-package wdired
-  :ensure nil
-  :commands (wdired-change-to-wdired-mode)
-  :config
-  (setq wdired-allow-to-change-permissions t)
-  (setq wdired-create-parent-directories t))
-
 #+end_src
 
 
@@ -906,14 +826,6 @@ I don't do much to customize my mode line, but I am a fan of
 
 (global-hl-line-mode)
 
-;; I use this rarely.
-
-;;(use-package hide-mode-line
-;;  :ensure t
-;;  :defer t
-;;  :bind
-;;  ("C-c C-h" . hide-mode-line-mode))
-
 #+end_src
 
 
@@ -955,52 +867,6 @@ this one surprised me.
 #+end_src
 
 
-** Colors and faces for Org and others
-
-Colors for the general. I need to review these and come up with my own
-palette.
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; This is a straight copy and paste from Prot's config. Someday I'll
-;; tune these to my preferences.
-
-(setq light-mode nil)
-(if light-mode
-    (setq
-     ;; TODO States
-     todo-color "DarkOrange"
-     in-progress-color "DeepSkyBlue3"
-     blocked-color "Firebrick1"
-     done-color "Green3"
-     wont-do-color "Green3"
-     ;; Tags
-     critical-color "red1"
-     easy-color "turquoise4"
-     medium-color "turquoise4"
-     hard-color "turquoise4"
-     work-color "royalblue1"
-     home-color "mediumPurple2"
-     )
-  (setq
-   ;; TODO States
-   todo-color "GoldenRod"
-   in-progress-color "Cyan"
-   blocked-color "Red"
-   done-color "LimeGreen"
-   wont-do-color "LimeGreen"
-   ;; Tags
-   critical-color "red1"
-   easy-color "cyan3"
-   medium-color "cyan3"
-   hard-color "cyan3"
-   work-color "royalblue1"
-   home-color "mediumPurple1"
-   )
-  )
-
-#+end_src
-
-
 ** Icons
 
 I group all the icon package loads here but several are dependent upon
@@ -1013,39 +879,42 @@ There are two major icon sets that can see. I'm used to the Nerd Icon
 family.
 
 #+begin_src emacs-lisp :tangle "new-init.el"
-;; Icons
+  ;; Icons
 
-;; The Nerd Icons. Not that these depend upon having the Nerd Fonts on
-;; your system.
+  ;; The Nerd Icons. Note that these depend upon having the Nerd Fonts on
+  ;; your system.
 
-(use-package nerd-icons
-  :ensure t)
+  (use-package nerd-icons
+    :ensure t)
 
-(use-package nerd-icons-dired
-  :ensure t
-  :after (dired nerd-icons)
-  :diminish
-  :hook
-  (dired-mode . nerd-icons-dired-mode))
+  (use-package nerd-icons-dired
+    :ensure t
+    :after (dired nerd-icons)
+    :diminish
+    :hook
+    (dired-mode . nerd-icons-dired-mode))
 
-(use-package nerd-icons-completion
-  :after (corfu vertico marginalia nerd-icons)
-  :diminish
-  :config
-  (declare-function nerd-icons-completion-mode "nerd-icons-completion")
-  (nerd-icons-completion-mode)
-  (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
-  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+  (use-package nerd-icons-completion
+    :after (vertico marginalia nerd-icons)
+    :diminish
+    :config
+    (declare-function nerd-icons-completion-mode "nerd-icons-completion")
+    (nerd-icons-completion-mode)
+    (declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
-(use-package nerd-icons-ibuffer
-  :after (nerd-icons ibuffer)
-  :diminish
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+  (use-package nerd-icons-ibuffer
+    :after (nerd-icons ibuffer)
+    :diminish
+    :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
-(use-package nerd-icons-corfu
-  :after (nerd-icons corfu))
+  ;; Add kind of item icons to marginalia notes (folder, file, etc).
 
-;; Add kind of item icons to marginalia notes (folder, file, etc).
+  (use-package kind-icon
+    :ensure t
+    :after (marginalia vertico))
+
+  ;; add descriptive notes 'in the margin' of various lists/uis.
 
 (use-package kind-icon
   :ensure t
@@ -1062,186 +931,24 @@ family.
 #+end_src
 
 
-** Org mode
-
-I'll start with a "minimal" setup and grow it from there. Org is far
-from my main Emacs application, but we'll grab it first.
-
-I want to get the org packages early in the initialization. I
-don't know for sure if any of my later packages might cause Org
-to initialize. To be sure we have the current Org (which often
-releases multiple times per Emacs release), access them now and
-force loads if needed.
+** Minimal Org
 
 #+begin_src emacs-lisp :tangle "new-init.el"
-;; Is there such a thing as a basic or minimal Org configuration?
+  ;; Minimal Org: make sure we have the current release but
+  ;; otherwise there is little that I customize.
 
-(use-package org
-  :ensure t
-  :pin gnu
-  :custom
-  (org-confirm-babel-evaluate nil)
-  (org-src-fontify-natively t)
-  (org-src-tab-acts-natively t)
-  (org-src-preserve-indentation t)
-  :config
-  (setq org-return-follows-link nil)
-  (setq org-loop-over-headlines-in-active-region 'start-level)
-  (setq org-modules '(ol-info))
-  (setq org-use-sub-superscripts '{})
-  (setq org-highlight-latex-and-related nil)
-  (setq org-fontify-quote-and-verse-blocks t)
-  (setq org-fontify-whole-block-delimiter-line t)
-  (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?C)
-  (setq org-default-priority ?B)
-  (setq org-priority-faces nil)
-  ;; TODO: is there a better way to do this?
-  ;; TODO: move what can be moved into :custom.
-  (setq org-log-done 'time)
-  (setq org-todo-keywords
-  	'((sequence "TODO(t)" "DOING(i@/!)" "BLOCKED(b@/!)"
-  		    "|"
-  		    "DONE(d@/!)" "WONT-DO(w@/!)" )))
-  (setq org-capture-templates
-  	'(
-          ("t" "TODO Item"
-           entry (file "~/org/todos.org")
-           "* TODO [#B] %? %^g\n"
-           :empty-lines 0)
+  (use-package org
+    :ensure t
+    :defer t)
 
-          ("j" "Journal Entry"
-           entry (file+datetree "~/org/journal.org")
-           "* %?"
-           :empty-lines 1)
+  (use-package org-modern
+    :ensure t
+    :defer t)
 
-          ("n" "Note"
-           entry (file+headline "~/org/notes.org" "Random Notes")
-           "** %?"
-           :empty-lines 0)
-          ))
-  (setq org-tag-alist
-  	'(
-          (:startgroup . nil)
-          ("easy" . ?e)
-          ("medium" . ?m)
-          ("difficult" . ?d)
-          (:endgroup . nil)
-
-          (:startgroup . nil)
-          ("@work" . ?w)
-          ("@home" . ?h)
-          ("@anywhere" . ?a)
-          (:endgroup . nil)
-
-          ("CRITICAL" . ?c)
-          ))
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-todo-keyword-faces
-  	`(
-          ("TODO"        . (:weight bold :foreground ,todo-color        ))
-          ("IN-PROGRESS" . (:weight bold :foreground ,in-progress-color ))
-          ("BLOCKED"     . (:weight bold :foreground ,blocked-color     ))
-          ("DONE"        . (:weight bold :foreground ,done-color        ))
-          ("WONT-DO"     . (:weight bold :foreground ,wont-do-color     ))
-          )
-  	)
-  (setq org-tag-faces
-  	`(
-          ("CRITICAL" . (:weight bold :foreground ,critical-color ))
-          ("easy"     . (:weight bold :foreground ,easy-color     ))
-          ("medium"   . (:weight bold :foreground ,medium-color   ))
-          ("hard"     . (:weight bold :foreground ,hard-color     ))
-          ("@work"    . (:weight bold :foreground ,work-color     ))
-          ("@home"    . (:weight bold :foreground ,home-color     ))
-          )
-  	)
-  )
-
-;; TODO: set up for my use...
-;; (setq org-structure-template-alist
-;; 	        '(
-;; 	  ("C" . "comment")
-;; 	  ("q" . "quote")
-;; 	  ("c" . "center")
-;; 	  ("v" . "verse")
-;;          ("x" . "example")
-;;
-;; 	  ("a" . "export ASCII")
-;;          ("X" . "export")
-;;
-;; 	  ("s" . "src")
-;;          ("e" . "src emacs-lisp")
-;;
-;;          ("t" . "src emacs-lisp :tangle FILENAME")
-;;          ("E" . "src emacs-lisp :results value code :lexical t")
-;;          ("T" . "src emacs-lisp :tangle FILENAME :mkdirp yes")
-;; 	  ))
-
-#+end_src
-
-
-** Org eye candy
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Load `org-modern' and `org-bullets' but do not enable them here. I
-;; find outline editing easier without these turned on but there may
-;; come a time when have them on all the time.
-
-(use-package org-modern
-  :ensure t
-  :defer t)
-
-(use-package org-bullets
-  :ensure t
-  :defer t)
-
-#+end_src
-
-
-** Org babel
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Specialized support for the odd language or whatever else comes up.
-
-;; (use-package ob-sml
-;;   :ensure t)
-;; 
-;; (use-package ob-typescript
-;;   :ensure t)
-
-#+end_src
-
-
-** Org key-binds
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Org related key-binds.
-
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(define-key global-map "\C-cc" 'org-capture)
-
-#+end_src
-
-
-** Dictionary
-
-I believe this is independent of the flyspell dictionary but
-I need to do more work.
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Dictionary.
-
-(use-package dictionary
-  :ensure nil
-  ;;    :bind ("C-c d" . dictionary-search)
-  :config
-  (setq dictionary-server "dict.org"
-        dictionary-default-popup-strategy "lev"
-        dictionary-create-buttons nil
-        dictionary-use-single-buffer t))
-
+  (use-package org-bullets
+    :ensure t
+    :defer t)
+  
 #+end_src
 
 
@@ -1344,7 +1051,7 @@ I use these as scratch paper and they are excluded from Git by my
 #+end_src
 
 
-** so-long mode speeds up abusively long line handling
+** so-long mode speeds up the handling of abusively long lines
 
 'so-long' handles long lines that are usually found in program source
 code where unneeded white-space has been removed. forcing paragraph
@@ -1365,30 +1072,6 @@ scans for right to left languages.
 #+end_src
 
 
-** Treemacs
-
-'Treemacs' is a side bar file navigation tool.
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Treemacs seems useful.
-
-(use-package treemacs
-  :ensure t
-  :after nerd-icons
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t t"   . treemacs)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(use-package treemacs-nerd-icons
-  :after treemacs
-  :ensure t)
-
-#+end_src
-
-
 ** Completion and mini-buffer
 
 The mini-buffer does most of the heavy lifting of user interaction.
@@ -1404,89 +1087,87 @@ These are all part of the built-in completion framework that `corfu'
 and others build upon.
 
 #+begin_src emacs-lisp :tangle "new-init.el"
-;; completion styles
+  ;; completion styles
 
-(use-package minibuffer
-  :ensure nil
-  :config
+  (use-package minibuffer
+    :ensure nil
+    :config
 
    ; Also see `completion-category-overrides'.
   (setq completion-styles '(basic substring initials flex prescient))
 
-  ;; Reset all the per-category defaults so that (i) we use the
-  ;; standard `completion-styles' and (ii) can specify our own styles
-  ;; in the `completion-category-overrides' without having to
-  ;; explicitly override everything.
-  (setq completion-category-defaults nil)
+    ;; Reset all the per-category defaults so that (i) we use the
+    ;; standard `completion-styles' and (ii) can specify our own styles
+    ;; in the `completion-category-overrides' without having to
+    ;; explicitly override everything.
+    (setq completion-category-defaults nil)
 
-  ;; A non-exhaustive list of known completion categories:
-  ;;
-  ;; - `bookmark'
-  ;; - `buffer'
-  ;; - `charset'
-  ;; - `coding-system'
-  ;; - `color'
-  ;; - `command' (e.g. `M-x')
-  ;; - `customize-group'
-  ;; - `environment-variable'
-  ;; - `expression'
-  ;; - `face'
-  ;; - `file'
-  ;; - `function' (the `describe-function' command bound to `C-h f')
-  ;; - `info-menu'
-  ;; - `imenu'
-  ;; - `input-method'
-  ;; - `kill-ring'
-  ;; - `library'
-  ;; - `minor-mode'
-  ;; - `multi-category'
-  ;; - `package'
-  ;; - `project-file'
-  ;; - `symbol' (the `describe-symbol' command bound to `C-h o')
-  ;; - `theme'
-  ;; - `unicode-name' (the `insert-char' command bound to `C-x 8 RET')
-  ;; - `variable' (the `describe-variable' command bound to `C-h v')
-  ;; - `consult-grep'
-  ;; - `consult-isearch'
-  ;; - `consult-kmacro'
-  ;; - `consult-location'
-  ;; - `embark-keybinding'
+    ;; A non-exhaustive list of known completion categories:
+    ;;
+    ;; - `bookmark'
+    ;; - `buffer'
+    ;; - `charset'
+    ;; - `coding-system'
+    ;; - `color'
+    ;; - `command' (e.g. `M-x')
+    ;; - `customize-group'
+    ;; - `environment-variable'
+    ;; - `expression'
+    ;; - `face'
+    ;; - `file'
+    ;; - `function' (the `describe-function' command bound to `C-h f')
+    ;; - `info-menu'
+    ;; - `imenu'
+    ;; - `input-method'
+    ;; - `kill-ring'
+    ;; - `library'
+    ;; - `minor-mode'
+    ;; - `multi-category'
+    ;; - `package'
+    ;; - `project-file'
+    ;; - `symbol' (the `describe-symbol' command bound to `C-h o')
+    ;; - `theme'
+    ;; - `unicode-name' (the `insert-char' command bound to `C-x 8 RET')
+    ;; - `variable' (the `describe-variable' command bound to `C-h v')
+    ;; - `consult-grep'
+    ;; - `consult-isearch'
+    ;; - `consult-kmacro'
+    ;; - `consult-location'
+    ;; - `embark-keybinding'
 
-  (setq completion-category-overrides
-        '((file (styles . (basic partial-completion prescient)))
-          (bookmark (styles . (basic substring)))
-          (library (styles . (basic substring)))
-          (embark-keybinding (styles . (basic substring)))
-          (imenu (styles . (basic substring prescient)))
-          (consult-location (styles . (basic substring prescient)))
-          (kill-ring (styles . (emacs22 prescient)))
-          (eglot (styles . (emacs22 substring prescient))))))
+    (setq completion-category-overrides
+          '((file (styles . (basic partial-completion )))
+            (bookmark (styles . (basic substring)))
+            (library (styles . (basic substring)))
+            (imenu (styles . (basic substring )))
+            (kill-ring (styles . (emacs22)))
+            (eglot (styles . (emacs22 substring))))))
 
-;; Built-in completion dials and switches.
+  ;; Built-in completion dials and switches.
 
-;; TODO: ordering with use package above.
-(setq completion-ignore-case t)
-(setq read-buffer-completion-ignore-case t)
-;; (setq-default case-fold-search t)   ; For general regexp
-(setq read-file-name-completion-ignore-case t)
+  ;; TODO: ordering with use package above.
+  (setq completion-ignore-case t)
+  (setq read-buffer-completion-ignore-case t)
+  ;; (setq-default case-fold-search t)   ; For general regexp
+  (setq read-file-name-completion-ignore-case t)
 
-(setopt completion-cycle-threshold 1)
-(setopt completions-detailed t)
-(setopt completion-auto-help 'always)
-(setopt completions-max-height 7)
-(setopt completions-format 'one-column)
-(setopt completions-group t)
-(setopt completion-auto-select 'second-tab)
+  (setopt completion-cycle-threshold 1)
+  (setopt completions-detailed t)
+  (setopt completion-auto-help 'always)
+  (setopt completions-max-height 7)
+  (setopt completions-format 'one-column)
+  (setopt completions-group t)
+  (setopt completion-auto-select 'second-tab)
 
-(use-package mb-depth
-  :ensure nil
-  :hook (after-init . minibuffer-depth-indicate-mode))
+  (use-package mb-depth
+    :ensure nil
+    :hook (after-init . minibuffer-depth-indicate-mode))
 
-(use-package minibuf-eldef
-  :ensure nil
-  :hook (after-init . minibuffer-electric-default-mode)
-  :config
-  (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
+  (use-package minibuf-eldef
+    :ensure nil
+    :hook (after-init . minibuffer-electric-default-mode)
+    :config
+    (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
 
 #+end_src
 
@@ -1701,8 +1382,8 @@ TODO: move to key-bind section.
   	 ("M-o" . ace-window)))
 
 (use-package dumb-jump
-  :hook
-  (xref-backend-functions . dump-jump-xref-activate))
+  :config
+   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 #+end_src
 
@@ -1971,7 +1652,7 @@ possible markers is easy. 'fpm.toml' is the Fortran Project Manager.
             (project-shell "Shell")
             (keyboard-quit "Quit")))
   (setq project-vc-extra-root-markers
-	'(".projectile" ".project.el" "fpm.toml"))
+	'(".projectile" ".project.el" ".project" "fpm.toml"))
   (setq project-key-prompt-style t) ; Emacs 30
   (advice-add #'project-switch-project
 	      :after #'troi-common-clear-minibuffer-message))
@@ -2021,71 +1702,25 @@ Use this as advice :after a noisy function."
 #+end_src
 
 
-** Git and version control
-
-Emacs has built-in version control that is probably sufficient for my
-needs. It provides a consistent abstraction layer of many of the
-standard version control systems. I was loading up 'magit' but I am
-not using it. I do my work from the control line.
-
-Remember that I remove support from 'vc' for all backends except Git
-in 'early-init.el'.
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; Version control framework (vc.el, vc-git.el, and more)
-
-(use-package vc
-  :ensure nil
-  :init
-  (setq vc-follow-symlinks t)
-  :config
-  ;; Those offer various types of functionality, such as blaming,
-  ;; viewing logs, showing a dedicated buffer with changes to affected
-  ;; files.
-  (require 'vc-annotate)
-  (require 'vc-dir)
-  (require 'vc-git)
-  (require 'add-log)
-  (require 'log-view)
-
-  ;; This one is for editing commit messages.
-  (require 'log-edit)
-  (setq log-edit-confirm 'changed)
-  (setq log-edit-keep-buffer nil)
-  (setq log-edit-require-final-newline t)
-  (setq log-edit-setup-add-author nil)
-
-  (setq vc-find-revision-no-save t)
-  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
-  (setq vc-git-log-switches '("--stat"))
-  (setq vc-git-print-log-follow t)
-  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
-  (setq vc-git-root-log-format
-        `("%d %h %ai %an: %s"
-          ;; The first shy group matches the characters drawn by --graph.
-          ;; We use numbered groups because `log-view-message-re' wants the
-          ;; revision number to be group 1.
-          ,(concat "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?"
-                   "\\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) "
-                   "\\(?4:[0-9]\\{4\\}-[0-9-]\\{4\\}[0-9\s+:-]\\{16\\}\\) "
-                   "\\(?3:.*?\\):")
-          ((1 'log-view-message)
-           (2 'change-log-list nil lax)
-           (3 'change-log-name)
-           (4 'change-log-date))))
-
-  (setq vc-git-log-edit-summary-target-len 50)
-  (setq vc-git-log-edit-summary-max-len 70))
-
-#+end_src
-
-
 ** Parentheses and Structured Editing
 
 #+begin_src emacs-lisp :tangle "new-init.el"
-;; Auto parenthesis matching
+  ;; Auto parenthesis matching
 
-(add-hook 'prog-mode-hook 'electric-pair-mode)
+  (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+  (use-package paredit
+    :ensure t
+    :hook
+    (emacs-lisp-mode . paredit-mode)
+    (scheme-mode . paredit-mode))
+
+  (use-package paredit-menu
+    :ensure t
+    :after paredit)
+
+  (use-package paredit-everywhere
+    :ensure t)
 
 #+end_src
 
@@ -2209,13 +1844,6 @@ of that mode or steals a setting name for its own use.
   	"--log=info"             ; or "error" or "verbose"
   	"--pch-storage=memory"   ; i have plenty
   	"--enable-config"))))
-
-(with-eval-after-load 'eglot
-  (add-to-list
-   'eglot-server-programs
-   '((scheme-mode) . ("chicken-lsp-server" "--stdio"))))
-
-
 ;; Some other clangd options:
 ;; "--log=error"						 ;;
 ;; "--background-index"						 ;;
@@ -2381,73 +2009,25 @@ Chez would work with the support files for _SS_. Racket should handle
 both but it's big and gaudy. Chicken works with _SS_, and I'll deal
 with _SICP_ when the time comes.
 
-LSP, what to do about LSP? There is LSP support for scheme in the
-'lsp-mode' ecosystem, but I don't see it under 'eglot' yet. It may
-just work, but I'll not bother with it now. There is a 'geiser-chez'
-package but no matching 'flymake'. 'flymake-chicken' exists but it's
-not in an archive. I don't know if I need/want it yet.
-
-/I'm having problems with geiser and it looks as if it and chicken
-aren't quite meshing. I'll try some other options./
-
-/If Geiser sees a 'geiser-somescheme' in your load-path, it becomes
-available leading to popups about which scheme to run. Removing
-non-active schemes for now./
-
-/There a couple of flakey LSPs for Scheme. They are too unstable for
-my liking. Going old school with no eglot/lsp./
-
 #+begin_src emacs-lisp :tangle "new-init.el"
-;; Guile or Chez scheme? Nah, Chicken!
+  ;; Guile or Chez scheme? Nah, Chicken!
 
-;;(use-package geiser-chez
-;;  :ensure t
-;;  :defer t
-;;  :custom
-;;  (geiser-chez-binary "chez"))
+  (use-package geiser
+    :ensure t)
 
-;; (use-package geiser-guile
-;;   :ensure t
-;;   :defer t
-;;   :config
-;;   (add-to-list 'geiser-implementations-alist
-;; 	       '(((regexp "\\.scm$") guile)
-;; 		((regexp "\\.ss$") chez)
-;; 		((regexp "\\.rkt$") racket))))
-;; 
-;; (use-package flymake-guile
-;;   :ensure t
-;;   :after geiser-guile)
+  (use-package geiser-chicken
+    :ensure t
+    :hook
+    (geiser-repl-mode . electric-pair-local-mode)
+    :config
+    (setq geiser-connection-timeout 500)
+    :custom
+    (geiser-repl-startup-time 500)
+    (geiser-implementations-alist
+     '((((regexp "\\.scm$") chicken)
+        ((regexp "\\.ss$") chicken)))))
 
-;; (use-package geiser-chicken
-;;  :ensure t
-;;  :defer t
-;;  :custom
-;;  (geiser-implementations-alist
-;;   '((((regexp "\\.scm$") chicken)
-;;      ((regexp "\\.ss$") chicken)))))
-
-;; I don't know if I want to get the non elpa-ed flymake or not.
-
-;; (require 'chicken)
-;; (require 'flymake-chicken)
-
-;;(use-package scheme-mode
-;;  ensure: nil
-;;  :hook (scheme-mode ))
-
-(use-package paredit
-  :ensure t
-  :hook
-  (emacs-lisp-mode . paredit-mode)
-  (scheme-mode . paredit-mode))
-
-(use-package paredit-menu
-  :ensure t
-  :after paredit)
-
-(use-package paredit-everywhere
-  :ensure t)
+  (require 'flymake-chicken)
 
 #+end_src
 
@@ -2537,31 +2117,6 @@ TODO: the search-whitespace-regexp, how do I turn it off temporarily?
               "/usr/bin/rg -nH --null -e <R> <F>"
             "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
     (setq xref-search-program (if rgp 'ripgrep 'grep))))
-
-#+end_src
-
-
-** 'wgrep' (remove once on Emacs 31)
-
-Writable grep buffers. The `wgrep' package will be obsolete in
-Emacs 31.
-
-#+begin_src emacs-lisp :tangle "new-init.el"
-;; wgrep (writable grep)
-;; See the `grep-edit-mode' for the new built-in feature.
-
-(unless (>= emacs-major-version 31)
-  (use-package wgrep
-    :ensure t
-    :after grep
-    :bind
-    ( :map grep-mode-map
-      ("e" . wgrep-change-to-wgrep-mode)
-      ("C-x C-q" . wgrep-change-to-wgrep-mode)
-      ("C-c C-c" . wgrep-finish-edit))
-    :config
-    (setq wgrep-auto-save-buffer t)
-    (setq wgrep-change-readonly-file t)))
 
 #+end_src
 
