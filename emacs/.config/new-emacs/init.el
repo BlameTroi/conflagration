@@ -107,7 +107,6 @@
 ;; phrases at the end of `init.el', but I would rather keep them close
 ;; to their mode's `require'.
 
-
 (require 'diminish)
 
 
@@ -132,9 +131,9 @@
 ;; Get the correct environment variable values as if this is a login
 ;; shell. The variable list is hard coded and specific to my needs.
 
-;; MacOS packaging grabs environment variables as requested in a
-;; plist within the package. Sometimes this fails, and other times
-;; variables I care about are not included.
+;; MacOS packaging grabs environment variables as requested in a plist
+;; within the package. Sometimes this fails, and other times variables
+;; I care about are not included.
 
 (require 'exec-path-from-shell)
          (declare-function
@@ -144,24 +143,26 @@
          (exec-path-from-shell-initialize)
          (exec-path-from-shell-copy-envs
            '(
-             ;; Old style Makefile variables for C. I probably don't need
-             ;; these anymore.
+             ;; Old style Makefile variables for C. I probably don't
+             ;; need these anymore.
              "LIBRARY_PATH"
              "CPATH"
              "CDPATH"
 
-             ;; Environment variables specific to compile and build for any
-             ;; languages I'm working with.
+             ;; Environment variables specific to compile and build
+             ;; for any languages I'm working with.
              "CMAKE_GENERATOR"
              "ODIN_ROOT"
 
-             ;; Where is the documentation? I know MANPATH is not used on all
-             ;; operating systems, but it doesn't cause me problems to get it.
+             ;; Where is the documentation? I know MANPATH is not used
+             ;; on all operating systems, but it doesn't cause me
+             ;; problems to get it.
              "INFOPATH"
              "MANPATH"
 
-             ;; Apple's libc malloc library emits some informational warnings
-             ;; specific to particular allocation pools. They do me know good.
+             ;; Apple's libc malloc library emits some informational
+             ;; warnings specific to particular allocation pools. They
+             ;; do me know good.
              "MallocNanoZone"
              ))
 
@@ -193,15 +194,15 @@
 
 ;;; Directories and files.
 
-;; Add my lisp to the `load-path'. Scratch and test code, things
-;; in development, etc.
+;; Add my lisp to the `load-path'. Scratch and test code, things in
+;; development, etc.
 
 (add-to-list
  'load-path
  (concat user-emacs-directory "troi-lisp"))
 
-;; Org mode files and directories. I am not a heavy Org user,
-;; but it is an assumed part of the Emacs infrastructure.
+;; Org mode files and directories. I am not a heavy Org user, but it
+;; is an assumed part of the Emacs infrastructure.
 
 (require 'org)
 (require 'org-bullets)
@@ -238,7 +239,7 @@
 (setopt dired-free-space 'separate)
 
 
-;;; Reload on file system changes.
+;;; Reload buffer if a file changes.
 
 (require 'autorevert)
 (add-hook 'emacs-startup-hook 'global-auto-revert-mode)
@@ -247,7 +248,8 @@
 (setopt auto-revert-verbose nil)
 
 
-;; Tool-tips (tooltip-mode)
+;; Tool-tips (tooltip-mode). While I don't think of these as
+;; the drop-down menus for completions, apparently they are.
 
 (require 'tooltip)
 (add-hook 'emacs-startup-hook 'tooltip-mode)
@@ -273,7 +275,8 @@
 (add-hook 'emacs-startup-hook 'column-number-mode)
 (setopt mode-line-position-column-line-format '(" (%l,%C)")) ; %C based 1, %c based 0
 
-;; Display function name in mode line. This also seems to work for Org headers.
+;; Display function name in mode line. This also seems to work for Org
+;; headers.
 
 (add-hook 'emacs-startup-hook 'which-function-mode)
 
@@ -384,8 +387,9 @@
         (assoc-default deft-text-mode '((markdown-mode . "md") (rst-mode . "rst"))
                        'eq "txt"))
 
-;; I use `side-notes' as scratch paper in project directories. The notes
-;; files aren't stored in Git, I have them excluded in my `.gitignore'.
+;; I use `side-notes' as scratch paper in project directories. The
+;; notes files aren't stored in Git, I have them excluded in my
+;; `.gitignore'.
 
 (require 'side-notes)
 ;;:bind ("M-s n" . side-notes-toggle-notes)
@@ -395,8 +399,8 @@
 
 ;;; Documentation.
 
-;; Read documentation with 'info' and 'eldoc'. For some reason I'm
-;; missing system info from Homebrew. I should probably move this
+;; Read documentation with 'man', 'info', and 'eldoc'. For some reason
+;; I'm missing system info from Homebrew. I should probably move this
 ;; into my `.zshenv'.
 
 (require 'info)
@@ -438,15 +442,16 @@
 ;;;###autoload
 (defun troi-common-clear-minibuffer-message (&rest _)
   "Print an empty message to clear the echo area.
-Use this as advice :after a noisy function. My thanks
-to Prot!"
+Use this as advice :after a noisy function.
+
+My thanks to Prot!"
   (message ""))
 
 
 ;;; Completion.
 
-;; Completion is spread throughout the rest of this configuration. I
-;; need to organize this better.
+;; Completion is spread throughout the rest of this configuration.
+;; I need to organize this better.
 
 ;; TODO: clean up !
 
@@ -526,12 +531,10 @@ to Prot!"
 (add-hook 'emacs-startup-hook 'vertico-prescient-mode)
 
 
-
 ;;; Drop a pin, or breadcrumbs.
 
 ;; Bookmarking is a subset of registers, or maybe registers are a
-;; subset of bookmarks. Whichever is true, we get there via
-;; `m-x b'.
+;; subset of bookmarks. Whichever is true, we get there via `c-x r'.
 
 (require 'bookmark)
 (add-hook 'bookmark-bmenu-mode-hook 'hl-line-mode)
@@ -559,7 +562,7 @@ to Prot!"
 (require 'eglot)
 (diminish 'eglot-mode "Egl")
 
-;; TODO: rehome these to language specific sections
+;; TODO: rehome these to language specific sections.
 ;; We can start up language servers as sub-processes, be sure we can
 ;; find the executables.
 (add-hook 'c-ts-mode-hook 'eglot-ensure)
@@ -590,7 +593,7 @@ to Prot!"
 (require 'treesit)
          (setopt treesit-font-lock-level 4) ; levels 1-3 are useless
 
-;; some of these might require M-x treesit-install-language-grammar
+;; Some of these might require M-x treesit-install-language-grammar.
 
 (setopt major-mode-remap-alist
         '((yaml-mode . yaml-ts-mode)
@@ -642,8 +645,9 @@ to Prot!"
 
 (defun troi/tear-off-window ()
   "Move a sub-window to a new frame.
-From a multi-window frame, tear off the current window and put
-it in a new frame."
+
+From a multi-window frame, tear off the current window and
+put it in a new frame."
   (interactive)
   (let ((wc (count-windows)))
     (if (< wc 2)
@@ -679,8 +683,9 @@ it in a new frame."
 
 ;; This is needed to avoid false 'can not find/load' errors on
 ;; requires that occur before this point in the source.
-;; (with-eval-after-load 'flymake
-;;   (setopt elisp-flymake-byte-compile-load-path load-path))
+
+(with-eval-after-load 'flymake
+   (setopt elisp-flymake-byte-compile-load-path load-path))
 
 
 ;;; Emacs views a `project' as a grouping of directories and files.
@@ -700,6 +705,7 @@ it in a new frame."
 (advice-add #'project-switch-project
             :after #'troi-common-clear-minibuffer-message)
 
+
 ;;; Difference engines.
 
 ;; `ediff'
@@ -713,8 +719,12 @@ it in a new frame."
 (setq ediff-show-clashes-only t)
 
 ;; `diff-mode'
+
 (require 'diff-mode)
 (setq diff-default-read-only t)
+
+
+;; `diff-hl'
 
 (require 'diff-hl)
 (add-hook 'emacs-startup-hook 'global-diff-hl-mode)
@@ -722,15 +732,27 @@ it in a new frame."
 
 ;;; Parentheses matching and structural editing.
 
-(add-hook 'prog-mode-hook 'electric-pair-mode)
+;; Hopefully `lispy' will do the jobs of both `paredit' and
+;; `electric-pair-mode'.
 
-(require 'paredit)
-(diminish 'paredit-mode "PE")
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-(add-hook 'scheme-mode-hook 'paredit-mode)
+(require 'lispy)
 
-(require 'paredit-menu)
-(require 'paredit-everywhere)
+;; This redundant with `paredit'.
+;; (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+;; `paredit' provides structural editing, but I still end up fighting
+;; with it. I need to change how I think about code ... sexps and not
+;; lines.
+
+;; It also remaps so many keybinds without any real customization
+;; opportunities (eg., M-q). Is `lispy' better?
+
+;; (require 'paredit)
+;; (require 'paredit-menu)
+;; (require 'paredit-everywhere)
+;; (diminish 'paredit-mode "PE")
+;; (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+;; (add-hook 'scheme-mode-hook 'paredit-mode)
 
 ;; Parentheses (show-paren-mode)
  (require 'paren)
@@ -739,6 +761,16 @@ it in a new frame."
 (setq show-paren-when-point-in-periphery nil)
 (setq show-paren-when-point-inside-paren nil)
 (setq show-paren-context-when-offscreen 'overlay)
+
+
+;; This may be a better reformatter for Lisps. It tries to
+;; reposition parentheses in a readable manner.
+
+(require 'adjust-parens)
+(add-hook 'emacs-lisp-mode-hook #'adjust-parens-mode)
+(add-hook 'scheme-mode-hook #'adjust-parens-mode)
+;;  (local-set-key (kbd "TAB") 'lisp-indent-adjust-parens)
+;;  (local-set-key (kbd
 
 
 ;;; Smooth scrolling.
@@ -751,12 +783,12 @@ it in a new frame."
 
 ;;; Enable disabled 'confusing' commands.
 
-;; The Emacs gods don't think we should have access to commands
-;; that might confuse us. They mark them disabled and issue an
-;; 'are you sure' warning.
+;; The Emacs gods don't think we should have access to commands that
+;; might confuse us. They mark them disabled and issue an 'are you
+;; sure' warning.
 
-;; 'put' is used because these are properties of the function
-;; name symbol.
+;; 'put' is used because these are properties of the function name
+;; symbol.
 
 (put 'scroll-left 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
@@ -768,13 +800,15 @@ it in a new frame."
 
 ;;; Language modes.
 
-;; Random 'no' configuration required modes
+
+;;; Random 'no' configuration required modes
 
 (require 'cmake-mode)
 (require 'ninja-mode)
 (require 'git-modes)
 
-;; C (not C++, C!)
+
+;;; C (not C++, C!)
 
 (setopt standard-indent 8)
 
@@ -806,9 +840,9 @@ it in a new frame."
 ;; "--header-insertion=never"					 ;;
 ;; "--header-insertion-decorators=0"
 
-;; I use 'astyle' to format C. The configuration goes in .astylerc
-;; in my home directory. My formatting is based on the 'linux'
-;; and 'k&r' styles.
+;; I use 'astyle' to format C. The configuration goes in .astylerc in
+;; my home directory. My formatting is based on the 'linux' and 'k&r'
+;; styles.
 
 (require 'reformatter)
 
@@ -818,10 +852,11 @@ it in a new frame."
   (add-hook 'c-ts-mode-hook 'astyle-on-save-mode)
   (add-hook 'c++-ts-mode-hook  'astyle-on-save-mode))
 
-;; Odin.
 
-;; Odin mode isn't available as a package yet. I have it copied to
-;; my `troi-lisp' directory.
+;;; Odin.
+
+;; Odin mode isn't available as a package yet. I have it copied
+;; to my `troi-lisp' directory.
 
 (require 'odin-mode)
 
@@ -830,9 +865,11 @@ it in a new frame."
                         'eglot-server-programs
                         '(odin-mode . ("ols"))))
 
-;; Geiser and assorted Schemes.
 
-;; I'm only using Chicken right now.
+;;; Geiser and assorted Schemes.
+
+;; I'm only using Chicken right now. I may switch to Chez after
+;; I finish _Simply_Scheme_ and _SICP_.
 
 (require 'geiser)
 (require 'geiser-chicken)
@@ -851,8 +888,12 @@ it in a new frame."
 ;;; Searching, grepping, and the like.
 
 (require 'isearch)
-;; "find one two" would find "one two" "one hi there two" etc.
-;; one `setq' here to make it obvious these are a group.
+
+;; "find one two" would find "one two" "one hi there two" etc. one
+;; `setq' here to make it obvious these are a group. I liked this but
+;; there were times I wanted to turn it off. I haven't figured out a
+;; clean way to do that.
+
 ;;(setq search-whitespace-regexp ".*?"
 ;;      isearch-lax-whitespace t
 ;;      isearch-regexp-lax-whitespace nil)
@@ -888,12 +929,15 @@ it in a new frame."
   (setq xref-search-program (if rgp 'ripgrep 'grep)))
 
 
-;; Text and other settings that haven't fit anywhere else yet.
+;; Text and other settings that haven't fit in anywhere else yet.
 
-;; Line widths. The `visual-fill-column' package 'narrows' the
-;; display when you're using a single window on a wide screen so
-;; if you are wrapping text it will wrap at the fill column and
-;; not the edge of the screen.
+;; The `visual-fill-column' package 'narrows' the display when you're
+;; using a single window on a wide screen so if you are wrapping text
+;; it will wrap at the fill column and not the edge of the screen.
+;; It has some interaction with other things that I don't like (mouse)
+;; so I'll leave this note about the package here but not load it.
+;;
+;; As of today, it's not been put up on ELPA. So find it on Github.
 
 ;; To my amazement, I actually prefer tabs for C like code.
 
@@ -931,11 +975,14 @@ it in a new frame."
 (setopt help-window-keep-selected t)
 (setopt confirm-kill-emacs 'y-or-n-p)
 
+;; Trailing spaces are evil. One reason I don't like Markdown
+;; is that trailing spaces are significant!
+
 (require 'ws-butler)
 (diminish 'ws-butler-mode nil)
 (add-hook 'prog-mode-hook 'ws-butler-mode)
 
-;; i often use C-l for visual breaks.
+;; I often use C-l for visual breaks.
 
 (require 'form-feed-st)
 (diminish 'form-feed-st-mode nil)
@@ -945,14 +992,22 @@ it in a new frame."
 
 ;;; All the keybinds.
 
+;; Show me the keys if I don't know them.
 
 (require 'which-key)
 (diminish 'which-key-mode nil)
 (add-hook 'emacs-startup-hook 'which-key-mode)
 
+;; `bind-key' is key binding helper that I need to learn how to use.
+;; `use-package' counts on it, but it can be used on its own.
+
 (require 'bind-key)
 
-;; TODO: work needed on many key binds.
+;; Motion and swapping via avy and ace.
+(global-set-key (kbd "C-c j") 'avy-goto-line)
+(global-set-key (kbd "s-j")   'avy-goto-char-timer)
+(global-set-key (kbd "C-x o") 'ace-window)
+(global-set-key (kbd "M-o")   'ace-window)
 
 ;; This makes TAB in the minibuffer behave more like it does in a
 ;; shell.
@@ -971,7 +1026,7 @@ it in a new frame."
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
 ;; Default search to regexp instead of string. TODO: Provide a toggle
-;; or string option.
+;; or string option. Perhaps prefix mode?
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
@@ -991,17 +1046,9 @@ it in a new frame."
 ;; ("f" . follow-mode)  ; override `font-lock-update'
 ;; ("r" . rename-uniquely)
 ;; ("l" . visual-line-mode)
-;;:bind (("C-c j" . avy-goto-line)
-;;       ("s-j"   . avy-goto-char-timer)))
-;;:bind (("C-x o" . ace-window)
-;;	 ("M-o" . ace-window)))
 ;;:bind (:map eglot-mode-map
 ;;          ("C-c c a" . eglot-code-actions)
 ;;        ("C-c c r" . eglot-rename))
-
-
-
-
 
 
 (provide 'init)
