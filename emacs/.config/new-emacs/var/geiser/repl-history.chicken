@@ -1,0 +1,463 @@
+(load "loadall.scm")
+}{
+(+ 3 (butlast 1024))
+}{
+(random 5)
+}{
+(tt-new-game)
+}{
+(define (list-copy xs))
+}{
+,m srfi-1
+}{
+(tt-new-game)
+}{
+(list-copy '(a b c))
+}{
+,h
+}{
+,help
+}{
+,?
+}{
+,m
+}{
+,m ?
+}{
+get-string
+}{
+,?
+}{
+,r
+}{
+,l ncurses-example.scm
+}{
+,l ../Simply_Schemely
+}{
+(chicken-home)
+}{
+,l ncurses-example.scm 
+}{
+exit
+}{
+(define (count-down x))
+}{
+(define (count-down x)
+       (display x)
+       (newline)
+       (count-down (- 1 x)))
+}{
+(count-down 10)
+}{
+(- 1 3)
+}{
+(define (count-down x)
+       (if (< 1 x) '()
+	   (begin)
+       (display x)
+       (newline)
+       (count-down (- x 1))))
+}{
+(< 1 10)
+}{
+,l ~/Projects/Scheme/Simply_Scheme/simply.scm
+}{
+,l /Users/troi/Projects/Scheme/Simply_Scheme/simply.scm
+}{
+(+ 3 (butfirst 2048))
+}{
+,l simply.scm
+}{
+(/ 1 3)
+}{
++
+}{
+define
+}{
+sqrt
+}{
+standard-deviation
+}{
+(define (square x) (* x x))
+}{
+(define (average a b) (/ (+ a b) 2))
+}{
+(square 10)
+}{
+(averate 5 5)
+}{
+(average 5 5)
+}{
+(define (hypotenuse a b)
+	(sqrt (+ (square a) (square b))))
+}{
+(hypotenuse 3 4)
+}{
+(square 2)
+}{
+(* 4 4)
+}{
+(* 2 2 2 2)
+}{
+(define (fourth x) (square (square x)))
+}{
+(fourth 2)
+}{
+(define (sqabs x) (sqrt (square x)))
+}{
+(sqabs -100)
+}{
+(sqabs -132.7)
+}{
+(define (scientific b p) (* b (expt 10 p)))
+}{
+(scientific 10 3)
+}{
+(scientific 7 3)
+}{
+(scientific 7 -3)
+}{
+(scientific 42 -5)
+}{
+(log 3)
+}{
+(log 7000)
+}{
+(* (log 3) (log 10))
+}{
+(* (log 7000) (log 10))
+}{
+(/ (log 7000) (log 10))
+}{
+(/ (log 8000) (log 10))
+}{
+(/ (log 9000) (log 10))
+}{
+(/ (log 9999) (log 10))
+}{
+(/ (log 10000) (log 10))
+}{
+(define (sci-coeffient n) (floor (/ (log n) (log 10))))
+}{
+(sci-coefficient 7)
+}{
+(define (sci-coefficient n) (floor (/ (log n) (log 10))))
+}{
+(sci-coefficient 7)
+}{
+(sci-coefficient 521703224)
+}{
+(define (tip n) (ceiling (n * 0.15)))
+}{
+(tip 10)
+}{
+ceiling
+}{
+ceil
+}{
+(define (tip n) (ceiling (* n 0.15)))
+}{
+(tip 10)
+}{
+(tip 19.98)
+}{
+(first 'sentence)
+}{
+,l simply.scm
+}{
+(first 'sentence)
+}{
+(second 'sentence)
+}{
+(split 'sentence)
+}{
+(symbol->string 'sentence)
+}{
+(split (symbol->string 'sentence))
+}{
+(second (symbol->string 'sentence))
+}{
+(string->list "fred")
+}{
+(second (string->list (symbol->string 'sentence)))
+}{
+(character->symbol (#\e))
+}{
+(butfirst 'sentence)
+}{
+(butfirst '(sentence))
+}{
+(word 'fred 'erick)
+}{
+,h
+}{
+,help
+}{
+,?
+}{
+,c
+}{
+,d (word 'fred 'erick)
+}{
+,m
+}{
+,exn
+}{
+,d (word 'fred 'erick)
+}{
+,d 1024
+}{
+(word 'george 's)
+}{
+(define (plural word) (word word 's))
+}{
+(plural 'george)
+}{
+(bf '(eat a peach))
+}{
+(count 'asdf)
+}{
+(count '(eat a peach))
+}{
+(count (first '(maggie mae)))
+}{
+(sentence 'i '(and i))
+}{
+(sentence '() '(is empty))
+}{
+(se "" '() "" '())
+}{
+(define (f1 a b) (se (bf a) (bl b)))
+}{
+(f1 '(a b c) '(d e f))
+}{
+(first (square 7))
+}{
+(define (square x) (* x x))
+}{
+(first (square 7))
+}{
+(word '() '())
+}{
+(word '())
+}{
+(sentence '() 'a 'b)
+}{
+(word 'asds '(i j k))
+}{
+(first ''banana)
+}{
+''banana
+}{
+(define (two-first wd1 wd2) (word (butlast wd1) (butlast wd2)))
+}{
+(two-first 'asdf 'ijkl))
+}{
+(first 'asdf)
+}{
+(first 'ijkl)
+}{
+(define (two-first wd1 wd2) (word (first wd1) (first wd2)))
+}{
+(two-first 'asdf 'ijkl))
+}{
+(define (two-first-sent sent) (two-first (first sent) (second sent)))
+}{
+(two-first-sent '(asdf ijkl))
+}{
+(define (ends word) (word (first word) (last word)))
+}{
+(ends 'john)
+}{
+(define (ends wd) (word (first wd) (last wd)))
+}{
+(ends 'john)
+}{
+(define (middle-names sent) (bl (bf sent)))
+}{
+(middle-names '(a b c d))
+}{
+(define (middle-names sent) (bl (bf sent)))
+}{
+(first 'asdf)
+}{
+(middle-names '(russel william wilson jr III))
+}{
+,?
+}{
+,r
+}{
+,?
+}{
+,c
+}{
+,exn
+}{
+(se 'sir '(mix a lot))
+}{
+(ends 'fred)
+}{
+(define (insert-and sl) (se (butlast sl) 'and (last sl)))
+}{
+(insert-and '(john paul george ringo))
+}{
+(define (query sl) (se (second sl) (first sl) (butfirst (butfirst sl)) '?))
+}{
+(query '(we are fucked))
+}{
+(= 67 "67")
+}{
+(= 67 '67)
+}{
+(define (buzz num) (if (or (member? 7 num) (divisible? 7 num)) 'buzz '(num)))
+}{
+(define (divisible? divisor num) (= 0 (remainder num divisor)))
+}{
+(buzz 1)
+}{
+(buzz 7)
+}{
+(buzz 17)
+}{
+(buzz 21)
+}{
+(buzz 22)
+}{
+(define (buzz num) (if (or (member? 7 num) (divisible? 7 num)) 'buzz num))
+}{
+(buzz 1)
+}{
+(this is (a test))
+}{
+(cond ((= 3 4) '(this boy))
+	    ((< 2 5) '(nowhere man))
+	    (else 'somebody))
+}{
+(cond (empty? 3) (square 7) (else 9))
+}{
+(define (third-person-singular verb)
+	(cond ((equal? verb 'be) 'is)
+	      ((equal? (last verb) 'o) (word verb 'es))
+	      (else (word verb 's))))
+}{
+(third-person-singular 'drink)
+}{
+(third-person-singular 'be)
+}{
+(third-person-singular 'do)
+}{
+(define (sign n)
+	(cond ((< n 0) 'negative)
+	      ((= n 0) 'zero)
+	      (else 'positive)))
+}{
+(sign 3)
+}{
+(sign 15)
+}{
+(sign 0)
+}{
+(sign -3)
+}{
+(sign "seven")
+}{
+(number? "seven")
+}{
+(number "seven")
+}{
+(string->number "seven")
+}{
+(define (sign n)
+	(cond ((not (number? n)) 'nan)
+	 ((< n 0) 'negative)
+	      ((= n 0) 'zero)
+	      (else 'positive)))
+}{
+(sign 3)
+}{
+(sign -3)
+}{
+(sign 0)
+}{
+(sign "seven")
+}{
+(sign 'seven)
+}{
+(define (american-time? ts)
+  (cond ((not (= 2     (count ts)))         #f)
+	((not (number? (first ts)))         #f)
+	((not (member? (last ts) '(am pm))) #f)
+	(else                               #t)))
+}{
+(american-time '(13 pm))
+}{
+(american-time? '(13 pm))
+}{
+(american-time? '(17 pm))
+}{
+(american-time? '(5 pm))
+}{
+(number? (first '(5 pm)))
+}{
+(member? (last '(5 pm)) '(am pm))
+}{
+(< 0 (first '(5 pm)))
+}{
+(american-time? '(5 pm))
+}{
+(american-time? '(17 pm))
+}{
+(sentence? '(5 pm))
+}{
+(word? '(5 pm))
+}{
+(word? 17)
+}{
+(european-time? 2517)
+}{
+(> 24 '2517)
+}{
+(> 3 2)
+}{
+(european-time? 2517)
+}{
+(european-time? 17)
+}{
+(european-time? 0)
+}{
+(european-time? '(1))
+}{
+(european-time? "24")
+}{
+(european-time? "25")
+}{
+(european-time? '23)
+}{
+(european-time '(17 pm))
+}{
+(list illegal time format)
+}{
+(list 'illegal time format)
+}{
+('illegal time format)
+}{
+('illegal 'time 'format)
+}{
+(list 'illegal 'time 'format)
+}{
+(american->european '(1 pm))
+}{
+(list 12)
+}{
+(list 12 + 3)
+}{
+(american->european '(1 pm))
+}{
+(american->european '(12 am))
+}{
+,q
+}{
+(sign 3)
+}{
+,q
+}{

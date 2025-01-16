@@ -1,0 +1,178 @@
+,show w
+}{
+,b
+}{
+(define blarg)
+}{
+(putprop blarg 17 `number)
+}{
+q
+}{
+(putprop 'blarg 17 'number)
+}{
+blarg
+}{
+(putprop blarg #\A 'letter)
+}{
+(putprop 'blarg #\A 'letter)
+}{
+(dump-properties 'blarg)
+}{
+(newatom fred)
+}{
+(newatom 'fred)
+}{
+(putprop fred1060 #\X 'X)
+}{
+(define what (x) (newatom x))
+}{
+(define what (lambda x (newatom x)))
+}{
+(what fred)
+}{
+(what 'fred)
+}{
+exit
+}{
+,b
+}{
+,m
+}{
+(import (ice-9 readline))
+}{
+(readline-activate)
+}{
+,b
+}{
+,b
+}{
+(readline-enable)
+}{
+exit
+}{
+,m
+}{
+,b
+}{
+(random)
+}{
+,q
+}{
+,b
+}{
+(random)
+}{
+,bt
+}{
+,help
+}{
+,help debug
+}{
+,frame 1
+}{
+,frame 2
+}{
+,frame 0
+}{
+,q
+}{
+,debug
+}{
+,d
+}{
+,help inspect
+}{
+,help system
+}{
+,statistics
+}{
+,break random
+}{
+,b
+}{
+(word->string "asdf")
+}{
+(number->string 3.14159)
+}{
+(random 3)
+}{
+,bt
+}{
+,q
+}{
+(txb-random)
+}{
+(random)
+}{
+,help debug
+}{
+,b
+}{
+,q
+}{
+del
+}{
+,disable
+}{
+,disable 0
+}{
+,q
+}{
+(close-all-ports)
+}{
+(random)
+}{
+,debug
+}{
+,b
+}{
+,q
+}{
+(display 'fred)
+}{
+(nl)
+}{
+,q
+}{
+(display 'random1)
+}{
+(txb-random)
+}{
+,b
+}{
+(entry-sn-generator)
+}{
+(quotient 3/5)
+}{
+,q
+}{
+(quotient 10 5)
+}{
+(modulo 3 8)
+}{
+(modulo 8 3)
+}{
+(break! random)
+}{
+(import (ice-9 debugger breakpoints source))
+}{
+(use-modules (ice-9 debugger breakpoint source))
+}{
+(import (ice-9 debugger))
+}{
+(import (ice-9 breakpoints))
+}{
+(use-modules (ice-9 debugger breakpoints source))
+}{
+break random
+}{
+,break random
+}{
+(random)
+}{
+,bt
+}{
+,step
+}{
+,q
+}{

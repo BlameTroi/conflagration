@@ -1,0 +1,114 @@
+,help
+}{
+help
+}{
+(help)
+}{
+(debug)
+}{
+(message "blarg")
+}{
+?
+}{
+?
+}{
+(message "blarg")
+}{
+"blarg"
+}{
+(setq msg "blarg")
+}{
+(defvar msg)
+}{
+vocab
+}{
+?
+}{
+,list
+}{
+(list)
+}{
+,eval
+}{
+(display maximum-memory-bytes)
+}{
+(maximum-memory-bytes)
+}{
+(library-directories)
+}{
+(library-list)
+}{
+(object-counts)
+}{
+(system)
+}{
+debug
+}{
+?
+}{
+(debug)
+}{
+?
+}{
+c
+}{
+q
+}{
+(load "ch02-probs.ss")
+}{
+(units)
+}{
+(first-element units)
+}{
+(second-element units)
+}{
+(cddr units)
+}{
+(rotator units)
+}{
+(rotater units)
+}{
+(rotater (rotater units))
+}{
+(snoc 'cubit units)
+}{
+(snoc 'cubits units)
+}{
+(directory-list ".")
+}{
+(directory-separator? :)
+}{
+(pprint char-grapheme-break-property)
+}{
+(pretty-print directory-separator?)
+}{
+(pretty-print rotator)
+}{
+(pretty-print rotater)
+}{
+(load "ch03-probs.ss")
+}{
+(make-list 3)
+}{
+(make-list #f)
+}{
+(make-list '(a b))
+}{
+(make-list '())
+}{
+(make-list nil)
+}{
+(classify 'a)
+}{
+(classify '())
+}{
+(classify '(a b c d))
+}{
+(classify 3.14159)
+}{
+(classify "fred")
+}{
+(classify #t)
+}{
+(classify #f)
+}{
