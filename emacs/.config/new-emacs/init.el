@@ -67,7 +67,12 @@
 ;; The Customization Interface and file.
 
 (setopt custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file)
+(load-file custom-file)
+(setopt package-install-upgrade-built-in t)
+(package-install-selected-packages)
+(setopt debug-on-error t)
+
+
 
 ;; Do I want a dashboard?
 
@@ -278,8 +283,6 @@
 
 (require 'marginalia)
 (require 'kind-icon)
-(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-(add-hook 'emacs-startup-hook 'marginalia-mode)
 
 ;; Spell check with flyspell.
 ;;     ( :map flyspell-mode-map
@@ -318,7 +321,7 @@
 ;; into my .zshenv.
 
 (require 'info)
-(setopt Info-additional-directory-list '("/opt/homebrew/share/info")))
+(setopt Info-additional-directory-list '("/opt/homebrew/share/info"))
 
 (require 'eldoc)
 (add-hook 'emacs-startup-hook 'global-eldoc-mode)
@@ -376,17 +379,19 @@
 ;;      ("C-n" . corfu-next)
 ;;      ("C-p" . corfu-previous))
 (add-hook 'prog-mode-hook 'corfu-mode)
-(add-hook 'shell-mode 'corfu-mode)
-(add-hook 'eshell-mode 'corfu-mode)
+(add-hook 'shell-mode-hook 'corfu-mode)
+(add-hook 'eshell-mode-hook 'corfu-mode)
 ;; This hides commands in m-x which do not apply to the current mode.
 (setopt read-extended-command-predicate #'command-completion-default-include-p)
 (add-hook 'emacs-startup-hook 'global-corfu-mode)
 
 (require 'corfu-popupinfo)
-(add-hook 'corfu-mode 'corfu-popupinfo-mode)
+(add-hook 'corfu-mode-hook 'corfu-popupinfo-mode)
 (setopt corfu-popupinfo-delay '(0.25 . 0.1))
 (setopt corfu-popupinfo-hide nil)
 
+(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+(add-hook 'emacs-startup-hook 'marginalia-mode)
 ;; Completion At Point Extensions:
 
 (require 'cape)
@@ -410,7 +415,7 @@
 (require 'corfu-prescient)
 (add-hook 'emacs-startup-hook 'corfu-prescient-mode)
 
-(require 'vertico-prescient-mode)
+(require 'vertico-prescient)
 (add-hook 'emacs-startup-hook 'vertico-prescient-mode)
 
 ;; Key binds
@@ -464,7 +469,7 @@
 ;; Built-in bookmarking framework.
 
 (require 'bookmark)
-(add-hook 'bookmark-bmenu-mode 'hl-line-mode)
+(add-hook 'bookmark-bmenu-mode-hook 'hl-line-mode)
 (setq bookmark-save-flag 1)          ; persist bookmark updates
 
 ;; Registers, named holders.
@@ -483,7 +488,7 @@
 (require 'ace-window)
 
 (require 'dumb-jump)
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+(add-hook 'xref-backend-functions-hook #'dumb-jump-xref-activate)
 
 ;; Eglot
 
@@ -502,14 +507,14 @@
 (setopt jsonrpc-event-hook nil)
 
 (setopt eglot-events-buffer-config '(:size 0 :format short))
-(esetopt glot-autoshutdown t)
-(esetopt glot-send-changes-idle-time 0.1)
-(esetopt glot-extend-to-xref t)
-(esetopt glot-report-progress nil)  ; Prevent minibuffer spam
-(esetopt glot-ignored-server-capabilities
+(setopt glot-autoshutdown t)
+(setopt glot-send-changes-idle-time 0.1)
+(setopt glot-extend-to-xref t)
+(setopt glot-report-progress nil)  ; Prevent minibuffer spam
+(setopt glot-ignored-server-capabilities
          '(:documentFormattingProvider
             :documentRangeFormattingProvider
-            :documentOnTypeFormattingProvider)))
+            :documentOnTypeFormattingProvider))
 
 ;; Treesitter
 
@@ -554,7 +559,7 @@
      typescript
      yaml))
 (declare-function global-treesit-auto-mode "treesit-auto")
-(add-hook 'emacs-startup-hook global-treesit-auto-mode)
+(add-hook 'emacs-startup-hook 'global-treesit-auto-mode)
 
 ;; Add frame borders and window dividers to give me a bit of
 ;; separation from the edge of the screen.
@@ -609,8 +614,8 @@
 
 ;; This is needed to avoid false 'can not find/load' errors on
 ;; requires that occur before this point in the source.
-(with-eval-after-load 'flymake
-                      (setopt elisp-flymake-byte-compile-load-path load-path))
+;; (with-eval-after-load 'flymake
+;;   (setopt elisp-flymake-byte-compile-load-path load-path))
 
 ;; `project'
 
@@ -651,7 +656,7 @@
 (setq diff-default-read-only t)
 
 (require 'diff-hl)
-(add-hook 'emacs-startup-hook global-diff-hl-mode)
+(add-hook 'emacs-startup-hook 'global-diff-hl-mode)
 
 ;; Auto parenthesis matching
 
@@ -697,8 +702,8 @@
 ;;  (auto-hide :url "https://github.com/BlameTroi/auto-hide.el"
 ;;             :branch "main")
 
-(require 'auto-hide)
-         (add-hook 'prog-mode-hook 'hs-minor-mode)
+;;(require 'auto-hide)
+;;         (add-hook 'prog-mode-hook 'hs-minor-mode)
 
 ;; Random 'no' configuration required modes
 
@@ -767,13 +772,15 @@
 (require 'geiser)
 (require 'geiser-chicken)
 (require 'srfi)
-(require 'flymake-chicken)
 (add-hook 'geiser-repl-mode-hook 'electric-pair-local-mode)
 (setq geiser-connection-timeout 500)
 (setopt geiser-repl-startup-time 500)
 (setopt geiser-implementations-alist
-        '((((regexp "\\.scm$") chicken)
-           ((regexp "\\.ss$") chicken))))
+        '(((regexp "\\.scm$") chicken)
+           ((regexp "\\.ss$") chicken)))
+
+(with-eval-after-load 'flymake
+  (require 'flymake-chicken))
 
 ;; Text display and editing.
 

@@ -43,6 +43,7 @@ side-notes
 srfi
 treesit-auto
 vertico
+vertico-prescient
 ws-butler
 )))
 (custom-set-faces
