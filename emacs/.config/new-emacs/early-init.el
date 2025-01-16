@@ -10,35 +10,59 @@
 
 ;; This file is NOT part of GNU Emacs. The author considers it to be
 ;; in the public domain.
-;;
-;; This file is generated from an Org document. That file should be
-;; found in the same directory as this in my "dotfiles" repository.
 
-;; I borrow liberally from Protesilaos "Prot" Stavrou's highly
-;; instructive literal configuration found on his website:
+;; This file was originally generated from an Org document. As much as
+;; I try, I just can't get into `literate' configurations. It was a
+;; good exercise to go through a few configurations and build my own
+;; attempt at being literate, but I can't live with it on a regular
+;; basis.
 ;;
-;; https://protesilaos.com/emacs/dotemacs
+;; As I moved this back to being pre-literate I made many changes.
+;; Most noticeable of them is the removal of `use-package'. It's a
+;; cool tool and it truly is the best thing since sliced bread, but it
+;; lets me skip learning things. It may come back into use once I have
+;; the confidence that I'm not avoiding learning things.
 ;;
-;; The clever bits in here are likely from his config. I have changed
-;; some names to avoid confusing myself, but I'm not trying to claim
-;; his code. Hopefully I've marked these well enough.
+;; There are several good 'learning' configurations to be found on
+;; reddit, github, and elsewhere on the web. Two highly readable
+;; configurations that influenced me the most are:
+;;
+;; 1) Protesilaos "Prot" Stavrou's highly instructive literal
+;;    configuration found on his website:
+;;
+;;    https://protesilaos.com/emacs/dotemacs
+;;
+;; 2) Ashton Wiersdorf's Emacs-Bedrock  at:
+;;
+;;    https://codeberg.org/ashton314/emacs-bedrock
 
 ;; The Emacs early initialization can include most anything that
 ;; doesn't:
 ;;
 ;; 1) Require `use-package' or `require'.
+;;
 ;; 2) Involve or change the visual frames and windows of Emacs.
+;;
+;; I am running Emacs 30 and its capabilities are assumed throughout. I
+;; don't do release checks and fallbacks.
 
 ;;; Code:
 
-;; Turn off garbage collection during startup.
+
+;;; Speed up initialization:
+
+;; Turn off garbage collection during startup. It is turned back on,
+;; restoring the default settings, after initialization is finished.
 
 (defvar troi/gc-cons-threshold gc-cons-threshold)
 (defvar troi/gc-cons-percentage gc-cons-percentage)
 (setopt gc-cons-threshold most-positive-fixnum)
 (setopt gc-cons-percentage 1.0)
 
-;; Force a garbage collection if I leave Emacs temporarily.
+;; Force a garbage collection if I leave Emacs temporarily. This
+;; function is run when garbage collection is turned back on. I don't
+;; know how much it helps on modern hardware, but it is harmless
+;; enough.
 
 (defun troi/gc-after-focus-change ()
   "Run GC when frame loses focus."
@@ -46,16 +70,31 @@
    5 nil
    (lambda () (unless (frame-focus-state) (garbage-collect)))))
 
-;; Turn of special file name handling during startup.
+;; Turn of `special' file name handling during startup. During
+;; initialization no special handling is required. As literally
+;; hundreds (and likely thousands) of files are accessed during
+;; initialization, this is thought to be a significant speed-up.
+;;
+;; These handlers are restored once initialization completes.
 
 (defvar troi/file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
-;; The only vcs I use is Git. I save the original back-ends list
-;; but don't plan to restore it.
+;; Version Control can be queried during initialization. To speed
+;; things up, I remove all backend support except for Git.
+;; The only vcs I use is Git. I save the original backends list but
+;; I don't restore it.
+;;
+;; I've seen some configurations that remove all backends here but
+;; then you can't use them from `init.el'.
 
 (defvar troi/vc-handled-backends vc-handled-backends)
 (setopt vc-handled-backends '(Git))
+
+
+;;; Dealing with the touchpad. It's just too touchy.
+
+;; See the function document string:
 
 (defun troi/bad-mouse-stop-that ()
   "Disable the mouse/touch-pad.
@@ -87,12 +126,16 @@ my `wheel-down' overrides."
 (add-to-list
  'after-init-hook #'troi/bad-mouse-stop-that)
 
-;; Park the mouse pointer in an inoffensive location.
+
+;;; Park the mouse pointer in an inoffensive location.
 
 (mouse-avoidance-mode 'banish)
 (setopt mouse-avoidance-banish-position
 	'((frame-or-window . frame) (side . right) (side-pos . 1)
 	  (top-or-bottom . bottom) (top-or-bottom-pos . 15)))
+
+
+;;; Prepare for display.
 
 ;; These set the frame on my Mac to 'real' full-screen.
 
@@ -120,10 +163,6 @@ my `wheel-down' overrides."
 (setopt inhibit-startup-echo-area-message user-login-name)
 (setopt inhibit-startup-buffer-menu t)
 
-;; I'm not sure I should stick with this, but for now I do.
-
-(setopt confirm-kill-processes nil)
-
 ;; I leave the menu bar active but hidden. The scroll and tool
 ;; bars are hidden.
 
@@ -132,6 +171,9 @@ my `wheel-down' overrides."
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (context-menu-mode -1)
+
+
+;;; JIT compilation.
 
 ;; Silence warnings that aren't relevant during normal sessions.
 
@@ -144,10 +186,12 @@ my `wheel-down' overrides."
 (if (and (fboundp 'native-compile-available-p)
          (native-compile-available-p))
     (setopt package-native-compile t)
-  (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28
-  (setq native-compile-prune-cache t)) ; Emacs 29
+  (setq native-comp-async-report-warnings-errors 'silent)
+  (setq native-compile-prune-cache t)
+  (setq native-comp-jit-compilation t))
 
-;; Metadata and stragglers.
+
+;;; Metadata and stragglers.
 
 (setopt user-full-name "Troy Brumley")
 (setopt user-mail-address "BlameTroi@gmail.com")
@@ -158,7 +202,8 @@ my `wheel-down' overrides."
 
 (setq read-process-output-max (* 64 1024))
 
-;; emacs collective's no littering recommendation
+;; `no-littering' recommends this to stash the native compiled code
+;; under var.
 
 (when (and (fboundp 'startup-redirect-eln-cache)
            (fboundp 'native-comp-available-p)
@@ -166,6 +211,9 @@ my `wheel-down' overrides."
   (startup-redirect-eln-cache
    (convert-standard-filename
     (expand-file-name  "var/eln-cache/" user-emacs-directory))))
+
+
+;;; Add hooks to restore changes after initialization.
 
 ;; Restore garbage collection and file name handler once startup
 ;; completes. We also plug in the idle time garbage collection

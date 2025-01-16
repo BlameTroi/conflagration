@@ -10,19 +10,38 @@
 
 ;; This file is NOT part of GNU Emacs. The author considers it to be
 ;; in the public domain.
+
+;; This file was originally generated from an Org document. As much as
+;; I try, I just can't get into `literate' configurations. It was a
+;; good exercise to go through a few configurations and build my own
+;; attempt at being literate, but I can't live with it on a regular
+;; basis.
+
+;; As I moved this back to being pre-literate I made many changes.
+;; Most noticeable of them is the removal of `use-package'. It's a
+;; cool tool and it truly is the best thing since sliced bread, but it
+;; lets me skip learning things. It may come back into use once I have
+;; the confidence that I'm not avoiding learning things.
+
+;; There are several good 'learning' configurations to be found on
+;; reddit, github, and elsewhere on the web. Two highly readable
+;; configurations that influenced me the most are:
 ;;
-;; This file was originally generated from an Org document. That file
-;; may be found in the same directory as this in my "dotfiles"
-;; repository as long as I feel it remains relevant.
+;; 1) Protesilaos "Prot" Stavrou's highly instructive literal
+;;    configuration found on his website:
+;;
+;;    https://protesilaos.com/emacs/dotemacs
+;;
+;; 2) Ashton Wiersdorf's Emacs-Bedrock  at:
+;;
+;;    https://codeberg.org/ashton314/emacs-bedrock
 
 ;; The `init.el' file is run after `early-init.el'. Here we initialize
 ;; Emacs 'the application'. Establish package repositories, themes,
 ;; fonts, visual settings, and load and configure packages.
-
-;; Key changes include (even more) simplification and removing
-;; `use-package'. It's cool and truly the best thing since sliced
-;; bread, but it lets me skip learning things I should be trying
-;; learning.
+;;
+;; I am running Emacs 30 and its capabilities are assumed throughout. I
+;; don't do release checks and fallbacks.
 
 ;;; Code:
 
@@ -46,10 +65,6 @@
 (setopt use-package-always-ensure nil)
 (setopt package-native-compile t)
 
-;; This is separate from the compile tweaks in `early-init.el' to keep
-;; it closer to `use-package' setup.
-(setq native-comp-jit-compilation t)
-
 (with-eval-after-load 'package
   (defvar package-archives)
   (add-to-list
@@ -64,13 +79,17 @@
             ("melpa-stable" . 6)
             ("melpa" . 5))))
 
+
 ;;; Customization and new system setup:
 
-;; The Customization Interface and file. I don't use the file
-;; often, but I leave the load code here commented out. By
-;; uncommenting, you can start up a new installation and have
-;; Emacs load all your selected packages. Be sure to review
-;; them in `custom.el'
+;; The Customization Interface and file. I don't use the file often,
+;; and I have commented out the load code. By uncommenting, you can
+;; start up a new installation and have Emacs load all your selected
+;; packages. When you manually load a package from an archive, it is
+;; noted in `custom.el'.
+;;
+;; `use-package' would load these, but I'm (temporarily?) not using
+;; it.
 
 (setopt custom-file (concat user-emacs-directory "custom.el"))
 ;; (load-file custom-file)
@@ -79,12 +98,25 @@
 ;; (setopt debug-on-error t)
 
 
+;;; Diminish minor mode indicators.
+
+;; Why does almost every minor mode insist on putting an indicator in
+;; the mode line? Activate `diminish' (it's still a loaded package)
+;; early in initialization and then `(diminish 'mode-name ?)' after
+;; each minor mode is `require'd. You could group the `diminish'
+;; phrases at the end of `init.el', but I would rather keep them close
+;; to their mode's `require'.
+
+
+(require 'diminish)
+
+
 ;;; Do I want a dashboard?
 
 (setopt initial-scratch-message ";; nothing to see here, move along")
 
 
-;;; No littering reduces directory clutter.
+;;; No littering and recent file mode.
 
 (require 'no-littering)
 (require 'recentf)
@@ -92,8 +124,8 @@
 (setopt recentf-max-saved-items 100)
 (add-to-list 'recentf-exclude no-littering-var-directory)
 (add-to-list 'recentf-exclude no-littering-etc-directory)
-
 (add-hook 'emacs-startup-hook 'recentf-mode)
+
 
 ;;; Environment variables.
 
@@ -142,6 +174,23 @@
 (setopt auto-save-default nil)
 
 
+;;; History and persistent positioning in edited files.
+
+(require 'savehist)
+(setopt savehist-additional-variables
+        '(compile-command
+          kill-ring
+          regexp-search-ring))
+(savehist-mode)
+(setq history-length 100)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history t)
+
+(require 'saveplace)
+(add-hook 'emacs-startup-hook 'save-place-mode)
+(setopt save-place-limit 1000)
+
+
 ;;; Directories and files.
 
 ;; Add my lisp to the `load-path'. Scratch and test code, things
@@ -164,6 +213,7 @@
 (setq org-agenda-files '(org-directory))
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
 
 ;;; Dired.
 
@@ -188,24 +238,7 @@
 (setopt dired-free-space 'separate)
 
 
-;;; History and persistent positioning in edited files.
-
-(require 'savehist)
-(setopt savehist-additional-variables
-        '(compile-command
-          kill-ring
-          regexp-search-ring))
-(savehist-mode)
-(setq history-length 100)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history t)
-
-(require 'saveplace)
-(add-hook 'emacs-startup-hook 'save-place-mode)
-(setopt save-place-limit 1000)
-
-
-;;; Load on file system changes.
+;;; Reload on file system changes.
 
 (require 'autorevert)
 (add-hook 'emacs-startup-hook 'global-auto-revert-mode)
@@ -229,11 +262,6 @@
 
 ;;; Mode line and related settings.
 
-;; Diminish mode indicators.
-;; TODO: much recovery needed!
-
-(require 'diminish)
-
 ;; Line numbering in programming modes is the way.
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -245,7 +273,7 @@
 (add-hook 'emacs-startup-hook 'column-number-mode)
 (setopt mode-line-position-column-line-format '(" (%l,%C)")) ; %C based 1, %c based 0
 
-;; Display function name in mode line.
+;; Display function name in mode line. This also seems to work for Org headers.
 
 (add-hook 'emacs-startup-hook 'which-function-mode)
 
@@ -261,9 +289,9 @@
 
 ;;; Theme and colors and faces:
 
-;; I keep returning to the `acme-theme'. It's very easy on my
-;; eyes. I expected to stick with dark black themes but this
-;; is clearly better.
+;; I keep returning to the `acme-theme'. It's very easy on my eyes.
+;; I expected to stick with dark black themes but this is clearly
+;; better.
 
 (setopt custom-safe-themes t)
 (require 'acme-theme)
@@ -288,10 +316,11 @@
 (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 230 :weight 'medium)
 
 
-;;; Don't fll of the edge of the screen.
+;;; Don't fill of the edge of the screen.
 
-;; Add frame borders and window dividers to give me a bit of
-;; separation from the edge of the screen.
+;; A nice trick from Prot! Add frame borders and window dividers to
+;; give me a bit of visual separation between windows and frames and
+;; the screen.
 
 (modify-all-frames-parameters
  '((right-divider-width . 5)
@@ -374,13 +403,14 @@
 (setopt Info-additional-directory-list '("/opt/homebrew/share/info"))
 
 (require 'eldoc)
+(diminish 'eldoc-mode nil)
 (add-hook 'emacs-startup-hook 'global-eldoc-mode)
 
 (require 'man)
 (setq Man-notify-method 'pushy)
 
 
-;;; Speedups.
+;;; Another speedup.
 
 ;; Improve processing of excessively long lines. Forcing left-to-right
 ;; instead of allowing for right-to-left is apparently a significant
@@ -393,12 +423,17 @@
 
 ;;; Minibuffer.
 
+;; Streamline and make it more informative.
+
 (require 'minibuffer)
+(setopt enable-recursive-minibuffers t)
+(setq minibuffer-default-prompt-format " [%s]")
+
 (require 'mb-depth)
 (add-hook 'emacs-startup-hook 'minibuffer-depth-indicate-mode)
+
 (require 'minibuf-eldef)
 (add-hook 'emacs-startup-hook 'minibuffer-electric-default-mode)
-(setq minibuffer-default-prompt-format " [%s]")
 
 ;;;###autoload
 (defun troi-common-clear-minibuffer-message (&rest _)
@@ -409,6 +444,11 @@ to Prot!"
 
 
 ;;; Completion.
+
+;; Completion is spread throughout the rest of this configuration. I
+;; need to organize this better.
+
+;; TODO: clean up !
 
 ;; Built-in completion dials and switches. Also see
 ;; `completion-category-overrides'.
@@ -473,6 +513,9 @@ to Prot!"
 
 ;;; Prescient completion candidate sorting and selection.
 
+;; `orderless' is another option, but I'm using `prescient' because
+;; it requires almost no configuration.
+
 (require 'prescient)
 (add-hook 'emacs-startup-hook 'prescient-persist-mode)
 
@@ -483,72 +526,24 @@ to Prot!"
 (add-hook 'emacs-startup-hook 'vertico-prescient-mode)
 
 
-;;; Key binds
-
-;; TODO: work needed on many key binds.
-
-;; This makes TAB in the minibuffer behave more like it does in a
-;; shell.
-(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
-
-;; Make ESC quit prompts.
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; On the Mac s-q is the command-Q equivalent. I use it to close Emacs
-;; when I don't use M-x 'save-buffers-kill-emacs'.
-(global-unset-key (kbd "C-x C-c"))
-
-;; The number of times I want a dumb list instead of the smart UI for
-;; buffers and directories is zero.
-(global-set-key (kbd "C-x C-d") 'dired)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-;; Default search to regexp instead of string. TODO: Provide a toggle
-;; or string option.
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
-
-;; Zap 'to' not 'through'. This is the way.
-(global-set-key "\M-z" 'zap-up-to-char)
-
-;; TODO: are these the bindings I want for these?
-;;("M-c" . capitalize-dwim)
-;;("M-l" . downcase-dwim) ; "lower" case
-;;("M-u" . upcase-dwim)
-;;("M-=" . count-words) ;; was count-words-region
-
-;; ("C-M-d" . up-list) ; confusing name for what looks like "down" to me
-;; ("<C-M-backspace>" . backward-kill-sexp)
-;; Keymap for buffers (Emacs28)
-;; :map ctl-x-x-map
-;; ("f" . follow-mode)  ; override `font-lock-update'
-;; ("r" . rename-uniquely)
-;; ("l" . visual-line-mode)
-;;:bind (("C-c j" . avy-goto-line)
-;;       ("s-j"   . avy-goto-char-timer)))
-;;:bind (("C-x o" . ace-window)
-;;	 ("M-o" . ace-window)))
-;;:bind (:map eglot-mode-map
-;;          ("C-c c a" . eglot-code-actions)
-;;        ("C-c c r" . eglot-rename))
-
 
 ;;; Drop a pin, or breadcrumbs.
 
-;; Built-in bookmarking framework.
+;; Bookmarking is a subset of registers, or maybe registers are a
+;; subset of bookmarks. Whichever is true, we get there via
+;; `m-x b'.
 
 (require 'bookmark)
 (add-hook 'bookmark-bmenu-mode-hook 'hl-line-mode)
 (setq bookmark-save-flag 1)          ; persist bookmark updates
 
-;; Registers, named holders.
-
 (require 'register)
 (setq register-preview-delay 0.8
       register-preview-function #'register-preview-default)
 
-(with-eval-after-load 'savehist
-                      (add-to-list 'savehist-additional-variables 'register-alist))
+(with-eval-after-load
+    'savehist
+  (add-to-list 'savehist-additional-variables 'register-alist))
 
 
 ;;; Movement and navigation.
@@ -562,6 +557,7 @@ to Prot!"
 ;;; Eglot. The new imporved LSP support.
 
 (require 'eglot)
+(diminish 'eglot-mode "Egl")
 
 ;; TODO: rehome these to language specific sections
 ;; We can start up language servers as sub-processes, be sure we can
@@ -576,11 +572,11 @@ to Prot!"
 (setopt jsonrpc-event-hook nil)
 
 (setopt eglot-events-buffer-config '(:size 0 :format short))
-(setopt glot-autoshutdown t)
-(setopt glot-send-changes-idle-time 0.1)
-(setopt glot-extend-to-xref t)
-(setopt glot-report-progress nil)  ; Prevent minibuffer spam
-(setopt glot-ignored-server-capabilities
+(setopt eglot-autoshutdown t)
+(setopt eglot-send-changes-idle-time 0.1)
+(setopt eglot-extend-to-xref t)
+(setopt eglot-report-progress nil)  ; Prevent minibuffer spam
+(setopt eglot-ignored-server-capabilities
          '(:documentFormattingProvider
             :documentRangeFormattingProvider
             :documentOnTypeFormattingProvider))
@@ -634,10 +630,20 @@ to Prot!"
 
 ;;; Utility function to move a window to a new frame.
 
+;; I usually run with only one maximized frame with two windows at
+;; most. But there are times when multiple frames are warranted. This
+;; function takes a window from a multi-window frame and puts it in a
+;; new frame.
+;;
+;; This only works if there are multiple windows in the current frame.
+;;
+;; The original function is from https://stackoverflow.com/a/57318988
+;; _How to move a buffer to a new frame_.
+
 (defun troi/tear-off-window ()
   "Move a sub-window to a new frame.
-  From a multi-window frame, tear off the current window and put
-  it in a new frame."
+From a multi-window frame, tear off the current window and put
+it in a new frame."
   (interactive)
   (let ((wc (count-windows)))
     (if (< wc 2)
@@ -719,6 +725,7 @@ to Prot!"
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 
 (require 'paredit)
+(diminish 'paredit-mode "PE")
 (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
 (add-hook 'scheme-mode-hook 'paredit-mode)
 
@@ -740,7 +747,6 @@ to Prot!"
 (setopt scroll-conservatively 100000)
 (setopt scroll-preserve-screen-position 1)
 ;; DO NOT USE (pixel-scroll-precision-mode) DO NOT USE
-
 
 
 ;;; Enable disabled 'confusing' commands.
@@ -807,6 +813,7 @@ to Prot!"
 (require 'reformatter)
 
 (require 'astyle)
+(diminish 'astyle-mode "AS")
 (when (executable-find "astyle")
   (add-hook 'c-ts-mode-hook 'astyle-on-save-mode)
   (add-hook 'c++-ts-mode-hook  'astyle-on-save-mode))
@@ -888,17 +895,16 @@ to Prot!"
 ;; if you are wrapping text it will wrap at the fill column and
 ;; not the edge of the screen.
 
+;; To my amazement, I actually prefer tabs for C like code.
+
 (setq-default tab-width 8)
 (setq-default indent-tabs-mode t)
-
-;; Available but not defaulted to on.
-;; (require 'visual-fill-column)
 
 ;; visual line mode is OK for text, use (truncate-lines t) for
 ;; code.
 
 (setq-default fill-column 70)
-;; (add-hook 'text-mode-hook 'visual-line-mode)
+(add-hook 'text-mode-hook 'visual-line-mode)
 
 ;; Plain text (text-mode)
 
@@ -923,22 +929,80 @@ to Prot!"
 (setopt switch-to-buffer-obey-display-actions t)
 (setopt help-window-select t)
 (setopt help-window-keep-selected t)
-(setopt enable-recursive-minibuffers t)
 (setopt confirm-kill-emacs 'y-or-n-p)
 
-(require 'which-key)
-(add-hook 'emacs-startup-hook 'which-key-mode)
-
-(require 'bind-key)
-
 (require 'ws-butler)
+(diminish 'ws-butler-mode nil)
 (add-hook 'prog-mode-hook 'ws-butler-mode)
 
 ;; i often use C-l for visual breaks.
 
 (require 'form-feed-st)
+(diminish 'form-feed-st-mode nil)
 (add-hook 'prog-mode-hook 'form-feed-st-mode)
 (add-hook 'text-mode-hook 'form-feed-st-mode)
+
+
+;;; All the keybinds.
+
+
+(require 'which-key)
+(diminish 'which-key-mode nil)
+(add-hook 'emacs-startup-hook 'which-key-mode)
+
+(require 'bind-key)
+
+;; TODO: work needed on many key binds.
+
+;; This makes TAB in the minibuffer behave more like it does in a
+;; shell.
+(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)
+
+;; Make ESC quit prompts.
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; On the Mac s-q is the command-Q equivalent. I use it to close Emacs
+;; when I don't use M-x 'save-buffers-kill-emacs'.
+(global-unset-key (kbd "C-x C-c"))
+
+;; The number of times I want a dumb list instead of the smart UI for
+;; buffers and directories is zero.
+(global-set-key (kbd "C-x C-d") 'dired)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; Default search to regexp instead of string. TODO: Provide a toggle
+;; or string option.
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+
+;; Zap 'to' not 'through'. This is the way.
+(global-set-key "\M-z" 'zap-up-to-char)
+
+;; TODO: are these the bindings I want for these?
+;;("M-c" . capitalize-dwim)
+;;("M-l" . downcase-dwim) ; "lower" case
+;;("M-u" . upcase-dwim)
+;;("M-=" . count-words) ;; was count-words-region
+
+;; ("C-M-d" . up-list) ; confusing name for what looks like "down" to me
+;; ("<C-M-backspace>" . backward-kill-sexp)
+;; Keymap for buffers (Emacs28)
+;; :map ctl-x-x-map
+;; ("f" . follow-mode)  ; override `font-lock-update'
+;; ("r" . rename-uniquely)
+;; ("l" . visual-line-mode)
+;;:bind (("C-c j" . avy-goto-line)
+;;       ("s-j"   . avy-goto-char-timer)))
+;;:bind (("C-x o" . ace-window)
+;;	 ("M-o" . ace-window)))
+;;:bind (:map eglot-mode-map
+;;          ("C-c c a" . eglot-code-actions)
+;;        ("C-c c r" . eglot-rename))
+
+
+
+
+
 
 (provide 'init)
 ;;; File init.el ends here.
