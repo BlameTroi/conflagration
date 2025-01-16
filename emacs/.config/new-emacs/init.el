@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-;; Compatibility and requirements.
+;;; Compatibility and requirements.
 
 (when (< emacs-major-version 30)
   (error "This configuration requires Emacs 30 or newer!"))
@@ -35,7 +35,7 @@
   (message "This Emacs configuration assumes you are running a GUI, some things may break.")
   (sleep-for 5))
 
-;; Packaging and Repositories.
+;;; Packaging and Repositories.
 
 ;; We have to `require' use-package if we're being compiled. This is
 ;; also a good place to set some package load behavior defaults.
@@ -44,41 +44,47 @@
   (require 'use-package))
 (setopt load-prefer-newer t)
 (setopt use-package-always-ensure nil)
-(setopt package-native-compile nil)
+(setopt package-native-compile t)
 
 ;; This is separate from the compile tweaks in `early-init.el' to keep
 ;; it closer to `use-package' setup.
 (setq native-comp-jit-compilation t)
 
 (with-eval-after-load 'package
-                      (defvar package-archives)
-                      (add-to-list
-                        'package-archives
-                        '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-                      (add-to-list
-                        'package-archives
-                        '("melpa" . "https://melpa.org/packages/") t)
-                      (setopt package-archive-priorities
-                              '(("gnu" . 10)
-                                ("nongnu" . 9)
-                                ("melpa-stable" . 6)
-                                ("melpa" . 5))))
+  (defvar package-archives)
+  (add-to-list
+   'package-archives
+   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (add-to-list
+   'package-archives
+   '("melpa" . "https://melpa.org/packages/") t)
+  (setopt package-archive-priorities
+          '(("gnu" . 10)
+            ("nongnu" . 9)
+            ("melpa-stable" . 6)
+            ("melpa" . 5))))
 
-;; The Customization Interface and file.
+;;; Customization and new system setup:
+
+;; The Customization Interface and file. I don't use the file
+;; often, but I leave the load code here commented out. By
+;; uncommenting, you can start up a new installation and have
+;; Emacs load all your selected packages. Be sure to review
+;; them in `custom.el'
 
 (setopt custom-file (concat user-emacs-directory "custom.el"))
-(load-file custom-file)
-(setopt package-install-upgrade-built-in t)
-(package-install-selected-packages)
-(setopt debug-on-error t)
+;; (load-file custom-file)
+;; (setopt package-install-upgrade-built-in t)
+;; (package-install-selected-packages)
+;; (setopt debug-on-error t)
 
 
-
-;; Do I want a dashboard?
+;;; Do I want a dashboard?
 
 (setopt initial-scratch-message ";; nothing to see here, move along")
 
-;; No littering reduces directory clutter.
+
+;;; No littering reduces directory clutter.
 
 (require 'no-littering)
 (require 'recentf)
@@ -89,14 +95,14 @@
 
 (add-hook 'emacs-startup-hook 'recentf-mode)
 
-;; Environment variables.
+;;; Environment variables.
+
+;; Get the correct environment variable values as if this is a login
+;; shell. The variable list is hard coded and specific to my needs.
 
 ;; MacOS packaging grabs environment variables as requested in a
 ;; plist within the package. Sometimes this fails, and other times
 ;; variables I care about are not included.
-
-;; Get the correct environment variable values as if this is a login
-;; shell. The variable list is hard coded and specific to my needs.
 
 (require 'exec-path-from-shell)
          (declare-function
@@ -127,21 +133,23 @@
              "MallocNanoZone"
              ))
 
-;; No safety net needed.
+
+;;; No safety net needed.
 
 (setopt make-backup-files nil)
 (setopt backup-inhibited nil) ; Is this redundant?
 (setopt create-lockfiles nil)
 (setopt auto-save-default nil)
 
-;; Directories and files.
+
+;;; Directories and files.
 
 ;; Add my lisp to the `load-path'. Scratch and test code, things
 ;; in development, etc.
 
 (add-to-list
-  'load-path
-  (concat user-emacs-directory "troi-lisp"))
+ 'load-path
+ (concat user-emacs-directory "troi-lisp"))
 
 ;; Org mode files and directories. I am not a heavy Org user,
 ;; but it is an assumed part of the Emacs infrastructure.
@@ -156,6 +164,8 @@
 (setq org-agenda-files '(org-directory))
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
+;;; Dired.
 
 ;; For `dired', use 'gls' if it's available. The default 'ls' in MacOS
 ;; and some other systems doesn't support all the options that 'dired'
@@ -177,13 +187,14 @@
 (setopt dired-do-revert-buffer t)
 (setopt dired-free-space 'separate)
 
-;; History and persistent positioning.
+
+;;; History and persistent positioning in edited files.
 
 (require 'savehist)
 (setopt savehist-additional-variables
         '(compile-command
-           kill-ring
-           regexp-search-ring))
+          kill-ring
+          regexp-search-ring))
 (savehist-mode)
 (setq history-length 100)
 (setq history-delete-duplicates t)
@@ -193,11 +204,15 @@
 (add-hook 'emacs-startup-hook 'save-place-mode)
 (setopt save-place-limit 1000)
 
+
+;;; Load on file system changes.
+
 (require 'autorevert)
 (add-hook 'emacs-startup-hook 'global-auto-revert-mode)
 (setopt auto-revert-avoid-polling t)
 (setopt global-auto-revert-non-file-buffers t)
 (setopt auto-revert-verbose nil)
+
 
 ;; Tool-tips (tooltip-mode)
 
@@ -211,9 +226,11 @@
         (border-width . 0)
         (no-special-glyphs . t)))
 
-;; Mode line related settings.
+
+;;; Mode line and related settings.
 
 ;; Diminish mode indicators.
+;; TODO: much recovery needed!
 
 (require 'diminish)
 
@@ -237,34 +254,60 @@
 (setq global-hl-line-sticky-flag t)
 (add-hook 'emacs-startup-hook 'global-hl-line-mode)
 
-;; TODO: rehome thee visuals.
+;; TODO: rehome these visuals.
 (setopt apropos-sort-by-scores t)
 (setopt blink-matching-delay 0.1)
 
-;; Theme and some font/face.
+
+;;; Theme and colors and faces:
+
+;; I keep returning to the `acme-theme'. It's very easy on my
+;; eyes. I expected to stick with dark black themes but this
+;; is clearly better.
 
 (setopt custom-safe-themes t)
 (require 'acme-theme)
 (mapc #'disable-theme custom-enabled-themes)
 (load-theme 'acme t)
 (setopt acme-theme-black-fg t)
+
+;; TODO: fix these to `set-face-attribute'
 (custom-set-faces
-  '(hl-line ((t (
-                 :inherit highlight
-                 :extend t
-                 :background "LightGoldenrod2"
-                 :foreground "black"))))
-  '(compilation-error ((t (:background "gray80" :foreground "Red"))))
-  '(flymake-error ((t (:underline (:color "Red" :style wave :position nil)))))
-  '(font-lock-comment-face ((t (:foreground "#707070" :slant oblique))))
-  '(font-lock-comment-face ((t (:foreground "#005500" :slant oblique)))))
+ '(hl-line ((t (
+                :inherit highlight
+                :extend t
+                :background "LightGoldenrod2"
+                :foreground "black"))))
+ '(compilation-error ((t (:background "gray80" :foreground "Red"))))
+ '(flymake-error ((t (:underline (:color "Red" :style wave :position nil)))))
+ '(font-lock-comment-face ((t (:foreground "#707070" :slant oblique))))
+ '(font-lock-comment-face ((t (:foreground "#005500" :slant oblique)))))
 
 (set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 190)
 (set-face-attribute 'fixed-pitch nil :font "FiraCode Nerd Font Mono" :height 190)
 (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 230 :weight 'medium)
 
+
+;;; Don't fll of the edge of the screen.
+
+;; Add frame borders and window dividers to give me a bit of
+;; separation from the edge of the screen.
+
+(modify-all-frames-parameters
+ '((right-divider-width . 5)
+   (internal-border-width . 5)))
+(dolist (face '(window-divider
+                 window-divider-first-pixel
+                 window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+
+;;; Icons and helpful glyphs and tips.
+
 ;; The Nerd Icons. I prefer these to All the Icons. Note that these
-;; depend upon having the Nerd Fonts on your system.
+;; depend upon having the Nerd Fonts installed on your system.
 
 (require 'nerd-icons)
 (require 'nerd-icons-dired)
@@ -273,16 +316,16 @@
 
 (add-hook 'dired-mode-hook 'nerd-icons-dired-mode)
 (add-hook 'ibuffer-mode-hook 'nerd-icons-ibuffer-mode)
-
-(declare-function nerd-icons-completion-mode "nerd-icons-completion")
 (add-hook 'emacs-startup-hook 'nerd-icons-completion-mode)
-(declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion")
 (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
 
 ;; Add descriptive notes 'in the margin' of various lists/uis.
 
 (require 'marginalia)
 (require 'kind-icon)
+
+
+;;; Spell checking.
 
 ;; Spell check with flyspell.
 ;;     ( :map flyspell-mode-map
@@ -298,7 +341,11 @@
 (setq ispell-program-name "aspell")
 (setq ispell-dictionary "en_US")
 
-;; 'deft' is a light weight free format note application.
+
+;;; Deft & Side Notes:
+
+;; 'deft' is a light weight free format note application. I find
+;; it easier to use than Org and it invites less tweaking.
 
 (require 'deft)
 (setopt deft-directory
@@ -308,17 +355,20 @@
         (assoc-default deft-text-mode '((markdown-mode . "md") (rst-mode . "rst"))
                        'eq "txt"))
 
-;; I use side-notes as scratch paper in project directories. The notes
-;; files aren't stored in Git, I have them excluded in my .gitignore.
+;; I use `side-notes' as scratch paper in project directories. The notes
+;; files aren't stored in Git, I have them excluded in my `.gitignore'.
 
 (require 'side-notes)
 ;;:bind ("M-s n" . side-notes-toggle-notes)
 (setopt side-notes-file "side-notes.txt")
 (setopt side-notes-secondary-file "~/general-side-notes.txt")
 
+
+;;; Documentation.
+
 ;; Read documentation with 'info' and 'eldoc'. For some reason I'm
 ;; missing system info from Homebrew. I should probably move this
-;; into my .zshenv.
+;; into my `.zshenv'.
 
 (require 'info)
 (setopt Info-additional-directory-list '("/opt/homebrew/share/info"))
@@ -326,10 +376,11 @@
 (require 'eldoc)
 (add-hook 'emacs-startup-hook 'global-eldoc-mode)
 
-;; `man' (man-pages)
-
 (require 'man)
 (setq Man-notify-method 'pushy)
+
+
+;;; Speedups.
 
 ;; Improve processing of excessively long lines. Forcing left-to-right
 ;; instead of allowing for right-to-left is apparently a significant
@@ -339,20 +390,34 @@
 (add-hook 'emacs-startup-hook 'global-so-long-mode)
 (setopt bidi-paragraph-direction 'left-to-right)
 
-;; Completion styles
+
+;;; Minibuffer.
 
 (require 'minibuffer)
+(require 'mb-depth)
+(add-hook 'emacs-startup-hook 'minibuffer-depth-indicate-mode)
+(require 'minibuf-eldef)
+(add-hook 'emacs-startup-hook 'minibuffer-electric-default-mode)
+(setq minibuffer-default-prompt-format " [%s]")
 
-;; Also see `completion-category-overrides'.
+;;;###autoload
+(defun troi-common-clear-minibuffer-message (&rest _)
+  "Print an empty message to clear the echo area.
+Use this as advice :after a noisy function. My thanks
+to Prot!"
+  (message ""))
+
+
+;;; Completion.
+
+;; Built-in completion dials and switches. Also see
+;; `completion-category-overrides'.
+
 (setq completion-styles '(basic substring initials flex prescient))
-
-;; Built-in completion dials and switches.
-
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
 ;; (setq-default case-fold-search t)   ; For general regexp
 (setq read-file-name-completion-ignore-case t)
-
 (setopt completion-cycle-threshold 1)
 (setopt completions-detailed t)
 (setopt completion-auto-help 'always)
@@ -361,14 +426,11 @@
 (setopt completions-group t)
 (setopt completion-auto-select 'second-tab)
 
-(require 'mb-depth)
-(add-hook 'emacs-startup-hook 'minibuffer-depth-indicate-mode)
+;; This hides commands in m-x which do not apply to the current mode.
+(setopt read-extended-command-predicate #'command-completion-default-include-p)
 
-(require 'minibuf-eldef)
-(add-hook 'emacs-startup-hook 'minibuffer-electric-default-mode)
-(setq minibuffer-default-prompt-format " [%s]")
 
-;; COmpletion in Region FUnctions:
+;;; COmpletion in Region FUnctions:
 
 ;; Corfu offers popup support both terminal and GUI use, but I do not
 ;; use the terminal.
@@ -381,8 +443,6 @@
 (add-hook 'prog-mode-hook 'corfu-mode)
 (add-hook 'shell-mode-hook 'corfu-mode)
 (add-hook 'eshell-mode-hook 'corfu-mode)
-;; This hides commands in m-x which do not apply to the current mode.
-(setopt read-extended-command-predicate #'command-completion-default-include-p)
 (add-hook 'emacs-startup-hook 'global-corfu-mode)
 
 (require 'corfu-popupinfo)
@@ -392,13 +452,16 @@
 
 (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 (add-hook 'emacs-startup-hook 'marginalia-mode)
-;; Completion At Point Extensions:
+
+
+;;; Completion At Point Extensions:
 
 (require 'cape)
 (add-to-list 'completion-at-point-functions #'cape-dabbrev)
 (add-to-list 'completion-at-point-functions #'cape-file)
 
-;; VERtical Interactive COmpletion.
+
+;;; VERtical Interactive COmpletion.
 
 (require 'vertico)
 (add-hook 'emacs-startup-hook 'vertico-mode)
@@ -407,7 +470,8 @@
 ;;:bind (:map vertico-map
 ;;            ("M-DEL" . vertico-directory-delete-word)))
 
-;; Prescient completion candidate sorting and selection.
+
+;;; Prescient completion candidate sorting and selection.
 
 (require 'prescient)
 (add-hook 'emacs-startup-hook 'prescient-persist-mode)
@@ -418,7 +482,10 @@
 (require 'vertico-prescient)
 (add-hook 'emacs-startup-hook 'vertico-prescient-mode)
 
-;; Key binds
+
+;;; Key binds
+
+;; TODO: work needed on many key binds.
 
 ;; This makes TAB in the minibuffer behave more like it does in a
 ;; shell.
@@ -466,6 +533,8 @@
 ;;        ("C-c c r" . eglot-rename))
 
 
+;;; Drop a pin, or breadcrumbs.
+
 ;; Built-in bookmarking framework.
 
 (require 'bookmark)
@@ -481,16 +550,16 @@
 (with-eval-after-load 'savehist
                       (add-to-list 'savehist-additional-variables 'register-alist))
 
-;; Movement and navigation.
+
+;;; Movement and navigation.
 
 (require 'avy)
-
 (require 'ace-window)
-
 (require 'dumb-jump)
 (add-hook 'xref-backend-functions-hook #'dumb-jump-xref-activate)
 
-;; Eglot
+
+;;; Eglot. The new imporved LSP support.
 
 (require 'eglot)
 
@@ -516,7 +585,8 @@
             :documentRangeFormattingProvider
             :documentOnTypeFormattingProvider))
 
-;; Treesitter
+
+;;; Treesitter. The new improved language mode parser.
 
 ;; There isn't much configuration to do for Treesitter. The
 ;; customization options are minimal and it's just "always there."
@@ -539,7 +609,7 @@
 
 (require 'treesit-auto)
 (setopt treesit-auto-install 'prompt)
-(declare-function treeset-auto-add-to-auto-mode-alist "treesit-auto" t t)
+
 (treesit-auto-add-to-auto-mode-alist
   '(bash
      c
@@ -558,23 +628,11 @@
      toml
      typescript
      yaml))
-(declare-function global-treesit-auto-mode "treesit-auto")
+
 (add-hook 'emacs-startup-hook 'global-treesit-auto-mode)
 
-;; Add frame borders and window dividers to give me a bit of
-;; separation from the edge of the screen.
 
-(modify-all-frames-parameters
-  '((right-divider-width . 5)
-    (internal-border-width . 5)))
-(dolist (face '(window-divider
-                 window-divider-first-pixel
-                 window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-(set-face-background 'fringe (face-attribute 'default :background))
-
-;; Utility function to move a window to a new frame.
+;;; Utility function to move a window to a new frame.
 
 (defun troi/tear-off-window ()
   "Move a sub-window to a new frame.
@@ -583,7 +641,7 @@
   (interactive)
   (let ((wc (count-windows)))
     (if (< wc 2)
-      (message "only one window")
+	(message "only one window")
       (let* ((window (selected-window))
              (buf (window-buffer window))
              (frame (make-frame)))
@@ -594,7 +652,8 @@
 ;; TODO: move key-binds
 (bind-key "C-x 5t" #'troi/tear-off-window)
 
-;; Flymake
+
+;;; Flymake
 
 ;; 'flymake' has been a good linter interface. 'eglot' reports issues
 ;; from 'clang-tidy' through 'flymake'.
@@ -617,7 +676,8 @@
 ;; (with-eval-after-load 'flymake
 ;;   (setopt elisp-flymake-byte-compile-load-path load-path))
 
-;; `project'
+
+;;; Emacs views a `project' as a grouping of directories and files.
 
 (require 'project)
 (setopt project-switch-commands
@@ -634,6 +694,8 @@
 (advice-add #'project-switch-project
             :after #'troi-common-clear-minibuffer-message)
 
+;;; Difference engines.
+
 ;; `ediff'
 
 (require 'ediff)
@@ -644,13 +706,6 @@
 (setq ediff-merge-revisions-with-ancestor t)
 (setq ediff-show-clashes-only t)
 
-;;;###autoload
-(defun troi-common-clear-minibuffer-message (&rest _)
-  "Print an empty message to clear the echo area.
-  Use this as advice :after a noisy function. My thanks
-  to Prot!"
-  (message ""))
-
 ;; `diff-mode'
 (require 'diff-mode)
 (setq diff-default-read-only t)
@@ -658,7 +713,8 @@
 (require 'diff-hl)
 (add-hook 'emacs-startup-hook 'global-diff-hl-mode)
 
-;; Auto parenthesis matching
+
+;;; Parentheses matching and structural editing.
 
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 
@@ -667,21 +723,27 @@
 (add-hook 'scheme-mode-hook 'paredit-mode)
 
 (require 'paredit-menu)
-
 (require 'paredit-everywhere)
 
-;; nicer scrolling
+;; Parentheses (show-paren-mode)
+ (require 'paren)
+(add-hook 'prog-mode-hook 'show-paren-local-mode)
+(setq show-paren-style 'parenthesis)
+(setq show-paren-when-point-in-periphery nil)
+(setq show-paren-when-point-inside-paren nil)
+(setq show-paren-context-when-offscreen 'overlay)
+
+
+;;; Smooth scrolling.
 
 (setopt scroll-margin 0)
 (setopt scroll-conservatively 100000)
 (setopt scroll-preserve-screen-position 1)
 ;; DO NOT USE (pixel-scroll-precision-mode) DO NOT USE
 
-(setopt switch-to-buffer-obey-display-actions t)
-(setopt help-window-select t)
-(setopt help-window-keep-selected t)
-(setopt enable-recursive-minibuffers t)
-(setopt confirm-kill-emacs 'y-or-n-p)
+
+
+;;; Enable disabled 'confusing' commands.
 
 ;; The Emacs gods don't think we should have access to commands
 ;; that might confuse us. They mark them disabled and issue an
@@ -697,20 +759,13 @@
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
-;; Hide (fold) function bodies.
-;; this is copied down from git:
-;;  (auto-hide :url "https://github.com/BlameTroi/auto-hide.el"
-;;             :branch "main")
 
-;;(require 'auto-hide)
-;;         (add-hook 'prog-mode-hook 'hs-minor-mode)
+;;; Language modes.
 
 ;; Random 'no' configuration required modes
 
 (require 'cmake-mode)
-
 (require 'ninja-mode)
-
 (require 'git-modes)
 
 ;; C (not C++, C!)
@@ -758,7 +813,8 @@
 
 ;; Odin.
 
-;; Odin mode isn't available as a package yet.
+;; Odin mode isn't available as a package yet. I have it copied to
+;; my `troi-lisp' directory.
 
 (require 'odin-mode)
 
@@ -767,7 +823,9 @@
                         'eglot-server-programs
                         '(odin-mode . ("ols"))))
 
-;; Guile or Chez scheme? Nah, Chicken!
+;; Geiser and assorted Schemes.
+
+;; I'm only using Chicken right now.
 
 (require 'geiser)
 (require 'geiser-chicken)
@@ -782,7 +840,8 @@
 (with-eval-after-load 'flymake
   (require 'flymake-chicken))
 
-;; Text display and editing.
+
+;;; Searching, grepping, and the like.
 
 (require 'isearch)
 ;; "find one two" would find "one two" "one hi there two" etc.
@@ -821,6 +880,7 @@
           "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
   (setq xref-search-program (if rgp 'ripgrep 'grep)))
 
+
 ;; Text and other settings that haven't fit anywhere else yet.
 
 ;; Line widths. The `visual-fill-column' package 'narrows' the
@@ -840,24 +900,8 @@
 (setq-default fill-column 70)
 ;; (add-hook 'text-mode-hook 'visual-line-mode)
 
-;; More odds and ends.
-
-(delete-selection-mode +1)
-(indent-tabs-mode +1)
-(setopt tab-always-indent 'complete)
-(setopt comment-empty-lines t)
-(setopt require-final-newline t)
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-;; Parentheses (show-paren-mode)
-(require 'paren)
-(add-hook 'prog-mode-hook 'show-paren-local-mode)
-(setq show-paren-style 'parenthesis)
-(setq show-paren-when-point-in-periphery nil)
-(setq show-paren-when-point-inside-paren nil)
-(setq show-paren-context-when-offscreen 'overlay)
-
 ;; Plain text (text-mode)
+
 (require 'text-mode)
 ;;  :mode "\\`\\(README\\|CHANGELOG\\|COPYING\\|LICENSE\\)\\'"
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
@@ -866,6 +910,21 @@
 (setq colon-double-space nil)
 (setq use-hard-newlines nil)
 (setq adaptive-fill-mode t)
+
+
+;;; As yet uncategorized odds and ends.
+
+(delete-selection-mode +1)
+(indent-tabs-mode +1)
+(setopt tab-always-indent 'complete)
+(setopt comment-empty-lines t)
+(setopt require-final-newline t)
+(defalias 'yes-or-no-p 'y-or-n-p)
+(setopt switch-to-buffer-obey-display-actions t)
+(setopt help-window-select t)
+(setopt help-window-keep-selected t)
+(setopt enable-recursive-minibuffers t)
+(setopt confirm-kill-emacs 'y-or-n-p)
 
 (require 'which-key)
 (add-hook 'emacs-startup-hook 'which-key-mode)
