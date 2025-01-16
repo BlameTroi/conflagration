@@ -5,14 +5,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-window acme-theme adjust-parens astyle cape cmake-mode
-		corfu-prescient deft diff-hl diminish dumb-jump
-		exec-path-from-shell form-feed-st geiser-chicken
-		git-modes kind-icon lispy marginalia
-		nerd-icons-completion nerd-icons-dired
-		nerd-icons-ibuffer ninja-mode no-littering org-bullets
-		org-modern paredit-everywhere paredit-menu side-notes
-		srfi treesit-auto vertico-prescient ws-butler)))
+   '(acme-theme astyle cape cmake-mode corfu-prescient deft diff-hl
+		diminish dumb-jump exec-path-from-shell form-feed-st
+		geiser-chicken git-modes kind-icon lispy magit
+		magit-file-icons marginalia nerd-icons-completion
+		nerd-icons-dired nerd-icons-ibuffer ninja-mode
+		no-littering org-bullets org-modern paredit-everywhere
+		paredit-menu side-notes srfi treesit-auto
+		vertico-prescient ws-butler)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

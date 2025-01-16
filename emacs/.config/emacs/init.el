@@ -136,35 +136,31 @@
 ;; I care about are not included.
 
 (require 'exec-path-from-shell)
-         (declare-function
-           exec-path-from-shell-initialize "exec-path-from-shell" ())
-         (declare-function
-           exec-path-from-shell-copy-envs "exec-path-from-shell")
-         (exec-path-from-shell-initialize)
-         (exec-path-from-shell-copy-envs
-           '(
-             ;; Old style Makefile variables for C. I probably don't
-             ;; need these anymore.
-             "LIBRARY_PATH"
-             "CPATH"
-             "CDPATH"
+(exec-path-from-shell-initialize)
+(exec-path-from-shell-copy-envs
+ '(
+   ;; Old style Makefile variables for C. I probably don't
+   ;; need these anymore.
+   "LIBRARY_PATH"
+   "CPATH"
+   "CDPATH"
 
-             ;; Environment variables specific to compile and build
-             ;; for any languages I'm working with.
-             "CMAKE_GENERATOR"
-             "ODIN_ROOT"
+   ;; Environment variables specific to compile and build
+   ;; for any languages I'm working with.
+   "CMAKE_GENERATOR"
+   "ODIN_ROOT"
 
-             ;; Where is the documentation? I know MANPATH is not used
-             ;; on all operating systems, but it doesn't cause me
-             ;; problems to get it.
-             "INFOPATH"
-             "MANPATH"
+   ;; Where is the documentation? I know MANPATH is not used
+   ;; on all operating systems, but it doesn't cause me
+   ;; problems to get it.
+   "INFOPATH"
+   "MANPATH"
 
-             ;; Apple's libc malloc library emits some informational
-             ;; warnings specific to particular allocation pools. They
-             ;; do me know good.
-             "MallocNanoZone"
-             ))
+   ;; Apple's libc malloc library emits some informational
+   ;; warnings specific to particular allocation pools. They
+   ;; do me know good.
+   "MallocNanoZone"
+   ))
 
 
 ;;; No safety net needed.
@@ -209,7 +205,7 @@
 (require 'org-modern)
 (setq org-dir (substitute-in-file-name "$HOME/org"))
 (if (not (file-directory-p org-dir))
-  (make-directory org-dir))
+    (make-directory org-dir))
 (setq org-directory org-dir)
 (setq org-agenda-files '(org-directory))
 
@@ -329,8 +325,8 @@
  '((right-divider-width . 5)
    (internal-border-width . 5)))
 (dolist (face '(window-divider
-                 window-divider-first-pixel
-                 window-divider-last-pixel))
+                window-divider-first-pixel
+                window-divider-last-pixel))
   (face-spec-reset-face face)
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
@@ -343,6 +339,7 @@
 
 (require 'nerd-icons)
 (require 'nerd-icons-dired)
+(diminish 'nerd-icons-dired-mode nil)
 (require 'nerd-icons-completion)
 (require 'nerd-icons-ibuffer)
 
@@ -580,9 +577,9 @@ My thanks to Prot!"
 (setopt eglot-extend-to-xref t)
 (setopt eglot-report-progress nil)  ; Prevent minibuffer spam
 (setopt eglot-ignored-server-capabilities
-         '(:documentFormattingProvider
-            :documentRangeFormattingProvider
-            :documentOnTypeFormattingProvider))
+        '(:documentFormattingProvider
+          :documentRangeFormattingProvider
+          :documentOnTypeFormattingProvider))
 
 
 ;;; Treesitter. The new improved language mode parser.
@@ -591,7 +588,7 @@ My thanks to Prot!"
 ;; customization options are minimal and it's just "always there."
 
 (require 'treesit)
-         (setopt treesit-font-lock-level 4) ; levels 1-3 are useless
+(setopt treesit-font-lock-level 4) ; levels 1-3 are useless
 
 ;; Some of these might require M-x treesit-install-language-grammar.
 
@@ -610,23 +607,23 @@ My thanks to Prot!"
 (setopt treesit-auto-install 'prompt)
 
 (treesit-auto-add-to-auto-mode-alist
-  '(bash
-     c
-     commonlisp
-     cpp
-     go
-     html
-     java
-     javascript
-     json
-     make
-     markdown
-     org
-     python
-     ruby
-     toml
-     typescript
-     yaml))
+ '(bash
+   c
+   commonlisp
+   cpp
+   go
+   html
+   java
+   javascript
+   json
+   make
+   markdown
+   org
+   python
+   ruby
+   toml
+   typescript
+   yaml))
 
 (add-hook 'emacs-startup-hook 'global-treesit-auto-mode)
 
@@ -685,7 +682,7 @@ put it in a new frame."
 ;; requires that occur before this point in the source.
 
 (with-eval-after-load 'flymake
-   (setopt elisp-flymake-byte-compile-load-path load-path))
+  (setopt elisp-flymake-byte-compile-load-path load-path))
 
 
 ;;; Emacs views a `project' as a grouping of directories and files.
@@ -754,23 +751,16 @@ put it in a new frame."
 ;; (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
 ;; (add-hook 'scheme-mode-hook 'paredit-mode)
 
+;; Let's try `adjust-parens' again.
+;; ...and I still find it unhelpful...
+
 ;; Parentheses (show-paren-mode)
- (require 'paren)
+(require 'paren)
 (add-hook 'prog-mode-hook 'show-paren-local-mode)
 (setq show-paren-style 'parenthesis)
 (setq show-paren-when-point-in-periphery nil)
 (setq show-paren-when-point-inside-paren nil)
 (setq show-paren-context-when-offscreen 'overlay)
-
-
-;; This may be a better reformatter for Lisps. It tries to
-;; reposition parentheses in a readable manner.
-
-(require 'adjust-parens)
-(add-hook 'emacs-lisp-mode-hook #'adjust-parens-mode)
-(add-hook 'scheme-mode-hook #'adjust-parens-mode)
-;;  (local-set-key (kbd "TAB") 'lisp-indent-adjust-parens)
-;;  (local-set-key (kbd
 
 
 ;;; Smooth scrolling.
@@ -814,24 +804,24 @@ put it in a new frame."
 
 ;; Just set a few options and wire in 'clangd'.
 (with-eval-after-load 'c-ts-mode
-                      (setopt c-ts-mode-enable-doxygen t)
-                      (setopt c-ts-mode-indent-offset 8)
-                      (setopt c-ts-mode-indent-style 'linux)
-                      (keymap-unset c-ts-base-mode-map "C-c C-c")) ; redundant 'comment-region'
+  (setopt c-ts-mode-enable-doxygen t)
+  (setopt c-ts-mode-indent-offset 8)
+  (setopt c-ts-mode-indent-style 'linux)
+  (keymap-unset c-ts-base-mode-map "C-c C-c")) ; redundant 'comment-region'
 
 ;; Configure the 'clangd' language server to my preferences.
 ;; 'clangd' uses 'CMakeLists.txt' and 'compile_commands.json'
 ;; to determine what to analyze. There are default settings
 ;; in my local config as well.
 (with-eval-after-load 'eglot
-                      (add-to-list
-                        'eglot-server-programs
-                        '((c-ts-mode c++-ts-mode)
-                          . ("clangd"
-                             "-j=4"                   ; async index threads
-                             "--log=info"             ; or "error" or "verbose"
-                             "--pch-storage=memory"   ; i have plenty
-                             "--enable-config"))))
+  (add-to-list
+   'eglot-server-programs
+   '((c-ts-mode c++-ts-mode)
+     . ("clangd"
+        "-j=4"                   ; async index threads
+        "--log=info"             ; or "error" or "verbose"
+        "--pch-storage=memory"   ; i have plenty
+        "--enable-config"))))
 ;; Some other clangd options:
 ;; "--log=error"						 ;;
 ;; "--background-index"						 ;;
@@ -861,9 +851,9 @@ put it in a new frame."
 (require 'odin-mode)
 
 (with-eval-after-load 'eglot
-                      (add-to-list
-                        'eglot-server-programs
-                        '(odin-mode . ("ols"))))
+  (add-to-list
+   'eglot-server-programs
+   '(odin-mode . ("ols"))))
 
 
 ;;; Geiser and assorted Schemes.
@@ -879,7 +869,7 @@ put it in a new frame."
 (setopt geiser-repl-startup-time 500)
 (setopt geiser-implementations-alist
         '(((regexp "\\.scm$") chicken)
-           ((regexp "\\.ss$") chicken)))
+          ((regexp "\\.ss$") chicken)))
 
 (with-eval-after-load 'flymake
   (require 'flymake-chicken))
@@ -924,7 +914,7 @@ put it in a new frame."
   (setq grep-program executable)
   (setq grep-template
         (if rgp
-          "/usr/bin/rg -nH --null -e <R> <F>"
+            "/usr/bin/rg -nH --null -e <R> <F>"
           "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
   (setq xref-search-program (if rgp 'ripgrep 'grep)))
 
@@ -988,6 +978,12 @@ put it in a new frame."
 (diminish 'form-feed-st-mode nil)
 (add-hook 'prog-mode-hook 'form-feed-st-mode)
 (add-hook 'text-mode-hook 'form-feed-st-mode)
+
+
+;;; Version control. I currently use Git.
+
+(require 'magit)
+(require 'magit-file-icons) ;; does this hook itself in on its own?
 
 
 ;;; All the keybinds.
