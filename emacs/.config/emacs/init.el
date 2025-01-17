@@ -788,8 +788,33 @@ put it in a new frame."
 (put 'downcase-region 'disabled nil)
 
 
-;;; Language modes.
+;;; Tabification:
 
+;; Why can't all the languages out there do this correctly?
+
+(defun troi/indenture (setting width)
+  "Parameterized resetting of tabs vs spaces.
+In an ideal world, everyone would use 8 space tabs. Sadly, the
+world is far from ideal.
+
+SETTING is an integer argument to `indent-tabs-mode', refer to
+its documentation string.
+
+WIDTH is the number of spaces a tab span, or appear to span, on
+your display."
+  (indent-tabs-mode setting)
+  (setq tab-width width))
+
+;; Some modes are better with tabs as tabs, others with tabs as
+;; spaces. We'll default to tabs as spaces and override that
+;; for modes where real tabs are preferred (C-ish, Go, etc.).
+
+(setopt tab-width 8)
+(setopt indent-tabs-mode nil) ;; override this for C
+(setopt standard-indent 8)
+
+
+;;; Language modes.
 
 ;;; Random 'no' configuration required modes
 
@@ -800,11 +825,17 @@ put it in a new frame."
 
 ;;; C (not C++, C!)
 
-(setopt standard-indent 8)
-
 ;; Just set a few options and wire in 'clangd'.
+
+;; C vs C-TS is a mess, hopefully these variables get the job done.
 (with-eval-after-load 'c-ts-mode
-  (setopt c-ts-mode-enable-doxygen t)
+  (add-hook 'c-ts-mode-hook (apply-partially #'troi/indenture +1 8))
+  (setopt c-ts-mode-indent-offset 8)
+  (setopt c-ts-mode-indent-style 'linux)
+  (keymap-unset c-ts-base-mode-map "C-c C-c")) ; redundant 'comment-region'
+
+(with-eval-after-load 'c++-ts-mode
+  (add-hook 'c++-ts-mode-hook (apply-partially #'troi/indenture +1 8))
   (setopt c-ts-mode-indent-offset 8)
   (setopt c-ts-mode-indent-style 'linux)
   (keymap-unset c-ts-base-mode-map "C-c C-c")) ; redundant 'comment-region'
@@ -855,6 +886,9 @@ put it in a new frame."
    'eglot-server-programs
    '(odin-mode . ("ols"))))
 
+(with-eval-after-load 'odin-mode
+  (add-hook 'odin-mode-hook (apply-partially #'troi/indenture +1 8))
+  (setq-local js-indent-level 8)) ;; odin uses js-indent and many other js things
 
 ;;; Geiser and assorted Schemes.
 
@@ -931,8 +965,6 @@ put it in a new frame."
 
 ;; To my amazement, I actually prefer tabs for C like code.
 
-(setq-default tab-width 8)
-(setq-default indent-tabs-mode t)
 
 ;; visual line mode is OK for text, use (truncate-lines t) for
 ;; code.
@@ -1048,4 +1080,4 @@ put it in a new frame."
 
 
 (provide 'init)
-;;; File init.el ends here.
+;;; init.el ends here.

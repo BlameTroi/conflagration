@@ -196,9 +196,14 @@ export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
 # export LDFLAGS="-L/opt/homebrew/opt/node@20/lib"
 # export CPPFLAGS="-I/opt/homebrew/opt/node@20/include"
 
-# emacs eat terminal integration
-[ -n "$EAT_SHELL_INTEGRATION_DIR" ] && source "$EAT_SHELL_INTEGRATION_DIR/zsh"
-
 # odin
 # export ODIN_ROOT="/opt/homebrew/Cellar/odin/2024-12"
 export ODIN_ROOT="/opt/homebrew/Cellar/odin/2024-12/libexec/"
+
+
+# `readline' is needed for Chicken Ccheme's `breadline' egg.
+# For compilers to find readline you may need to set:
+export LDFLAGS="-L/opt/homebrew/Cellar/readline/8.2.13/lib"
+export CPPFLAGS="-I/opt/homebrew/Cellar/readline/8.2.13/include"
+# For pkg-config to find readline you may need to set:
+export PKG_CONFIG_PATH="/opt/homebrew/Cellar/readline/8.2.13/lib/pkgconfig"

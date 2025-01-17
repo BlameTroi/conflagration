@@ -233,4 +233,4 @@ my `wheel-down' overrides."
       #'troi/gc-after-focus-change))))
 
 (provide 'early-init)
-;;; File early-init.el ends here.
+;;; early-init.el ends here.

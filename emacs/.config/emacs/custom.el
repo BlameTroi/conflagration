@@ -7,7 +7,7 @@
  '(package-selected-packages
    '(acme-theme astyle cape cmake-mode corfu-prescient deft diff-hl
 		diminish dumb-jump exec-path-from-shell form-feed-st
-		geiser-chicken git-modes kind-icon lispy magit
+		geiser-chicken git-modes kind-icon lispy
 		magit-file-icons marginalia nerd-icons-completion
 		nerd-icons-dired nerd-icons-ibuffer ninja-mode
 		no-littering org-bullets org-modern paredit-everywhere
