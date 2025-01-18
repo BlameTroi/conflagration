@@ -43,6 +43,18 @@
 ;; I am running Emacs 30 and its capabilities are assumed throughout. I
 ;; don't do release checks and fallbacks.
 
+;; Change log:
+;;
+;; 2025/01/17 Geiser pretty much sucks with Chicken Scheme and I'm not
+;;            familiar enough with either Geiser or elisp to try to
+;;            clean it up. That's just beyond my present skills.
+;;            Besides, I just want to work through some Scheme code.
+;;            I'm removing Geiser, Lispy, Paredit, and dependencies so
+;;            I can try to use the old school scheme support, which is
+;;            reported to be reliable.
+;;
+
+
 ;;; Code:
 
 ;;; Compatibility and requirements.
@@ -894,22 +906,24 @@ your display."
   (add-hook 'odin-mode-hook (apply-partially #'troi/indenture +1 8))
   (setq-local js-indent-level 8)) ;; odin uses js-indent and many other js things
 
-;;; Geiser and assorted Schemes.
+;;; Chicken Scheme.
 
-;; I'm only using Chicken right now. I may switch to Chez after
-;; I finish _Simply_Scheme_ and _SICP_.
+;; Geiser's integration with anything but Guile is suspect at best.
+;; It definitely is useless with Chicken. Rather than a quarter or
+;; half assed implementation, I wish they would just delete the
+;; non-functional layers. You can't execute from buffer into the
+;; repl, and so on.
+;;
+;; I've checked in the closest thing to working I had with Geiser
+;; and am now ripping it out. I'm also removing Paredit and Lispy.
+;; I've got too many new things to deal with to handle learning
+;; those tools.
+;;
+;; Classic Scheme mode is also limited but seems to behave better
+;; from a quick test and my research.
 
-(require 'geiser)
-(require 'geiser-chicken)
 (require 'srfi)
-;; (add-hook 'geiser-repl-mode-hook 'electric-pair-local-mode)
-(setq geiser-connection-timeout 500)
-(setopt geiser-repl-startup-time 500)
-(setopt geiser-implementations-alist
-        '(((regexp "\\.scm$") chicken)
-          ((regexp "\\.ss$") chicken)))
 (setopt scheme-program-name "csi -:c")
-(setopt geiser-chicken-binary '("csi" "-:c"))
 
 
 ;;; Searching, greping, and the like.
