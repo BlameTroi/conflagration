@@ -730,9 +730,13 @@ put it in a new frame."
 ;;; Parentheses matching and structural editing.
 
 ;; Hopefully `lispy' will do the jobs of both `paredit' and
-;; `electric-pair-mode'.
+;; `electric-pair-mode'. It does but I'm not at a place where
+;; I'm willing to do the key mapping and learning. Until I
+;; am:
 
-(require 'lispy)
+;; (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+;; (require 'lispy)
 
 ;; This redundant with `paredit'.
 ;; (add-hook 'prog-mode-hook 'electric-pair-mode)
@@ -898,18 +902,17 @@ your display."
 (require 'geiser)
 (require 'geiser-chicken)
 (require 'srfi)
-(add-hook 'geiser-repl-mode-hook 'electric-pair-local-mode)
+;; (add-hook 'geiser-repl-mode-hook 'electric-pair-local-mode)
 (setq geiser-connection-timeout 500)
 (setopt geiser-repl-startup-time 500)
 (setopt geiser-implementations-alist
         '(((regexp "\\.scm$") chicken)
           ((regexp "\\.ss$") chicken)))
+(setopt scheme-program-name "csi -:c")
+(setopt geiser-chicken-binary '("csi" "-:c"))
 
-(with-eval-after-load 'flymake
-  (require 'flymake-chicken))
 
-
-;;; Searching, grepping, and the like.
+;;; Searching, greping, and the like.
 
 (require 'isearch)
 
