@@ -77,6 +77,7 @@
 (setopt use-package-always-ensure nil)
 (setopt package-native-compile t)
 
+
 (with-eval-after-load 'package
   (defvar package-archives)
   (add-to-list
@@ -90,6 +91,26 @@
             ("nongnu" . 9)
             ("melpa-stable" . 6)
             ("melpa" . 5))))
+
+;;; Compile Angel for more betterer native compilation.
+
+(setopt package-native-compile t)
+(setq native-comp-jit-compilation t)
+(require 'compile-angel)
+;; (setopt compile-angel-verbose nil) ;; for debugging
+
+;; Run the following before enabling `compile-angel-on-load-mode'
+(push "loaddefs.el" compile-angel-excluded-files)
+(push "/cus-load.el" compile-angel-excluded-files)
+(push "/charprop.el" compile-angel-excluded-files)
+(push "/savehist.el" compile-angel-excluded-files)
+(push "/recentf-save.el" compile-angel-excluded-files)
+(push "/prescient-save.el" compile-angel-excluded-files)
+(push "/acme-theme.el" compile-angel-excluded-files)
+
+
+(compile-angel-on-load-mode)
+(add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
 
 
 ;;; Customization and new system setup:
@@ -120,6 +141,12 @@
 ;; to their mode's `require'.
 
 (require 'diminish)
+
+;; Clean up mode line indicators for compile angel.
+
+(diminish 'compile-angel-on-save-local-mode "")
+(diminish 'compile-angel-on-save-mode "")
+(diminish 'compile-angel-on-load-mode "")
 
 
 ;;; Do I want a dashboard?
@@ -778,6 +805,9 @@ put it in a new frame."
 (setq show-paren-when-point-inside-paren nil)
 (setq show-paren-context-when-offscreen 'overlay)
 
+(require 'rainbow-delimiters)
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+
 
 ;;; Smooth scrolling.
 
@@ -922,9 +952,19 @@ your display."
 ;; Classic Scheme mode is also limited but seems to behave better
 ;; from a quick test and my research.
 
+;; I'm not sure this is best done in Emacs but we'll see.
 (require 'srfi)
+
+;; These are the built-in Scheme packages.
+(require 'scheme)
+(require 'cmuscheme)
 (setopt scheme-program-name "csi -:c")
 
+;; This is an add on for completion. It may be out of date.
+(require 'scheme-complete)
+(setopt *scheme-use-r7rs* nil)
+(setopt scheme-mit-dialect nil)
+(setopt scheme-default-implementation 'chicken)
 
 ;;; Searching, greping, and the like.
 

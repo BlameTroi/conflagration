@@ -183,11 +183,11 @@ Plug 'farmergreg/vim-lastplace'
 
 " i'm hoping gruvbox (8) light mode will come close to the plan9 acme
 " experience ... it didn't, but dark gruvbox8_hard is working out well
-Plug 'lifepillar/vim-gruvbox8', {'branch': 'neovim'}
-Plug 'fcpg/vim-fahrenheit'
+" Plug 'lifepillar/vim-gruvbox8', {'branch': 'neovim'}
+" Plug 'fcpg/vim-fahrenheit'
 
 " this is for if i want to roll my own or customize a colorscheme
-Plug 'lifepillar/vim-colortemplate', {'tag': 'v2.*'}
+" Plug 'lifepillar/vim-colortemplate', {'tag': 'v2.*'}
 
 " it's either signify or gitgutter, let's try gitgutter
 Plug 'airblade/vim-gitgutter'
@@ -200,7 +200,7 @@ Plug 'itchyny/lightline.vim'
 " Plug 'JuliaEditorSupport/julia-vim'
 
 " i'm finding that i really want a file explorer in the editor ... sigh
-Plug 'preservim/nerdtree'
+" Plug 'preservim/nerdtree'
 
 " old school tag management and fuzzy finding with gutentags and
 " ctrlp.
@@ -233,20 +233,20 @@ Plug 'robertmeta/nofrils'
 "Plug 'kamwitsta/flatwhite-vim'
 "Plug 'axvr/photon.vim'
 "Plug 'vyshane/cleanroom-vim-color'
-"Plug 'alxhnr/dark_tty'
+Plug 'alxhnr/dark_tty'
 
 " navigation, movement, and keys
 "Plug 'liuchengxu/vim-which-key'
-"Plug 'zakj/vim-showmarks'
+Plug 'zakj/vim-showmarks'
 "Plug 'justinmk/vim-sneak'
 "Plug 'easymotion/vim-easymotion'
 
 " languages
 
-Plug 'sterpe/vim-algol68'
+" Plug 'sterpe/vim-algol68'
 
 " go, i don't seem able to avoid it
-Plug 'fatih/vim-go', {'tag': 'v1.*'}
+" Plug 'fatih/vim-go', {'tag': 'v1.*'}
 
 call plug#end()
 " plug#end()  sets `filetype plugin indent on` and `syntax enable`
