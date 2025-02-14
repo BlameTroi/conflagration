@@ -35,8 +35,8 @@ zstyle ':vcs_info:*' stagedstr ' +'
 zstyle ':vcs_info:*' unstagedstr ' *'
 zstyle ':vcs_info:*' formats ' [%b%u%c]'
 zstyle ':vcs_info:*' actionformats ' [%b|%a%u%c]'
-PS1='%n %~$vcs_info_msg_0_ $ '
-
+export PROMPT='%2~ +++ '
+export RPROMPT='$vcs_info_msg_0_ [%*]'
 
 # shell options ...
 
