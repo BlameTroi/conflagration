@@ -10,17 +10,23 @@
 DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 
-# emacsish
+# Editing
 
-bindkey -e
-[[ $EMACS = t ]] && unsetopt zle
+export VISUAL="vim"
+export EDITOR="vim"
+export ALTERNATE_EDITOR=""
 
+# utility
+
+export MANPAGER='nvim +Man!'
 
 # completion
 
 autoload -Uz compinit
 compinit
 
+# readline
+bindkey -v
 
 # add some vcs status information to prompts
 
@@ -40,14 +46,21 @@ export RPROMPT='$vcs_info_msg_0_ [%*]'
 
 # shell options ...
 
+# Hex and Octal output as I like it:
+#
+setopt C_BASES
+setopt OCTAL_ZEROES
 
 # changing Directories
 
 setopt AUTO_CD
 setopt AUTO_PUSHD
-setopt CDABLE_VARS
 setopt PUSHD_TO_HOME
-
+setopt CHASE_LINKS
+setopt PUSHD_IGNORE_DUPS
+DIRSTACKSIZE=8
+setopt PUSHD_MINUS 
+alias dh='dirs -v'
 
 # completion
 
@@ -106,28 +119,17 @@ setopt C_BASES
 
 # aliases
 
-# .zshalias
-#
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# example of single item needed after test
-# type ag >/dev/null 2>&1 && alias grep=ag
-# for multiples
-# if --above to &&--; then
-#   blah
-# fi
-
+# I removed my separate .zshalias and put the aliases here.
 
 # nvim if available
 
 if type nvim >/dev/null 2>&1; then
-  alias vim='nvim'
-  alias vimdiff='nvim -d'
+	alias vim='nvim'
+	alias vimdiff='nvim -d'
+	export VISUAL="nvim"
+	export EDITOR=""
+	export ALTERNATE_EDITOR=""
 fi
-
 
 # default to human readable figures
 
@@ -165,8 +167,8 @@ alias cls='clear'
 # fzf should use ripgrep if available
 
 if type rg &> /dev/null 2>&1 ; then
-  export FZF_DEFAULT_COMMAND='rg --files'
-  export FZF_DEFAULT_OPTS='-m --color=bw'
+	export FZF_DEFAULT_COMMAND='rg --files'
+	export FZF_DEFAULT_OPTS='-m --color=bw'
 fi
 
 
@@ -177,28 +179,41 @@ fi
 
 # fzf integration
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if type fzf >/dev/null 2>&1; then
+	source <(fzf --zsh)
+fi
+
+#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 #export FZF_DEFAULT_COMMAND='fd --type file'
 #export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git --color=always'
 #export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4'
 
 
-# Path additions -- odd path extensions from homebrew and similar
+# Path additions -- odd path extensions from homebrew and similar.
+# For some reason my bin, which I set in zshenv, is not in front
+# by the time we get here. So ...
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# WHen you don't want Apple's built in Ruby:
 
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
-# export PATH=/usr/local/smlnj/bin:"$PATH"
-# export PATH="$HOME/.local/bin/smlformat:$PATH"
+# TODO: do i want to insert symlinks for gcc and g++ to the real
+# versions in homebrew, or continue to let clang override them?
+export PATH=/usr/local/smlnj/bin:"$PATH"
+export PATH="$HOME/.local/bin/smlformat:$PATH"
 
 export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
 # if you need compilers to find node ...
-# export LDFLAGS="-L/opt/homebrew/opt/node@20/lib"
-# export CPPFLAGS="-I/opt/homebrew/opt/node@20/include"
+export LDFLAGS="-L/opt/homebrew/opt/node@20/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/node@20/include"
 
 # odin
 # export ODIN_ROOT="/opt/homebrew/Cellar/odin/2024-12"
-export ODIN_ROOT="/opt/homebrew/Cellar/odin/2024-12/libexec/"
+# TODO: is this still needed on Macos?
+#export ODIN_ROOT="/opt/homebrew/Cellar/odin/2025-03_1/libexec/"
 
 
 # `readline' is needed for Chicken Ccheme's `breadline' egg.
@@ -207,3 +222,27 @@ export LDFLAGS="-L/opt/homebrew/Cellar/readline/8.2.13/lib"
 export CPPFLAGS="-I/opt/homebrew/Cellar/readline/8.2.13/include"
 # For pkg-config to find readline you may need to set:
 export PKG_CONFIG_PATH="/opt/homebrew/Cellar/readline/8.2.13/lib/pkgconfig"
+
+# i've given in to the pressure to switch to cmake. i default my
+# builds to use ninja instead of gnu make because multiple
+# configurations are built in.
+
+export CMAKE_GENERATOR="Ninja Multi-Config"
+
+
+# how did i not know about this? unprefixed paths on cd are
+# checked to see if they are immediate descendants of
+# directories specified here.
+
+# it's causing some problems when executable names collide with
+# directory names. So off for a bit.
+typeset -U CDPATH
+#export cdpath=(. $HOME/projects $cdpath[@])
+#export CDPATH=.:~/projects:~
+
+
+# not enough programs honor this, but whre possible i prefer to
+# turn off colored output.
+
+export NO_COLOR=1
+

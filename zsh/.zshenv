@@ -26,7 +26,10 @@ export XDG_STATE_HOME="$HOME/.local/state"
 
 # my path extensions. i don't have anything that uses .cargo and go is
 # managed by homebrew, so only my personal bin needs to be included.
-
+# 
+# by the time the path hits .zshrc, a bunch of stuff has been put in
+# front of my .local/bin, leaving this here but it's redundant in 
+# login shells.
 typeset -U PATH
 export path=(~/.local/bin $path[@])
 # export path=(~/.local/bin ~/.cargo/bin /usr/local/go/bin $path[@])
@@ -38,13 +41,6 @@ export path=(~/.local/bin $path[@])
 
 umask 033
 
-
-# all my editing is emacs these days. this may need some tweaking
-# to work correctly on macos.
-
-export VISUAL="emacs"
-export EDITOR=$VISUAL
-export ALTERNATE_EDITOR=""
 
 
 # Timezone, set TZ$ to /etc/timezone if it exists, or default to
@@ -86,20 +82,6 @@ export MallocNanoZone=0
 
 export CMAKE_GENERATOR="Ninja Multi-Config"
 
-
-# how did i not know about this? unprefixed paths on cd are
-# checked to see if they are immediate descendants of
-# directories specified here.
-
-typeset -U CDPATH
-export cdpath=(. ~/projects ~ $cdpath[@])
-#export CDPATH=.:~/projects:~
-
-
-# not enough programs honor this, but whre possible i prefer to
-# turn off colored output.
-
-export NO_COLOR=1
 
 # ### dotnet ###
 #export DOTNET_ROOT = ~/.dotnet

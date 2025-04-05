@@ -10,3 +10,11 @@
 	windowMemory=2047m
 [init]
 	defaultBranch = main
+[merge]
+	tool = vimdiff
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false
+[mergetool]
+	prompt = false

@@ -30,87 +30,87 @@ packadd! matchit
 
 "
 " Vim-Plug
-call plug#begin('~/.vim/plugged')
-
-" Code completion
-" 
-" I thought about using ycm but as it doesn't support neovim well yet.
-" I'm also seeing issues with jedi-vim, neovim, and virtual environments
-" that I don't see with vim 8 or 9. Rather than crawl into the rabbit hole
-" of neovim I am not using virtual environments. This is hobby code and
-" while virtual environments are indeed a good thing (TM) I have no real
-" need.
-
-" speed up deaing with folds
-Plug 'Konfekt/FastFold'
-
-" helper
-Plug 'junegunn/vim-easy-align'
-
-" Python
-" ale and python-mode seem to be what the cool kids use, but they aren't
-" working well for me. I'm just going to get myself something that works
-" on the few things I need.
-Plug 'tmhedberg/SimpylFold',          {'for': 'python'}
-Plug 'Vimjas/vim-python-pep8-indent', {'for': 'python'}
-Plug 'davidhalter/jedi-vim',          {'for': 'python'}
-
+"call plug#begin('~/.vim/plugged')
 "
-" Snippets
-Plug 'honza/vim-snippets'
-Plug 'SirVer/ultisnips'
-
-" Status line
-Plug 'KaraMCC/vim-streamline'
-let g:streamline_enable_devicons = 1
-let g:streamline_minimal_ui      = 0
-
-" Better vim behavior
-Plug 'ctrlpvim/ctrlp.vim'
-let g:ctrlp_custom_ignore = '\.git\|node_modules\|\.cache'
-
-Plug 'farmergreg/vim-lastplace'
-
-" allow modelines but limit the commands that can be used
-Plug 'ciaranm/securemodelines'
-let g:secure_modelines_verbose = 1
-let g:secure_modelines_leave_modeline = 1
-
-" git
-Plug 'airblade/vim-gitgutter'
-let g:gitgutter_set_sign_backgrounds = 1
-
-" tags
-Plug 'preservim/tagbar'
-Plug 'ludovicchabant/vim-gutentags'
-
-" motion and such
-Plug 'easymotion/vim-easymotion'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary'
-
-" fuzzy and grep
-Plug 'junegunn/fzf', {'do': './install --all'}
-Plug 'junegunn/fzf.vim'
-
-" TODO: qf ?
-" https://github.com/romainl/vim-qf
-
-" eye candy
-Plug 'ryanoasis/vim-devicons'
-Plug 'chrisbra/unicode.vim'
-Plug 'altercation/vim-colors-solarized'
-Plug '~/projects/vim/vim-retroi'
-
+"" Code completion
+"" 
+"" I thought about using ycm but as it doesn't support neovim well yet.
+"" I'm also seeing issues with jedi-vim, neovim, and virtual environments
+"" that I don't see with vim 8 or 9. Rather than crawl into the rabbit hole
+"" of neovim I am not using virtual environments. This is hobby code and
+"" while virtual environments are indeed a good thing (TM) I have no real
+"" need.
 "
-" algol
-Plug 'sterpe/vim-algol68'
-
+"" speed up deaing with folds
+"Plug 'Konfekt/FastFold'
 "
-Plug 'habamax/vim-pire'
-
-call plug#end()
-
+"" helper
+"Plug 'junegunn/vim-easy-align'
+"
+"" Python
+"" ale and python-mode seem to be what the cool kids use, but they aren't
+"" working well for me. I'm just going to get myself something that works
+"" on the few things I need.
+"Plug 'tmhedberg/SimpylFold',          {'for': 'python'}
+"Plug 'Vimjas/vim-python-pep8-indent', {'for': 'python'}
+"Plug 'davidhalter/jedi-vim',          {'for': 'python'}
+"
+""
+"" Snippets
+"Plug 'honza/vim-snippets'
+"Plug 'SirVer/ultisnips'
+"
+"" Status line
+"Plug 'KaraMCC/vim-streamline'
+"let g:streamline_enable_devicons = 1
+"let g:streamline_minimal_ui      = 0
+"
+"" Better vim behavior
+"Plug 'ctrlpvim/ctrlp.vim'
+"let g:ctrlp_custom_ignore = '\.git\|node_modules\|\.cache'
+"
+"Plug 'farmergreg/vim-lastplace'
+"
+"" allow modelines but limit the commands that can be used
+"Plug 'ciaranm/securemodelines'
+"let g:secure_modelines_verbose = 1
+"let g:secure_modelines_leave_modeline = 1
+"
+"" git
+"Plug 'airblade/vim-gitgutter'
+"let g:gitgutter_set_sign_backgrounds = 1
+"
+"" tags
+"Plug 'preservim/tagbar'
+"Plug 'ludovicchabant/vim-gutentags'
+"
+"" motion and such
+"Plug 'easymotion/vim-easymotion'
+"Plug 'tpope/vim-surround'
+"Plug 'tpope/vim-commentary'
+"
+"" fuzzy and grep
+"Plug 'junegunn/fzf', {'do': './install --all'}
+"Plug 'junegunn/fzf.vim'
+"
+"" TODO: qf ?
+"" https://github.com/romainl/vim-qf
+"
+"" eye candy
+"Plug 'ryanoasis/vim-devicons'
+"Plug 'chrisbra/unicode.vim'
+"Plug 'altercation/vim-colors-solarized'
+"Plug '~/projects/vim/vim-retroi'
+"
+""
+"" algol
+"Plug 'sterpe/vim-algol68'
+"
+""
+"Plug 'habamax/vim-pire'
+"
+"call plug#end()
+"
 "
 " Enable filetype customization 
 syntax enable
@@ -131,7 +131,7 @@ endif
 
 " coloring and highlighting
 set background=dark
-colorscheme solarized
+colorscheme retrobox
 " colorscheme darkblue
 " colorscheme retroi-amber
 set termguicolors
@@ -209,7 +209,7 @@ set grepprg=LC_ALL=C\ grep\ -nrsh
 "
 " TODO: is there a better way to access headers like <sys/types.h>
 " for jumping to files? right now i'm hardcoding to my lubuntu system.
-set path+=/usr/include/x86_64-linux-gnu
+"set path+=/usr/include/x86_64-linux-gnu
 set path+=**                    " allow :e file autocomplete in subdirectories
 
 "
@@ -292,6 +292,15 @@ augroup filetype_basic
   autocmd BufNewFile,BufRead *.bi  set ft=basic
   autocmd BufNewFile,BufRead *.bm  set ft=basic
   autocmd BufNewFile,BufRead *.bas compiler fbc
+augroup END
+
+augroup filetype_scheme
+    autocmd!
+    autocmd filetype scheme let b:is_chicken=1
+    autocmd BufNewFile,BufRead *.scm set ft=scheme
+    autocmd BufNewFile,BufRead *.sld set ft=scheme
+    autocmd BufNewFile,BufRead *.rkt set ft=scheme
+    autocmd BufNewFile,BufRead *.ss  set ft=scheme
 augroup END
 
 " testing
