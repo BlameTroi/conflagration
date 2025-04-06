@@ -1,1 +1,0 @@
-/Users/troi/Projects/Emacs/scheme-complete/scheme-complete.el

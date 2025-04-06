@@ -1,6 +1,0 @@
-# ctags options for fpc
---exclude-exception=*.scm
---exclude-exception=*.ss
---exclude-exception=*.SCM
---exclude-exception=*.sld
---languages=+scheme

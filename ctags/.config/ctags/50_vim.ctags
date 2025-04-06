@@ -1,3 +1,0 @@
-# ctags options for vim
---exclude-exception=*.vim
---languages=+vim

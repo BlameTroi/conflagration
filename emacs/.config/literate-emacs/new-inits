@@ -1,3 +1,0 @@
-cp new-early-init.el early-init.el
-cp new-init.el init.el
-
