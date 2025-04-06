@@ -1,0 +1,4 @@
+-Wall
+-std=c18
+-g3
+-I/opt/homebrew/include/openssl

@@ -1,4 +1,5 @@
 # astyle trying to find one i like
+mode=c
 style=attach
 indent=force-tab=8
 attach-namespaces
@@ -7,6 +8,7 @@ attach-extern-c
 attach-closing-while
 indent-after-parens
 indent-col1-comments
+indent-preproc-define
 break-return-type
 break-return-type-decl
 pad-header
