@@ -25,8 +25,9 @@ export MANPAGER='nvim +Man!'
 autoload -Uz compinit
 compinit
 
-# readline
-bindkey -v
+# readline -- for some reason while I vim elsewhere, the emacs
+# bindings work better for me a the command line
+bindkey -e
 
 # add some vcs status information to prompts
 
