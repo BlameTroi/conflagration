@@ -1,5 +1,5 @@
 local M = {
-   "BlameTroi/nvim-lastplace",
+   "ethanholz/nvim-lastplace",
    opts = {
       lastplace_ignore_buftype = {
          "quickfix",

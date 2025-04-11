@@ -21,6 +21,7 @@ local M = {
          local disable_filetypes = {
             "c",
             "cpp",
+            "odin",
          }
          local lsp_format_opt
          if disable_filetypes[vim.bo[bufnr].filetype] then

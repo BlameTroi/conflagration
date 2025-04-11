@@ -25,15 +25,18 @@ tab_width = 8
 [*.md]
 trim_trailing_whitespace = false
 indent_style = space
-indent_size = 5
+indent_size = tab
+tab_width = 5
 
 [*.txt]
 indent_style = space
-indent_size = 5
+indent_size = tab
+tab_width = 5
 
 [*.org]
 indent_style = space
-indent_size = 3
+indent_size = tab
+tab_width = 3
 
 # Configuration files.
 [*.{ini,toml}]
@@ -43,39 +46,44 @@ tab_width = 8
 
 # Those new fangled scripting languages.
 [*.lua]
-indent_size = 3
-indent_size = 3
+indent_size = tab
+tab_width = 3
 indent_style = space
 trim_trailing_whitespace = true
 
 [*.{ts,tsc,js}]
-indent_size = 3
-indent_size = 3
+indent_size = tab
+tab_width = 3
 indent_style = space
 trim_trailing_whitespace = true
 
 [*.py]
 indent_style = space
-indent_size = 3
+indent_size = tab
+tab_width = 3
 trim_trailing_whitespace = true
 
 [*.gemspec,*.rb]
-indent_size = 2
+indent_size = tab
+tab_width = 2
 
 # The old fangled scripting languages.
 [*.{rexx,sh,zsh,bat}]
 indent_style = space
-indent_size = 3
+indent_size = tab
+tab_width = 3
 trim_trailing_whitespace = true
 
 [*.vim]
 indent_style = space
-indent_size = 4
+indent_size = tab
+tab_width = 4
 
 # Scheme and friends.
 [*.{scm,sls,ss,sld,rkt,sps,fnl}]
 indent_style = space
-indent_size = 3
+indent_size = tab
+tab_width = 3
 trim_trailing_whitespace = true
 
 [*.el]
@@ -85,16 +93,18 @@ trim_trailing_whitespace = true
 # The old ways still work.
 [*.{p,pas,for,f90}]
 indent_style = space
-indent_size = 3
+indent_size = tab
+tab_width = 3
 trim_trailing_whitespace = true
 
 [*.{c,cpp,h,hpp,s,S}]
 indent_style = tab
 trim_trailing_whitespace = true
 
-[*.{.odin}]
+[*.odin]
 indent_style = space
-indent_size = 3
+indent_size = tab
+tab_width = 4
 trim_trailing_whitespace = true
 
 # There's always a clown in the crowd.

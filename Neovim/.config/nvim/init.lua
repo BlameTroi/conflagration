@@ -54,6 +54,7 @@ vim.opt.inccommand = "split"
 
 vim.cmd("set completeopt+=fuzzy")
 vim.cmd("set completeopt+=noinsert")
+vim.cmd("set completeopt+=noselect")
 
 -- These are obvious settings that need no explanation.
 
@@ -117,13 +118,34 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
    group = textgroup,
    callback = function()
       vim.cmd([[
-      highlight ExtraWhitespace ctermbg=white guibg=gray
-      match ExtraWhitespace /\s\+$/
       set ai et ts=5 sw=5 tw=70 fo-=t fo+=2n
       ]])
    end,
 })
 
+local markdowngroup = vim.api.nvim_create_augroup("markdown", { clear = true })
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+   pattern = { "*.md", "*.markdown", "README*", "LICENSE*" },
+   group = markdowngroup,
+   callback = function()
+      vim.cmd([[
+      highlight ExtraWhitespace ctermbg=white guibg=gray
+      match ExtraWhitespace /\s\{2,\}$/
+      set spell
+   ]])
+   end,
+})
+
+local codegroup = vim.api.nvim_create_augroup("code", { clear = true })
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+   pattern = { "*.c", "*.f90", "*.odin" },
+   group = codegroup,
+   callback = function()
+      vim.cmd([[
+      set fo+=c fo+=r fo+=/ fo+=o fo+=q
+      ]])
+   end,
+})
 -- [[ Common Keymappings  ]]
 
 -- These can get messy and I try to use defaults when I can stand them. But
@@ -157,6 +179,19 @@ vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left wind
 vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+
+-- Trying to learn to not use arrow keys in insert or visual mode. The
+-- power users jump out and use motion commands.
+
+vim.keymap.set("i", "<left>", "")
+vim.keymap.set("i", "<right>", "")
+vim.keymap.set("i", "<up>", "")
+vim.keymap.set("i", "<down>", "")
+
+vim.keymap.set("v", "<left>", "")
+vim.keymap.set("v", "<right>", "")
+vim.keymap.set("v", "<up>", "")
+vim.keymap.set("v", "<down>", "")
 
 -- Highlight yanked text.
 
@@ -210,7 +245,10 @@ require("lazy").setup({
 -- has initialized.
 
 vim.opt.background = "dark"
-vim.cmd("colorscheme pax")
+-- vim.cmd("colorscheme kanagawa-dragon")
+-- vim.cmd("colorscheme gruber-darker")
+vim.cmd("colorscheme lucius")
+vim.cmd("LuciusBlackHighContrast")
 
 -- [[ Lualine customization ]]
 

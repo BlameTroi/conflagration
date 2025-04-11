@@ -9,6 +9,7 @@ local M = {
       },
       words = 0x100,
       storage_directory = "~/Notepad/0x100-Words",
+      file_extension = ".md",
    },
 }
 return M
