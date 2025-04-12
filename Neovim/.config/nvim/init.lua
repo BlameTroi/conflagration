@@ -105,9 +105,11 @@ vim.opt.tabstop = 8
 
 -- The basic spell checker has been prettygood so far. I keep my dictionary in
 -- a non-standard location.
-
+-- use stdpath("config") find these directories
+vim.opt.spellfile = vim.fn.expand(vim.fn.stdpath("config") .. "/data/en.utf-8.add")
 vim.opt.spelllang = { "en_us" }
-vim.opt.spellfile = vim.fn.expand("~/.local/nvim_spell/en.utf-8.add")
+vim.opt.thesaurus = vim.fn.expand(vim.fn.stdpath("config") .. "/data/thesaurus.txt")
+-- vim.opt.spellfile = vim.fn.expand("~/.local/nvim_spell/en.utf-8.add")
 
 -- This is how I like plaintext formatted: I set ai instead of noai so that
 -- hanging indents work.
