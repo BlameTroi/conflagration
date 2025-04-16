@@ -103,13 +103,12 @@ vim.opt.tabstop = 8
 
 -- [[ Basic text editing and formatting ]]
 
--- The basic spell checker has been prettygood so far. I keep my dictionary in
+-- The basic spell checker has been pretty good so far. I keep my dictionary in
 -- a non-standard location.
 -- use stdpath("config") find these directories
 vim.opt.spellfile = vim.fn.expand(vim.fn.stdpath("config") .. "/data/en.utf-8.add")
 vim.opt.spelllang = { "en_us" }
 vim.opt.thesaurus = vim.fn.expand(vim.fn.stdpath("config") .. "/data/thesaurus.txt")
--- vim.opt.spellfile = vim.fn.expand("~/.local/nvim_spell/en.utf-8.add")
 
 -- This is how I like plaintext formatted: I set ai instead of noai so that
 -- hanging indents work.
@@ -148,6 +147,16 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
       ]])
    end,
 })
+
+local commentgroup = vim.api.nvim_create_augroup("comment", { clear = true })
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+   pattern = { "*.odin" },
+   group = commentgroup,
+   callback = function()
+      vim.cmd([[ set commentstring=/*\ %s\ */ ]])
+   end,
+})
+
 -- [[ Common Keymappings  ]]
 
 -- These can get messy and I try to use defaults when I can stand them. But
