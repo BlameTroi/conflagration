@@ -50,7 +50,7 @@ local M = {
          lua = { "stylua" },
          fortran = { "fprettify" },
          c = { "astyle" },
-         odin = { "odinfmt" },
+         -- odin = { "odinfmt" },
       },
    },
 }
