@@ -247,3 +247,6 @@ typeset -U CDPATH
 
 export NO_COLOR=1
 
+# Tweaking around nvim
+export NVIM_APPNAME=lazyvim
+echo neovim is $NVIM_APPNAME
