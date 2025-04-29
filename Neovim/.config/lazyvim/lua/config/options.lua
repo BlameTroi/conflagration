@@ -4,8 +4,11 @@
 
 -- these work best after uienter
 vim.schedule(function()
-  vim.opt.background = "dark"
-  vim.cmd("colorscheme mono-jade")
+  vim.opt.background = "light"
+  vim.cmd("colorscheme default")
+  -- vim.cmd("colorscheme amber")
+  -- vim.cmd("colorscheme mono-jade")
+  --  vim.cmd("colorscheme amberchrome")
   -- vim.cmd("colorscheme malotru")
   -- vim.cmd("colorscheme lucius")
   -- vim.cmd("LuciusBlackHighContrast")
@@ -19,9 +22,11 @@ end)
 
 vim.opt.breakindent = true
 vim.opt.autoindent = true
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 4
-vim.opt.tabstop = 4
+vim.opt.expandtab = false
+-- will syntax defaults and lsp set these properlY?
+vim.opt.shiftwidth = 0
+vim.opt.softtabstop = 0
+vim.opt.tabstop = 8
 
 -- [[ Basic text editing and formatting ]]
 
@@ -90,7 +95,10 @@ vim.lsp.config["clangd"] = {
 }
 vim.lsp.enable("clangd")
 
--- Set up a command to restart dashboard
-vim.api.nvim_create_user_command("Dashboard", function()
-  Snacks.dashboard.open()
-end, {})
+-- I'm having problems with alacritty.toml so we'll try a few different things to
+-- get past them.
+
+vim.lsp.config["taplo"] = {
+  enabled = false,
+  cmd = {},
+}

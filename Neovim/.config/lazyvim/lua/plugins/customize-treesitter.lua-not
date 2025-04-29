@@ -1,0 +1,10 @@
+return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    -- change some options
+    --
+    opts = {
+      indent = { enable = true },
+    },
+  },
+}

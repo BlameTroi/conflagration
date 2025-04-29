@@ -30,6 +30,7 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
       highlight ExtraWhitespace ctermbg=white guibg=gray
       match ExtraWhitespace /\s\{2,\}$/
       set spell
+      set tw=70
    ]])
   end,
 })
