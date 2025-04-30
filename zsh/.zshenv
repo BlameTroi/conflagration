@@ -46,7 +46,6 @@ export path=(~/.local/bin $path[@])
 
 umask 033
 
-
 # Timezone, set TZ$ to /etc/timezone if it exists, or default to
 # America/New_York.
 if [ ! -f /etc/timezone ]; then
@@ -54,6 +53,20 @@ if [ ! -f /etc/timezone ]; then
 else
     export TZ=$(</etc/timezone)
 fi
+
+# These are set by apple terminal and iterm2, but it looks as if every
+# app does something different. As 'pipenv' wants LANG set, I hard code
+# these here. LC_ALL=C ensures that sort order is byte, not character.
+# Set it to en_US.UTF-8 if you want to sort non ascii text.
+
+export LANG="en_US.UTF-8"
+export LC_COLLATE="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+export LC_MESSAGES="en_US.UTF-8"
+export LC_MONETARY="en_US.UTF-8"
+export LC_NUMERIC="en_US.UTF-8"
+export LC_TIME="en_US.UTF-8"
+export LC_ALL="C"
 
 # Guile paths
 
@@ -143,3 +156,6 @@ export PKG_CONFIG_PATH="/opt/homebrew/opt/tcl-tk@8/lib/pkg $PKG_CONFIG_PATH"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
+
+# virtual environment plugin
+eval "$(pyenv virtualenv-init -)"

@@ -37,7 +37,7 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 
 local codegroup = vim.api.nvim_create_augroup("code", { clear = true })
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-  pattern = { "*.c", "*.f90", "*.odin" },
+  pattern = { "*.c", "*.f90", "*.odin", "*.py" },
   group = codegroup,
   callback = function()
     vim.cmd([[
@@ -52,5 +52,16 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   group = commentgroup,
   callback = function()
     vim.cmd([[ set commentstring=/*\ %s\ */ ]])
+  end,
+})
+
+local pythongroup = vim.api.nvim_create_augroup("python", { clear = true })
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  pattern = { "*.py" },
+  group = pythongroup,
+  callback = function()
+    vim.cmd([[
+    set ts=4 sts=4 sw=4 tw=79 et ai
+    ]])
   end,
 })

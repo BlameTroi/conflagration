@@ -4,7 +4,7 @@
 
 -- these work best after uienter
 vim.schedule(function()
-  vim.opt.background = "light"
+  vim.opt.background = "dark"
   vim.cmd("colorscheme default")
   -- vim.cmd("colorscheme amber")
   -- vim.cmd("colorscheme mono-jade")

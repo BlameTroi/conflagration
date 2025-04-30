@@ -1,0 +1,2 @@
+# for when you want to do this from the command line
+open -a /Applications/Emacs.app --args --debug-init

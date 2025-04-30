@@ -1,0 +1,147 @@
+#-----------------------------------------------------------
+# "let's try an exclude everything and then include."
+#
+# Originally I was excluding everything and then un-ignoring
+# everything that by default I wanted (unextensioned license and
+# readmes, files with extensions, directories) and then re-ignoring
+# anything that slipped through. 
+#
+# While I think that leads to a safer ignore strategy (security and
+# privacy) it isn't how things are done. I'm switching to use the
+# templates from git@github.com:github/gitignore.git for language
+# and tools that I use. Anything that slips through will be handled
+# at the project level with an additional .gitignore file.
+#
+# I keep language/framework specific templates in the 'templates/'
+# sub directory and combing them with my extra items from this file
+# using 'make-ignore.sh my-extras.txt templates/*.gitignore'.
+#
+# The templates are copied from 'github/gitignore' repository.
+#
+# Among these are items missed in the major template files, things
+# such as GPG, Vim, and file system artifacts.
+#-----------------------------------------------------------
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.elc
+*.pyc
+*.lst
+*.map
+*.dSYM/
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.log
+*.db
+*.sqlite
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+tags
+tags.lock
+tags.temp
+.netrwhist
+.viminfo
+*~
+.#*
+\#*#
+*.ninja
+.ninja*
+.cache/
+side-notes.txt
+general-side-notes.txt
+literate-config.el
+**/emacs/var/**
+**/emacs/.cache/**
+**/emacs/eln-cache/**
+**/emacs/elpa/**
+**/emacs/eshell/history
+**/emacs/eshell/lastdir
+**/emacs/recentf
+**/emacs/places
+**/emacs/auto-save-alist
+**/emacs/projects
+**/emacs/transient/**
+**/emacs/tldr/**
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+tags
+[._]*.un~
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+.venv
+pip-selfcheck.json
+secring.*
+xcuserdata/
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon[
+]
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.rkt~
+*.rkt.bak
+\#*.rkt#
+\#*.rkt#*#
+
+# Compiled racket bytecode
+compiled/
+*.zo
+
+# Dependency tracking files
+*.dep

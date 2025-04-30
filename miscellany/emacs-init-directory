@@ -1,0 +1,2 @@
+# when you need to run a different init
+open -a /Applications/Emacs.app --args --debug-init --init-directory $@

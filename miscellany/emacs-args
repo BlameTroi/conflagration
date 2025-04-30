@@ -1,0 +1,2 @@
+open -a /Applications/Emacs.app --args --debug-init
+open -a /Applications/Emacs.app --args --debug-init --init-directory ~/.config/emacs-conflag
