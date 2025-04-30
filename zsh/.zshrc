@@ -1,7 +1,6 @@
 # .zshrc
 
-# Sourced only for interactive shell invocations. Here's where
-# we add the eye candy and zsh command line stuff.
+# This is sourced for interactive shell invocations.
 
 # A speedup for Git and others, mark as dirty only files that
 # Git cares about.
@@ -13,8 +12,8 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 autoload -Uz compinit
 compinit
 
-# For some reason while I Vim elsewhere, the Emacs
-# bindings work better for me on the command line.
+# For some reason while I use Vim elsewhere, the Emacs bindings work
+# better for me on the command line.
 
 bindkey -e
 
@@ -125,13 +124,13 @@ alias rm="echo use path to rm if you are sure about this! or try trash"
 
 # Miscellaneous commands:
 
-alias less='less -r'                          # raw control characters
-alias ls='ls -F' # --color=auto'
-alias l='ls -F' # --color=auto'
-alias ll='ls -lF' # --color=auto'      # long list
-alias la='ls -AF' # --color=auto'      # almost all (excludes . and ..)
-alias l='ls -CF' # --color=auto'       # list by columns, suffix type indicator
-alias lla='ls -lAF' # --color=auto'    # long list almost all
+alias less='less -r'                # raw control characters
+alias ls='ls -F --color=auto'
+alias l='ls -F --color=auto'
+alias ll='ls -lF --color=auto'      # long list
+alias la='ls -AF --color=auto'      # almost all (excludes . and ..)
+alias l='ls -CF --color=auto'       # list by columns, suffix type indicator
+alias lla='ls -lAF --color=auto'    # long list almost all
 
 # I am a longtime Basic programmer:
 
@@ -157,8 +156,9 @@ fi
 #export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4'
 
+# Tweaking around nvim. My old configuration is in .config/nvim, which
+# is the default. It can be overridden by setting NVIM_APPNAME to the
+# directory holding the desired config.
 
-# Tweaking around nvim
 export NVIM_APPNAME=lazyvim
 echo neovim is $NVIM_APPNAME
-
