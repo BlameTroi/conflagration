@@ -2,6 +2,9 @@
   "512-words": { "branch": "main", "commit": "827e71bca2502489638d50b22f279c9f77bbc79c" },
   "LazyVim": { "branch": "main", "commit": "3f034d0a7f58031123300309f2efd3bb0356ee21" },
   "SchemaStore.nvim": { "branch": "main", "commit": "442901b78dca4da1078b32e25e1afb32460e0082" },
+  "ZFVimBackup": { "branch": "master", "commit": "ad861d852c43da7c29904f49213cc9df0596501b" },
+  "ZFVimIgnore": { "branch": "master", "commit": "021e60ffbcd9ab84061a4a4c08ed305e823ea6e1" },
+  "ZFVimJob": { "branch": "master", "commit": "51f13834ef5d9b795c89fdc8d4155c28b7d452a2" },
   "aerial.nvim": { "branch": "master", "commit": "2e00d1d4248f08dddfceacb8d2996e51e13e00f6" },
   "amber": { "branch": "main", "commit": "65256c0c418a1938d3ac10d191c29bc4b76fc6c8" },
   "amberchrome": { "branch": "main", "commit": "91144bf5e1a3e9f057e14e158520f9e65e164a9e" },
@@ -62,5 +65,6 @@
   "vim-nightfly-colors": { "branch": "master", "commit": "033e0240479126267deae2f9a4a1b0864f14bba6" },
   "vim-sleuth": { "branch": "master", "commit": "be69bff86754b1aa5adcbb527d7fcd1635a84080" },
   "which-key.nvim": { "branch": "main", "commit": "370ec46f710e058c9c1646273e6b225acf47cbed" },
-  "yanky.nvim": { "branch": "main", "commit": "04775cc6e10ef038c397c407bc17f00a2f52b378" }
+  "yanky.nvim": { "branch": "main", "commit": "04775cc6e10ef038c397c407bc17f00a2f52b378" },
+  "zfvimdirdiff": { "branch": "master", "commit": "4676df8cd284c7aed59a16a4d44cb253d0c279d2" }
 }

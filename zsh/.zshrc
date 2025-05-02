@@ -162,3 +162,14 @@ fi
 
 export NVIM_APPNAME=lazyvim
 echo neovim is $NVIM_APPNAME
+
+# Uv makes you jump through a few hoops to set up a system/base/global
+# Python environment. As it is clear that uv can switch between a
+# virtual environment, the best approach I can find for my use to borrow
+# an idea from conda and have a base or global environment.
+#
+# The alias for pip is important. I am going to assume that I'm always in
+# a virutal environment.
+
+source ~/.global/bin/activate
+alias pip='uv pip'

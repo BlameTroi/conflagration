@@ -99,6 +99,8 @@ vim.lsp.enable("clangd")
 -- get past them.
 
 vim.lsp.config["taplo"] = {
-  enabled = false,
-  cmd = {},
+  filetypes = { 'toml' },
+  -- IMPORTANT: this seems to handle not begin in git?
+  root_markers = { "*.toml", "*.git" },
 }
+vim.lsp.enable("tapolo")

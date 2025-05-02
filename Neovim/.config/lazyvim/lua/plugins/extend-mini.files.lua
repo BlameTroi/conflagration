@@ -1,4 +1,5 @@
 -- from lazyvim for ambitious devs, add open root to mini files
+if true then return {} end
 return {
   "echasnovski/mini.files",
   keys = {
