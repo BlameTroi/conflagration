@@ -116,6 +116,7 @@ if type nvim >/dev/null 2>&1; then
 	# alias nvim='LC_ALL=$LANG nvim'
 	alias vim='nvim'
 	alias vimdiff='nvim -d'
+	alias view='nvim -R'
 	export VISUAL="nvim"
 	export EDITOR="nvim"
 	export MANPAGER='nvim +Man!'

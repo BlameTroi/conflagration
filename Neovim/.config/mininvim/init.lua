@@ -8,7 +8,7 @@
 -- easier to work with.
 
 -- TODO:
--- 1) Mason & LSP
+-- DONE 1) Mason & LSP
 -- 2) Go modular.
 -- 3) Fix signcolumn and markers.
 -- 4) Any additional formatter?
@@ -109,11 +109,12 @@ now(function()
   vim.opt.winminwidth = 5 -- Minimum window width
 
   -- The basic spell checker has been pretty good so far. I keep my dictionary in
-  -- a non-standard location. You can use stdpath("config") find these directories
-  -- if you want to use the standard locations.
-  vim.opt.spellfile = vim.fn.expand("~/Notepad/thes-and-dict/en.utf-8.add")
-  vim.opt.spelllang = { "en_us" }
-  vim.opt.thesaurus = vim.fn.expand("~/Notepad/thes-and-dict/thesaurus.txt")
+  -- a non-standard location -- my actual config. The default is under `stdpath("data")`.
+    vim.opt.spelllang = { "en_us" }
+    vim.opt.spellsuggest = "best,10"
+    local spelldir = vim.fn.stdpath("config").."/spell"
+    vim.opt.spellfile = spelldir .. "/en.utf-8.add"
+    vim.opt.thesaurus = spelldir .. "/thesaurus.txt"
 end)
 
 -- The author uses separate add/now/later blocks, which makes sense to me.
