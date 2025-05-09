@@ -101,16 +101,29 @@ setopt PROMPT_PERCENT
 
 # Prefer Neovim if available:
 
-export VISUAL="vim"
-export EDITOR="vim"
-export ALTERNATE_EDITOR=""
+# For most of my work I want the old ASCII C behavior, but visuals and moving
+# data into and out of vim need to deal with UTF-8. I think I've got the LANG
+# and LC_* environment variables set right.
+#
+# If not, I've confirmed that I can alias a command as 'LC_ALL=$LANG command'
+# and then use command in later alias and everything propogates as I want.
+#
+# Uncomment out the first alias in each block below as a last resort. Also,
+# vimdiff for 'real' vim checks hte command name $0 to determine if a session
+# should diff or edit.
 
 if type nvim >/dev/null 2>&1; then
+	# alias nvim='LC_ALL=$LANG nvim'
 	alias vim='nvim'
 	alias vimdiff='nvim -d'
 	export VISUAL="nvim"
 	export EDITOR="nvim"
 	export MANPAGER='nvim +Man!'
+else
+	# alias vim='LC_ALL $LANG vim'
+	# alias vimdiff='LC_ALL $LANG vimdiff'
+	export VISUAL="vim"
+	export EDITOR="vim"
 fi
 
 # Human readable figures:
@@ -156,13 +169,6 @@ fi
 #export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4'
 
-# Tweaking around nvim. My old configuration is in .config/nvim, which
-# is the default. It can be overridden by setting NVIM_APPNAME to the
-# directory holding the desired config.
-
-export NVIM_APPNAME=lazyvim
-echo neovim is $NVIM_APPNAME
-
 # Uv makes you jump through a few hoops to set up a system/base/global
 # Python environment. As it is clear that uv can switch between a
 # virtual environment, the best approach I can find for my use to borrow
@@ -173,3 +179,19 @@ echo neovim is $NVIM_APPNAME
 
 source ~/.global/bin/activate
 alias pip='uv pip'
+
+# Shorter names are usually good for me.
+alias idle='python -m idlelib'
+
+# Tweaking around nvim. My old configuration is in .config/nvim, which
+# is the default. It can be overridden by setting NVIM_APPNAME to the
+# directory holding the desired config. I Lazy is pretty good but I find
+# some of the code and techniques difficult to follow. Mini.nvim is
+# easier for me so I'm trying to build a config with it. What I have
+# is now stable enough to move to production.
+
+#export NVIM_APPNAME=nvim
+#export NVIM_APPNAME=lazyvim
+export NVIM_APPNAME=mininvim
+
+echo neovim is $NVIM_APPNAME

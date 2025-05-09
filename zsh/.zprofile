@@ -68,15 +68,20 @@ fi
 # these here even though I'm not using 'pipenv' at the moment. LC_ALL=C
 # ensures that sort order is byte, not character. Set it to en_US.UTF-8
 # if you want to sort non ascii text.
+#
+# I think the best compromise to allow nerd font style glyphs to be
+# copy/paste safe from desktop to vim is as below. I want most "internal"
+# behavior to follow the C rules. Messages, monitary, numeric, and time
+# should follow en_US.
 
 export LANG="en_US.UTF-8"
-export LC_COLLATE="en_US.UTF-8"
-export LC_CTYPE="en_US.UTF-8"
+export LC_ALL=C
+export LC_COLLATE=C
+export LC_CTYPE=C
 export LC_MESSAGES="en_US.UTF-8"
 export LC_MONETARY="en_US.UTF-8"
 export LC_NUMERIC="en_US.UTF-8"
 export LC_TIME="en_US.UTF-8"
-export LC_ALL="C"
 
 # Guile paths
 
@@ -109,8 +114,15 @@ typeset -U path PATH
 path=(${HOME}/.local/bin \
     /opt/homebrew/opt \
     /opt/homebrew/opt/node@20/bin \
+    /opt/homebrew/opt/ruby/bin \
+    /opt/homebrew/lib/ruby/gems/3.4.0/bin \
     $path[@])
 export PATH
+
+# if you need ruby for the below, add these
+#  export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
+#  export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
+#  export PKG_CONFIG_PATH="/opt/homebrew/opt/ruby/lib/pkgconfig"
 
 # if you need compilers to find node ...
 export LDFLAGS="-L/opt/homebrew/opt/node@20/lib $LDFLAGS"

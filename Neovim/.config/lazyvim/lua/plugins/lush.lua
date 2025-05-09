@@ -1,6 +1,4 @@
 return {
-  -- {"meain/vim-colorswitch"},
-  -- { "amadeus/vim-convert-color-to" },
   {
     "BlameTroi/nvim-colorizer.lua",
     opts = {

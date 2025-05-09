@@ -28,8 +28,3 @@ vim.keymap.set("v", "<left>", "")
 vim.keymap.set("v", "<right>", "")
 vim.keymap.set("v", "<up>", "")
 vim.keymap.set("v", "<down>", "")
-
--- Exit terminal mode in the builtin terminal with an easier to remember
--- shortcut.
-
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
