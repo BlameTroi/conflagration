@@ -189,12 +189,32 @@ now(function () require("mini.surround").setup() end)
 -- General Workflow Modules:
 
 now(function () require("mini.bracketed").setup() end)
-now(function () require("mini.clue").setup() end)
+-- now(function () require("mini.clue").setup() end)
 now(function () require("mini.jump").setup() end)
 now(function () require("mini.jump2d").setup() end)
 now(function () require("mini.pick").setup() end)
 
 -- And now I can add my non-mini plugins.
+
+-- I'm going back to which-key from clue.
+
+now(function ()
+    add({ source = "folke/which-key.nvim" })
+    require("which-key").setup({
+        opts = {
+            keys = {
+                "<leader>?",
+                function ()
+                    require("which-key").show({ global = false })
+                end,
+                desc = "Buffer Local Keymaps (which-key)",
+            },
+            preset = "classic",
+        },
+    })
+end)
+
+
 
 -- Return to the last position in a file. Note that this plugin is not
 -- being maintained but it still works fine.
