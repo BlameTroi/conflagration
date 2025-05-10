@@ -305,12 +305,12 @@ now(function ()
 
     -- All language servers are expected to be installed with 'mason.vnim'
     vim.lsp.enable({
-        "bash-language-server",
+        "bashls",
         "clangd",
         "fortls",
         "gopls",
-        "json-lsp",
-        "lua_langauge_server",
+        "jsonls",
+        "luals",
         "marksman",
         "millet",
         "ols",
@@ -318,9 +318,9 @@ now(function ()
         "ruff",
         "taplo",
         "textlsp",
-        "typescript-langauge-server",
-        "vim-language-server",
-        "yaml-language-server",
+        "tsls",
+        "vimls",
+        "yamlls",
     })
 end)
 
