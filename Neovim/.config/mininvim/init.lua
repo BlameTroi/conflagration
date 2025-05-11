@@ -31,19 +31,20 @@
 -- the idea of using a standard part of Vim apealling.
 local path_package = vim.fn.stdpath("data") .. "/site"
 local mini_path = path_package .. "/pack/deps/start/mini.nvim"
+
 if not vim.loop.fs_stat(mini_path) then
-  vim.cmd('echo "Installing `mini.nvim`" | redraw')
-  local clone_cmd = {
-    "git",
-    "clone",
-    "--filter=blob:none",
-    -- Uncomment next line to use 'stable' branch
-    -- '--branch', 'stable',
-    "https://github.com/echasnovski/mini.nvim",
-    mini_path,
-  }
-  vim.fn.system(clone_cmd)
-  vim.cmd("packadd mini.nvim | helptags ALL")
+   vim.cmd('echo "Installing `mini.nvim`" | redraw')
+   local clone_cmd = {
+      "git",
+      "clone",
+      "--filter=blob:none",
+      -- Uncomment next line to use 'stable' branch
+      -- '--branch', 'stable',
+      "https://github.com/echasnovski/mini.nvim",
+      mini_path,
+   }
+   vim.fn.system(clone_cmd)
+   vim.cmd("packadd mini.nvim | helptags ALL")
 end
 
 -- Fire up mini.deps.
@@ -60,58 +61,58 @@ _T = { add, now, later }
 -- on leader or mapleader. Add any additional options here
 
 now(function()
-  -- The first thing to do is to set leader and localleader. As I prefer space for leader, we need to force space in
-  -- normal mode to be a no-op. It is normally a synonym for 'l'.
-  vim.cmd("nnoremap <space> <nop>")
-  vim.g.mapleader = " "
-  vim.g.maplocalleader = "\\"
+   -- The first thing to do is to set leader and localleader. As I prefer space for leader, we need to force space in
+   -- normal mode to be a no-op. It is normally a synonym for 'l'.
+   vim.cmd("nnoremap <space> <nop>")
+   vim.g.mapleader = " "
+   vim.g.maplocalleader = "\\"
 
-  -- Now get mini.basics applied for "sensible" defaults.
-  require("mini.basics").setup({
-    options = { basic = true, extra_ui = true, win_borders = "single" },
-    mappings = {
-      basic = true,
-      option_toggle_prefix = "",
-      windows = true,
-      move_with_alt = true,
-    },
-    autocommands = { basic = true, relnum_in_visual_mode = false },
-    silent = true,
-  })
+   -- Now get mini.basics applied for "sensible" defaults.
+   require("mini.basics").setup({
+      options = { basic = true, extra_ui = true, win_borders = "single" },
+      mappings = {
+         basic = true,
+         option_toggle_prefix = "",
+         windows = true,
+         move_with_alt = true,
+      },
+      autocommands = { basic = true, relnum_in_visual_mode = false },
+      silent = true,
+   })
 
-  -- I'm peculiar about the mouse.
-  vim.opt.clipboard = "unnamedplus"
-  vim.opt.background = "dark" -- hello darkness my old friend
-  vim.opt.mouse = "" -- mouse clicks shouldn't move the cursor
+   -- I'm peculiar about the mouse.
+   vim.opt.clipboard = "unnamedplus"
+   vim.opt.background = "dark" -- hello darkness my old friend
+   vim.opt.mouse = "" -- mouse clicks shouldn't move the cursor
 
-  -- These are options that are either different from the defaults or I want different from what mini.basics will set.
-  -- While the mini.basics doc says it not change an option that has been changed already, I'm placing most of these
-  -- _after_ mini.basics setup.
-  --
-  -- I've made a serious effort to remove duplicates for defaults/mini.basics values, but I'm only human so there could
-  -- be redundancies.
-  vim.opt.confirm = true -- Confirm to save changes before exiting modified buffer
-  vim.opt.formatoptions = "jcroqlnt" -- tcqj
-  vim.opt.ignorecase = true -- Ignore case
-  vim.opt.inccommand = "split" -- preview incremental substitute
-  vim.opt.linebreak = true -- Wrap lines at convenient points
-  vim.opt.list = true -- Show some invisibles
-  vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-  vim.opt.number = true -- I like them
-  vim.opt.relativenumber = true -- And I'm learning to like this
-  vim.opt.scrolloff = 3 -- Lines of context
-  vim.opt.shiftround = true -- Round indent
-  vim.opt.sidescrolloff = 8 -- Columns of context
-  vim.opt.splitkeep = "screen"
-  vim.opt.winminwidth = 5 -- Minimum window width
+   -- These are options that are either different from the defaults or I want different from what mini.basics will set.
+   -- While the mini.basics doc says it not change an option that has been changed already, I'm placing most of these
+   -- _after_ mini.basics setup.
+   --
+   -- I've made a serious effort to remove duplicates for defaults/mini.basics values, but I'm only human so there could
+   -- be redundancies.
+   vim.opt.confirm = true -- Confirm to save changes before exiting modified buffer
+   vim.opt.formatoptions = "jcroqlnt" -- tcqj
+   vim.opt.ignorecase = true -- Ignore case
+   vim.opt.inccommand = "split" -- preview incremental substitute
+   vim.opt.linebreak = true -- Wrap lines at convenient points
+   vim.opt.list = true -- Show some invisibles
+   vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+   vim.opt.number = true -- I like them
+   vim.opt.relativenumber = true -- And I'm learning to like this
+   vim.opt.scrolloff = 3 -- Lines of context
+   vim.opt.shiftround = true -- Round indent
+   vim.opt.sidescrolloff = 8 -- Columns of context
+   vim.opt.splitkeep = "screen"
+   vim.opt.winminwidth = 5 -- Minimum window width
 
-  -- The basic spell checker has been pretty good so far. I keep my dictionary in
-  -- a non-standard location -- my actual config. The default is under `stdpath("data")`.
-  vim.opt.spelllang = { "en_us" }
-  vim.opt.spellsuggest = "best,10"
-  local spelldir = vim.fn.stdpath("config") .. "/spell"
-  vim.opt.spellfile = spelldir .. "/en.utf-8.add"
-  vim.opt.thesaurus = spelldir .. "/thesaurus.txt"
+   -- The basic spell checker has been pretty good so far. I keep my dictionary in
+   -- a non-standard location -- my actual config. The default is under `stdpath("data")`.
+   vim.opt.spelllang = { "en_us" }
+   vim.opt.spellsuggest = "best,10"
+   local spelldir = vim.fn.stdpath("config") .. "/spell"
+   vim.opt.spellfile = spelldir .. "/en.utf-8.add"
+   vim.opt.thesaurus = spelldir .. "/thesaurus.txt"
 end)
 
 -- The author uses separate add/now/later blocks, which makes sense to me.
@@ -126,37 +127,37 @@ now(function() require("mini.icons").setup() end)
 
 now(function() require("mini.statusline").setup() end)
 
-now(function()
-  local hipatterns = require("mini.hipatterns")
-  hipatterns.setup({
-    highlighters = {
-      fixme = { pattern = "BUG:", group = "MiniHipatternsFixme" },
-      hack = { pattern = "HACK:", group = "MiniHipatternsHack" },
-      todo = { pattern = "TODO:", group = "MiniHipatternsTodo" },
-      note = { pattern = "NOTE:", group = "MiniHipatternsNote" },
-      -- TODO: do this only for filetypes that it matters, lua, vim, css
-      hex_color = hipatterns.gen_highlighter.hex_color(),
-    },
-  })
+later(function()
+   local hipatterns = require("mini.hipatterns")
+   hipatterns.setup({
+      highlighters = {
+         fixme = { pattern = "BUG:", group = "MiniHipatternsFixme" },
+         hack = { pattern = "HACK:", group = "MiniHipatternsHack" },
+         todo = { pattern = "TODO:", group = "MiniHipatternsTodo" },
+         note = { pattern = "NOTE:", group = "MiniHipatternsNote" },
+         -- TODO: do this only for filetypes that it matters, lua, vim, css
+         hex_color = hipatterns.gen_highlighter.hex_color(),
+      },
+   })
 end)
 
-now(function() require("mini.git").setup() end)
+later(function() require("mini.git").setup() end)
 
-now(function() require("mini.diff").setup() end)
+later(function() require("mini.diff").setup() end)
 
 now(function()
-  add({ source = "projekt0n/github-nvim-theme" })
-  require("github-theme").setup({
-    options = {
-      styles = {
-        comments = "italic",
-        keywords = "bold",
-        types = "italic,bold",
+   add({ source = "projekt0n/github-nvim-theme" })
+   require("github-theme").setup({
+      options = {
+         styles = {
+            comments = "italic",
+            keywords = "bold",
+            types = "italic,bold",
+         },
       },
-    },
-  })
-  vim.opt.background = "dark"
-  vim.cmd("colorscheme github_dark_high_contrast")
+   })
+   vim.opt.background = "dark"
+   vim.cmd("colorscheme github_dark_high_contrast")
 end)
 
 -- Now that the UI themeing and such as established it's time for
@@ -164,208 +165,205 @@ end)
 
 -- Editor Modules:
 
-now(function() require("mini.ai").setup() end)
-now(function() require("mini.comment").setup() end)
-now(function() require("mini.completion").setup() end)
-now(function() require("mini.keymap").setup() end)
-now(function() require("mini.move").setup() end)
-now(function() require("mini.operators").setup() end)
-now(function() require("mini.pairs").setup() end)
-now(function() require("mini.splitjoin").setup() end)
-now(function() require("mini.surround").setup() end)
+--now(function() require("mini.keymap").setup() end)
+later(function() require("mini.ai").setup() end)
+later(function() require("mini.comment").setup() end)
+later(function() require("mini.completion").setup() end)
+later(function() require("mini.move").setup() end)
+later(function() require("mini.operators").setup() end)
+later(function() require("mini.pairs").setup() end)
+later(function() require("mini.splitjoin").setup() end)
+later(function() require("mini.surround").setup() end)
 
 -- General Workflow Modules:
 
-now(function() require("mini.bracketed").setup() end)
--- now(function () require("mini.clue").setup() end)
-now(function() require("mini.jump").setup() end)
-now(function() require("mini.jump2d").setup() end)
-now(function() require("mini.pick").setup() end)
+later(function() require("mini.bracketed").setup() end)
+later(function() require("mini.jump").setup() end)
+later(function() require("mini.jump2d").setup() end)
+later(function() require("mini.pick").setup() end)
 
 -- And now I can add my non-mini plugins.
 
 -- I'm going back to which-key from clue.
 
-now(function()
-  add({ source = "folke/which-key.nvim" })
-  require("which-key").setup({
-    opts = {
-      keys = {
-        "<leader>?",
-        function() require("which-key").show({ global = false }) end,
-        desc = "Buffer Local Keymaps (which-key)",
+later(function()
+   add({ source = "folke/which-key.nvim" })
+   require("which-key").setup({
+      opts = {
+         keys = {
+            "<leader>?",
+            function() require("which-key").show({ global = false }) end,
+            desc = "Buffer Local Keymaps (which-key)",
+         },
+         preset = "helix",
+         win = { border = "single" },
       },
-      preset = "classic",
-    },
-  })
+   })
 end)
 
 -- Return to the last position in a file. Note that this plugin is not
 -- being maintained but it still works fine.
 
 now(function()
-  add({ source = "ethanholz/nvim-lastplace" })
-  require("nvim-lastplace").setup({
-    lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
-    lastplace_ignore_filetype = {
-      "gitcommit",
-      "gitrebase",
-      "svn",
-      "hgcommit",
-    },
-    lastplace_open_folds = true,
-  })
+   add({ source = "ethanholz/nvim-lastplace" })
+   require("nvim-lastplace").setup({
+      lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
+      lastplace_ignore_filetype = {
+         "gitcommit",
+         "gitrebase",
+         "svn",
+         "hgcommit",
+      },
+      lastplace_open_folds = true,
+   })
 end)
 
 -- Treesitter to highlight, edit, and navigate code.
 
-now(function()
-  add({
-    source = "nvim-treesitter/nvim-treesitter",
-    hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
-  })
-  add({ source = "nvim-treesitter/nvim-treesitter-textobjects" })
+later(function()
+   add({
+      source = "nvim-treesitter/nvim-treesitter",
+      hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
+   })
+   add({ source = "nvim-treesitter/nvim-treesitter-textobjects" })
 
-  require("nvim-treesitter.configs").setup({
-    ensure_installed = {
-      "bash",
-      "c",
-      "lua",
-      "markdown",
-      "vim",
-      "vimdoc",
-      "python",
-      "odin",
-      "ruby",
-    },
-    auto_install = true,
-    ignore_install = {},
-    sync_install = false,
-    modules = {},
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = { "ruby" },
-    },
-    incremental_selection = {
-      enable = true,
-      -- keymaps = {
-      --    init_selection = "gnn", -- set to `false` to disable one of the mappings
-      --    node_incremental = "grn",
-      --    scope_incremental = "grc",
-      --    node_decremental = "grm",
-      -- },
-    },
-    textobjects = { enable = true },
-    indent = { enable = true, disable = { "ruby" } },
-  })
+   require("nvim-treesitter.configs").setup({
+      ensure_installed = {
+         "bash",
+         "c",
+         "lua",
+         "markdown",
+         "vim",
+         "vimdoc",
+         "python",
+         "odin",
+         "ruby",
+      },
+      auto_install = true,
+      ignore_install = {},
+      sync_install = false,
+      modules = {},
+      highlight = {
+         enable = true,
+         additional_vim_regex_highlighting = { "ruby" },
+      },
+      incremental_selection = {
+         enable = true,
+         -- keymaps = {
+         --    init_selection = "gnn", -- set to `false` to disable one of the mappings
+         --    node_incremental = "grn",
+         --    scope_incremental = "grc",
+         --    node_decremental = "grm",
+         -- },
+      },
+      textobjects = { enable = true },
+      indent = { enable = true, disable = { "ruby" } },
+   })
 end)
 
 -- Lazydev helps link things up to reduce lint warnings.
 
-now(function()
-  add({ source = "folke/lazydev.nvim" })
-  require("lazydev").setup({
-    ft = "lua",
-    { path = "${3rd}/luv/library", words = "vim%.uv" },
-  })
+later(function()
+   add({ source = "folke/lazydev.nvim" })
+   require("lazydev").setup({
+      ft = "lua",
+      { path = "${3rd}/luv/library", words = "vim%.uv" },
+   })
 end)
 
--- Mason for managing LSP executables.
+-- Mason for managing LSP and other executables.
 
-now(function()
-  add({ source = "mason-org/mason.nvim" })
-  require("mason").setup({
-    ui = {
-      icons = {
-        package_installed = "✓",
-        package_pending = "➜",
-        package_uninstalled = "✗",
+later(function()
+   add({ source = "mason-org/mason.nvim" })
+   require("mason").setup({
+      ui = {
+         icons = {
+            package_installed = "✓",
+            package_pending = "➜",
+            package_uninstalled = "✗",
+         },
       },
-    },
-  })
+   })
 end)
 
 -- Formatting =================================================================
-now(function()
-  add({ source = "stevearc/conform.nvim" })
+later(function()
+   add({ source = "stevearc/conform.nvim" })
 
-  require("conform").setup({
-    -- Map of filetype to formatters
-    formatters_by_ft = {
-      bash = { "shfmt" },
-      c = { "clang-format" },
-      cmake = { "cmake-format" },
-      fortran = { "fprettify" },
-      javascript = { "prettier" },
-      json = { "prettier" },
-      lua = { "stylua", opts = { args = "--search-parent-directories" } },
-      markdown = { "prettier" },
-      python = { "ruff" },
-      ruby = { "rubocop" },
-      toml = { "taplo" },
-      typescript = { "prettier" },
-      yaml = { "prettier" },
-      zsh = { "shfmt" },
-      -- TODO: need to support smlfmt and odinfmt
-    },
-    format_on_save = { lsp_format = "fallback", timeout_ms = 5000 },
-    log_level = vim.log.levels.ERROR,
-    notify_no_formatters = true,
-    notify_on_error = true,
-  })
+   require("conform").setup({
+      formatters_by_ft = {
+         bash = { "shfmt" },
+         c = { "clang-format" },
+         fortran = { "fprettify" },
+         javascript = { "prettier" },
+         json = { "prettier" },
+         lua = { "stylua", opts = { args = "--search-parent-directories" } },
+         markdown = { "prettier" },
+         python = { "ruff" },
+         ruby = { "rubocop" },
+         toml = { "taplo" },
+         typescript = { "prettier" },
+         yaml = { "prettier" },
+         zsh = { "shfmt" },
+      },
+      format_on_save = { lsp_format = "fallback", timeout_ms = 5000 },
+      log_level = vim.log.levels.ERROR,
+      notify_no_formatters = true,
+      notify_on_error = true,
+   })
 end)
 
 -- Language server configurations =============================================
-now(function()
-  add({ source = "neovim/nvim-lspconfig" })
+later(function()
+   add({ source = "neovim/nvim-lspconfig" })
 
-  -- All language servers are expected to be installed with 'mason.vnim'
-  vim.lsp.enable({
-    "bashls",
-    "clangd",
-    "fortls",
-    "gopls",
-    "jsonls",
-    "luals",
-    "marksman",
-    "millet",
-    "ols",
-    "rubocop",
-    "ruff",
-    "taplo",
-    "textlsp",
-    "tsls",
-    "vimls",
-    "yamlls",
-  })
+   -- All language servers are expected to be installed with 'mason.vnim'
+   vim.lsp.enable({
+      "bashls",
+      "clangd",
+      "fortls",
+      "gopls",
+      "jsonls",
+      "luals",
+      "marksman",
+      "millet",
+      "ols",
+      "rubocop",
+      "ruff",
+      "taplo",
+      "textlsp",
+      "tsls",
+      "vimls",
+      "yamlls",
+   })
 end)
 
 -- Neotree, I prefer the old style tree view.
 
 later(function()
-  add({
-    source = "nvim-neo-tree/neo-tree.nvim",
-    depends = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-      "MunifTanjim/nui.nvim",
-      -- {"3rd/image.nvim", opts = {}}, -- Optional image support in preview window: See `# Preview Mode` for more information
-    },
-  })
+   add({
+      source = "nvim-neo-tree/neo-tree.nvim",
+      depends = {
+         "nvim-lua/plenary.nvim",
+         "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+         "MunifTanjim/nui.nvim",
+         -- {"3rd/image.nvim", opts = {}}, -- Optional image support in preview window: See `# Preview Mode` for more information
+      },
+   })
 end)
 
 -- 512 words (actually 256 for me) daily journaling.
 
 later(function()
-  add({ source = "BlameTroi/512-words" })
-  require("512-words").setup({
-    buffer = { textwidth = 75 },
-    words = 0x100,
-    storage_directory = "~/Notepad",
-    date_prefix = "#",
-    file_extension = ".md",
-  })
-  vim.keymap.set("n", "gW", function() require("512-words").open() end)
+   add({ source = "BlameTroi/512-words" })
+   require("512-words").setup({
+      buffer = { textwidth = 75 },
+      words = 0x100,
+      storage_directory = "~/Notepad",
+      date_prefix = "#",
+      file_extension = ".md",
+   })
+   vim.keymap.set("n", "gW", function() require("512-words").open() end)
 end)
 
 -- Infer indents and tabs in the buffer from the file loaded.
@@ -375,66 +373,17 @@ later(function() add({ source = "tpope/vim-sleuth" }) end)
 -- A very good directory and file diff.
 
 later(
-  function()
-    add({
-      source = "ZSaberLv0/zfvimdirdiff",
-      depends = {
-        "ZSaberLV0/ZFVimJob",
-        "ZSaberLv0/ZFVimIgnore",
-        "ZSaberLv0/ZFVimBackup",
-      },
-    })
-  end
+   function()
+      add({
+         source = "ZSaberLv0/zfvimdirdiff",
+         depends = {
+            "ZSaberLV0/ZFVimJob",
+            "ZSaberLv0/ZFVimIgnore",
+            "ZSaberLv0/ZFVimBackup",
+         },
+      })
+   end
 )
-
--- Treesitter
--- LSP
-
--- I'm trying mini.clue instead of whichkey. There's a need for configuration to
--- advise mini.clue as to which keys should trigger a clue.
-
-now(function()
-  local miniclue = require("mini.clue")
-  miniclue.setup({
-    triggers = {
-      -- Leader triggers
-      { mode = "n", keys = "<Leader>" },
-      { mode = "x", keys = "<Leader>" }, -- Built-in completion
-      { mode = "i", keys = "<C-x>" }, -- `g` key
-      { mode = "n", keys = "g" },
-      { mode = "x", keys = "g" }, -- Marks
-      { mode = "n", keys = "'" },
-      { mode = "n", keys = "`" },
-      { mode = "x", keys = "'" },
-      { mode = "x", keys = "`" }, -- Registers
-      { mode = "n", keys = '"' },
-      { mode = "x", keys = '"' },
-      { mode = "i", keys = "<C-r>" },
-      { mode = "c", keys = "<C-r>" },
-
-      -- Window commands
-      { mode = "n", keys = "<C-w>" }, -- `z` key
-      { mode = "n", keys = "z" },
-      { mode = "x", keys = "z" },
-    },
-
-    clues = {
-      -- Enhance this by adding descriptions for <Leader> mapping groups
-      miniclue.gen_clues.builtin_completion(),
-      miniclue.gen_clues.g(),
-      miniclue.gen_clues.marks(),
-      miniclue.gen_clues.registers(),
-      miniclue.gen_clues.windows(),
-      miniclue.gen_clues.z(),
-    },
-    -- Delay before showing clue window
-    delay = 300,
-
-    -- Keys to scroll inside the clue window
-    scroll_down = "<C-d>",
-    scroll_up = "<C-u>",
-  })
-end)
 
 -- Much more to come.
 
@@ -452,13 +401,37 @@ local map = vim.keymap.set
 -- map("n", "<space>", "", { noremap = true})
 
 -- Which-key interogate local map.
-map("n", "<leader>?", function() require("which-key").show({ global = false }) end, { desc = "Buffer Local Keymaps" })
--- map("n", "<leader>bo", function() Snacks.bufdelete.other() end, { desc = "Delete Other Buffers" })
+map(
+   "n",
+   "<leader>?",
+   function() require("which-key").show({ global = false }) end,
+   { desc = "Buffer Local Keymaps" }
+)
 -- better up/down
-map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
-map({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
-map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
-map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
+map(
+   { "n", "x" },
+   "j",
+   "v:count == 0 ? 'gj' : 'j'",
+   { desc = "Down", expr = true, silent = true }
+)
+map(
+   { "n", "x" },
+   "<Down>",
+   "v:count == 0 ? 'gj' : 'j'",
+   { desc = "Down", expr = true, silent = true }
+)
+map(
+   { "n", "x" },
+   "k",
+   "v:count == 0 ? 'gk' : 'k'",
+   { desc = "Up", expr = true, silent = true }
+)
+map(
+   { "n", "x" },
+   "<Up>",
+   "v:count == 0 ? 'gk' : 'k'",
+   { desc = "Up", expr = true, silent = true }
+)
 
 -- Move to window using the <ctrl> hjkl keys
 map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
@@ -469,16 +442,46 @@ map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 -- Resize window using <ctrl> arrow keys
 map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
 map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
-map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
-map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+map(
+   "n",
+   "<C-Left>",
+   "<cmd>vertical resize -2<cr>",
+   { desc = "Decrease Window Width" }
+)
+map(
+   "n",
+   "<C-Right>",
+   "<cmd>vertical resize +2<cr>",
+   { desc = "Increase Window Width" }
+)
 
 -- Move Lines
-map("n", "<A-j>", "<cmd>execute 'move .+' . v:count1<cr>==", { desc = "Move Down" })
-map("n", "<A-k>", "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = "Move Up" })
+map(
+   "n",
+   "<A-j>",
+   "<cmd>execute 'move .+' . v:count1<cr>==",
+   { desc = "Move Down" }
+)
+map(
+   "n",
+   "<A-k>",
+   "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==",
+   { desc = "Move Up" }
+)
 map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
 map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
-map("v", "<A-j>", ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = "Move Down" })
-map("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = "Move Up" })
+map(
+   "v",
+   "<A-j>",
+   ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv",
+   { desc = "Move Down" }
+)
+map(
+   "v",
+   "<A-k>",
+   ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv",
+   { desc = "Move Up" }
+)
 
 -- buffers
 map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
@@ -501,19 +504,49 @@ map("n", "<leader>bD", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 -- Clear search, diff update and redraw
 -- taken from runtime/lua/_editor.lua
 map(
-  "n",
-  "<leader>ur",
-  "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
-  { desc = "Redraw / Clear hlsearch / Diff Update" }
+   "n",
+   "<leader>ur",
+   "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
+   { desc = "Redraw / Clear hlsearch / Diff Update" }
 )
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
-map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "Next Search Result" })
-map("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next Search Result" })
-map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next Search Result" })
-map("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "Prev Search Result" })
-map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result" })
-map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result" })
+map(
+   "n",
+   "n",
+   "'Nn'[v:searchforward].'zv'",
+   { expr = true, desc = "Next Search Result" }
+)
+map(
+   "x",
+   "n",
+   "'Nn'[v:searchforward]",
+   { expr = true, desc = "Next Search Result" }
+)
+map(
+   "o",
+   "n",
+   "'Nn'[v:searchforward]",
+   { expr = true, desc = "Next Search Result" }
+)
+map(
+   "n",
+   "N",
+   "'nN'[v:searchforward].'zv'",
+   { expr = true, desc = "Prev Search Result" }
+)
+map(
+   "x",
+   "N",
+   "'nN'[v:searchforward]",
+   { expr = true, desc = "Prev Search Result" }
+)
+map(
+   "o",
+   "N",
+   "'nN'[v:searchforward]",
+   { expr = true, desc = "Prev Search Result" }
+)
 
 -- Add undo break-points
 map("i", ",", ",<c-g>u")
@@ -531,22 +564,38 @@ map("v", "<", "<gv")
 map("v", ">", ">gv")
 
 -- commenting
-map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
-map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
+map(
+   "n",
+   "gco",
+   "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>",
+   { desc = "Add Comment Below" }
+)
+map(
+   "n",
+   "gcO",
+   "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>",
+   { desc = "Add Comment Above" }
+)
 
 -- new file
 map("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
 
 -- location list
 map("n", "<leader>xl", function()
-  local success, err = pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
-  if not success and err then vim.notify(err, vim.log.levels.ERROR) end
+   local success, err = pcall(
+      vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose
+         or vim.cmd.lopen
+   )
+   if not success and err then vim.notify(err, vim.log.levels.ERROR) end
 end, { desc = "Location List" })
 
 -- quickfix list
 map("n", "<leader>xq", function()
-  local success, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
-  if not success and err then vim.notify(err, vim.log.levels.ERROR) end
+   local success, err = pcall(
+      vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose
+         or vim.cmd.copen
+   )
+   if not success and err then vim.notify(err, vim.log.levels.ERROR) end
 end, { desc = "Quickfix List" })
 
 map("n", "[q", vim.cmd.cprev, { desc = "Previous Quickfix" })
