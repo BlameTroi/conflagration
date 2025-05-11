@@ -29,6 +29,7 @@
 -- Mini uses git for downloading and packadd to lay the plugins into the
 -- configuration directories. Even though most people don't use packadd, I find
 -- the idea of using a standard part of Vim apealling.
+
 local path_package = vim.fn.stdpath("data") .. "/site"
 local mini_path = path_package .. "/pack/deps/start/mini.nvim"
 
@@ -47,73 +48,23 @@ if not vim.loop.fs_stat(mini_path) then
    vim.cmd("packadd mini.nvim | helptags ALL")
 end
 
--- Fire up mini.deps.
-
 require("mini.deps").setup({ path = { package = path_package } })
 
 -- Readability shortcuts for mini.dps functions.
 -- I expect mini.deps.setup() to have set MiniDeps.
+-- T is a global for me to stash things in. Everyone else seems to use G
+-- for such things.
 
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
-_T = { add, now, later }
+T = { add, now, later }
 
--- All my standard option settings. Leader and mapleader must be set before any plugins that might create keymaps based
--- on leader or mapleader. Add any additional options here
+-- Run thorugh my initialization in lua/config.
 
-now(function()
-   -- The first thing to do is to set leader and localleader. As I prefer space for leader, we need to force space in
-   -- normal mode to be a no-op. It is normally a synonym for 'l'.
-   vim.cmd("nnoremap <space> <nop>")
-   vim.g.mapleader = " "
-   vim.g.maplocalleader = "\\"
+require("config.options")
+require("config.visuals")
+require("config.plumbing")
 
-   -- Now get mini.basics applied for "sensible" defaults.
-   require("mini.basics").setup({
-      options = { basic = true, extra_ui = true, win_borders = "single" },
-      mappings = {
-         basic = true,
-         option_toggle_prefix = "",
-         windows = true,
-         move_with_alt = true,
-      },
-      autocommands = { basic = true, relnum_in_visual_mode = false },
-      silent = true,
-   })
-
-   -- I'm peculiar about the mouse.
-   vim.opt.clipboard = "unnamedplus"
-   vim.opt.background = "dark" -- hello darkness my old friend
-   vim.opt.mouse = "" -- mouse clicks shouldn't move the cursor
-
-   -- These are options that are either different from the defaults or I want different from what mini.basics will set.
-   -- While the mini.basics doc says it not change an option that has been changed already, I'm placing most of these
-   -- _after_ mini.basics setup.
-   --
-   -- I've made a serious effort to remove duplicates for defaults/mini.basics values, but I'm only human so there could
-   -- be redundancies.
-   vim.opt.confirm = true -- Confirm to save changes before exiting modified buffer
-   vim.opt.formatoptions = "jcroqlnt" -- tcqj
-   vim.opt.ignorecase = true -- Ignore case
-   vim.opt.inccommand = "split" -- preview incremental substitute
-   vim.opt.linebreak = true -- Wrap lines at convenient points
-   vim.opt.list = true -- Show some invisibles
-   vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-   vim.opt.number = true -- I like them
-   vim.opt.relativenumber = true -- And I'm learning to like this
-   vim.opt.scrolloff = 3 -- Lines of context
-   vim.opt.shiftround = true -- Round indent
-   vim.opt.sidescrolloff = 8 -- Columns of context
-   vim.opt.splitkeep = "screen"
-   vim.opt.winminwidth = 5 -- Minimum window width
-
-   -- The basic spell checker has been pretty good so far. I keep my dictionary in
-   -- a non-standard location -- my actual config. The default is under `stdpath("data")`.
-   vim.opt.spelllang = { "en_us" }
-   vim.opt.spellsuggest = "best,10"
-   local spelldir = vim.fn.stdpath("config") .. "/spell"
-   vim.opt.spellfile = spelldir .. "/en.utf-8.add"
-   vim.opt.thesaurus = spelldir .. "/thesaurus.txt"
-end)
+require("config.mini")
 
 -- The author uses separate add/now/later blocks, which makes sense to me.
 -- If I read this right, now before add before later, in source sequence.
@@ -121,44 +72,9 @@ end)
 
 -- UI related.
 
-now(function() require("mini.notify").setup() end)
-
-now(function() require("mini.icons").setup() end)
-
-now(function() require("mini.statusline").setup() end)
-
-later(function()
-   local hipatterns = require("mini.hipatterns")
-   hipatterns.setup({
-      highlighters = {
-         fixme = { pattern = "BUG:", group = "MiniHipatternsFixme" },
-         hack = { pattern = "HACK:", group = "MiniHipatternsHack" },
-         todo = { pattern = "TODO:", group = "MiniHipatternsTodo" },
-         note = { pattern = "NOTE:", group = "MiniHipatternsNote" },
-         -- TODO: do this only for filetypes that it matters, lua, vim, css
-         hex_color = hipatterns.gen_highlighter.hex_color(),
-      },
-   })
-end)
-
 later(function() require("mini.git").setup() end)
 
 later(function() require("mini.diff").setup() end)
-
-now(function()
-   add({ source = "projekt0n/github-nvim-theme" })
-   require("github-theme").setup({
-      options = {
-         styles = {
-            comments = "italic",
-            keywords = "bold",
-            types = "italic,bold",
-         },
-      },
-   })
-   vim.opt.background = "dark"
-   vim.cmd("colorscheme github_dark_high_contrast")
-end)
 
 -- Now that the UI themeing and such as established it's time for
 -- functionality. First I'll get all the mini.* modules I want.
@@ -184,23 +100,6 @@ later(function() require("mini.pick").setup() end)
 
 -- And now I can add my non-mini plugins.
 
--- I'm going back to which-key from clue.
-
-later(function()
-   add({ source = "folke/which-key.nvim" })
-   require("which-key").setup({
-      opts = {
-         keys = {
-            "<leader>?",
-            function() require("which-key").show({ global = false }) end,
-            desc = "Buffer Local Keymaps (which-key)",
-         },
-         preset = "helix",
-         win = { border = "single" },
-      },
-   })
-end)
-
 -- Return to the last position in a file. Note that this plugin is not
 -- being maintained but it still works fine.
 
@@ -215,126 +114,6 @@ now(function()
          "hgcommit",
       },
       lastplace_open_folds = true,
-   })
-end)
-
--- Treesitter to highlight, edit, and navigate code.
-
-later(function()
-   add({
-      source = "nvim-treesitter/nvim-treesitter",
-      hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
-   })
-   add({ source = "nvim-treesitter/nvim-treesitter-textobjects" })
-
-   require("nvim-treesitter.configs").setup({
-      ensure_installed = {
-         "bash",
-         "c",
-         "lua",
-         "markdown",
-         "vim",
-         "vimdoc",
-         "python",
-         "odin",
-         "ruby",
-      },
-      auto_install = true,
-      ignore_install = {},
-      sync_install = false,
-      modules = {},
-      highlight = {
-         enable = true,
-         additional_vim_regex_highlighting = { "ruby" },
-      },
-      incremental_selection = {
-         enable = true,
-         -- keymaps = {
-         --    init_selection = "gnn", -- set to `false` to disable one of the mappings
-         --    node_incremental = "grn",
-         --    scope_incremental = "grc",
-         --    node_decremental = "grm",
-         -- },
-      },
-      textobjects = { enable = true },
-      indent = { enable = true, disable = { "ruby" } },
-   })
-end)
-
--- Lazydev helps link things up to reduce lint warnings.
-
-later(function()
-   add({ source = "folke/lazydev.nvim" })
-   require("lazydev").setup({
-      ft = "lua",
-      { path = "${3rd}/luv/library", words = "vim%.uv" },
-   })
-end)
-
--- Mason for managing LSP and other executables.
-
-later(function()
-   add({ source = "mason-org/mason.nvim" })
-   require("mason").setup({
-      ui = {
-         icons = {
-            package_installed = "✓",
-            package_pending = "➜",
-            package_uninstalled = "✗",
-         },
-      },
-   })
-end)
-
--- Formatting =================================================================
-later(function()
-   add({ source = "stevearc/conform.nvim" })
-
-   require("conform").setup({
-      formatters_by_ft = {
-         bash = { "shfmt" },
-         c = { "clang-format" },
-         fortran = { "fprettify" },
-         javascript = { "prettier" },
-         json = { "prettier" },
-         lua = { "stylua", opts = { args = "--search-parent-directories" } },
-         markdown = { "prettier" },
-         python = { "ruff" },
-         ruby = { "rubocop" },
-         toml = { "taplo" },
-         typescript = { "prettier" },
-         yaml = { "prettier" },
-         zsh = { "shfmt" },
-      },
-      format_on_save = { lsp_format = "fallback", timeout_ms = 5000 },
-      log_level = vim.log.levels.ERROR,
-      notify_no_formatters = true,
-      notify_on_error = true,
-   })
-end)
-
--- Language server configurations =============================================
-later(function()
-   add({ source = "neovim/nvim-lspconfig" })
-
-   -- All language servers are expected to be installed with 'mason.vnim'
-   vim.lsp.enable({
-      "bashls",
-      "clangd",
-      "fortls",
-      "gopls",
-      "jsonls",
-      "luals",
-      "marksman",
-      "millet",
-      "ols",
-      "rubocop",
-      "ruff",
-      "taplo",
-      "textlsp",
-      "tsls",
-      "vimls",
-      "yamlls",
    })
 end)
 
@@ -390,7 +169,6 @@ later(
 -- Keymaps come last. The first large block of maps is extracted from LazyVim's
 -- defaults. Many of those were assigned to Snacks functions, but I'm not using
 -- Snacks, so I've commented them out for reference.
--- TODO: consider switching to mini.keymaps
 
 local map = vim.keymap.set
 
