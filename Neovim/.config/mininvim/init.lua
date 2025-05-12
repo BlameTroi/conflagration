@@ -58,13 +58,12 @@ require("mini.deps").setup({ path = { package = path_package } })
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 T = { add, now, later }
 
--- Run thorugh my initialization in lua/config.
+-- My configuration is broken up into modules, with high level groups
+-- run in what I believe to be the correct order. But those details are
+-- delegated.
 
-require("config.options")
-require("config.visuals")
-require("config.plumbing")
-
-require("config.mini")
+require("config")
+require("plugins")
 
 -- The author uses separate add/now/later blocks, which makes sense to me.
 -- If I read this right, now before add before later, in source sequence.
@@ -72,30 +71,11 @@ require("config.mini")
 
 -- UI related.
 
-later(function() require("mini.git").setup() end)
-
-later(function() require("mini.diff").setup() end)
-
 -- Now that the UI themeing and such as established it's time for
 -- functionality. First I'll get all the mini.* modules I want.
 
--- Editor Modules:
-
---now(function() require("mini.keymap").setup() end)
-later(function() require("mini.ai").setup() end)
-later(function() require("mini.comment").setup() end)
-later(function() require("mini.completion").setup() end)
-later(function() require("mini.move").setup() end)
-later(function() require("mini.operators").setup() end)
-later(function() require("mini.pairs").setup() end)
-later(function() require("mini.splitjoin").setup() end)
-later(function() require("mini.surround").setup() end)
-
 -- General Workflow Modules:
 
-later(function() require("mini.bracketed").setup() end)
-later(function() require("mini.jump").setup() end)
-later(function() require("mini.jump2d").setup() end)
 later(function() require("mini.pick").setup() end)
 
 -- And now I can add my non-mini plugins.
@@ -144,10 +124,6 @@ later(function()
    })
    vim.keymap.set("n", "gW", function() require("512-words").open() end)
 end)
-
--- Infer indents and tabs in the buffer from the file loaded.
-
-later(function() add({ source = "tpope/vim-sleuth" }) end)
 
 -- A very good directory and file diff.
 
