@@ -1,5 +1,9 @@
 -- ~/.config/mininvim/lua/config/options.lua
 
+---Uncomment below to double check that your only undefined globals
+---are those you trust: eg, vim.*, MiniDeps.*.
+---@diagnostic disable:undefined-global
+
 -- Set various options and defaults that don't require any plugins besides the
 -- mini suite to be loaded. In here I only use mini.basics (sensible defaults)
 -- and then do my overrides.

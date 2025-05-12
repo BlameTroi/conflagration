@@ -1,9 +1,10 @@
--- ~/.config/mininvim/lua/plugins/gitsigns.lua
+-- ~/.config/mininvim/lua/plugins/picker.lua
 
 ---Uncomment below to double check that your only undefined globals
 ---are those you trust: eg, vim.*, MiniDeps.*.
 ---@diagnostic disable:undefined-global
 
-local add = MiniDeps.add
-add({ source = "lewis6991/gitsigns.nvim" })
-require("gitsigns").setup()
+-- Picker and chooser UI, perhaps other dialogs.
+
+require("mini.pick").setup()
+require("mini.extra").setup()

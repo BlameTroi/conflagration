@@ -1,9 +1,11 @@
 -- ~/.config/mininvim/lua/config/plumbing.lua
 
+---Uncomment below to double check that your only undefined globals
+---are those you trust: eg, vim.*, MiniDeps.*.
+---@diagnostic disable:undefined-global
+
 -- Plumbing and infrastructure for things like Tree Sitter grammars,
 -- linters, formatters, and LSP.
-
-local add = MiniDeps.add
 
 -- Treesitter improves code highlights, editing, and navigation. It is built in,
 -- but grammars need to be generated locally.
@@ -18,11 +20,10 @@ local add = MiniDeps.add
 -- package as shared libraries. The source used to build them does not appear to
 -- be preserved.
 
-add({
+MiniDeps.add({
    source = "nvim-treesitter/nvim-treesitter",
    hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
 })
-
 require("nvim-treesitter.configs").setup({
    ensure_installed = {
       "bash",
@@ -65,9 +66,9 @@ require("nvim-treesitter.configs").setup({
 --
 -- mason -> lspconfig -> mason-lspconfig.
 
-add({ source = "mason-org/mason.nvim" })
-add({ source = "neovim/nvim-lspconfig" })
-add({ source = "mason-org/mason-lspconfig.nvim" })
+MiniDeps.add({ source = "mason-org/mason.nvim" })
+MiniDeps.add({ source = "neovim/nvim-lspconfig" })
+MiniDeps.add({ source = "mason-org/mason-lspconfig.nvim" })
 
 -- Mason can download and install external tools for linting, formatting, and to
 -- provide LSP support. These are installed under config("data")/mason. This
@@ -130,7 +131,7 @@ require("mason-lspconfig").setup({
 -- formatexpr will fall back to the lsp formatexpr which should fall back to
 -- normal Vim formatting.
 
-add({ source = "stevearc/conform.nvim" })
+MiniDeps.add({ source = "stevearc/conform.nvim" })
 require("conform").setup({
    formatters_by_ft = {
       bash = { "shfmt" },
@@ -153,14 +154,3 @@ require("conform").setup({
    notify_on_error = true,
 })
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-
--- Lazydev helps link Lua libraries to your workspace. I attempt to use this
--- just to quite down the varlus lint warnings.
--- TODO: Perhaps move to luals.lua?
--- NOTE: This currently throws a deprecated warning on client notify. Folke is
---       on vacation so he can't fix it atm.
-add({ source = "folke/lazydev.nvim" })
-require("lazydev").setup({
-   ft = "lua",
-   { path = "${3rd}/luv/library", words = "vim%.uv" },
-})

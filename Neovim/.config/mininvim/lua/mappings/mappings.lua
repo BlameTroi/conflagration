@@ -1,5 +1,9 @@
 -- ~/.config/mininvim/lua/mappings/mappings.lua
 
+---Uncomment below to double check that your only undefined globals
+---are those you trust: eg, vim.*, MiniDeps.*.
+---@diagnostic disable:undefined-global
+
 -- Keymaps.
 
 -- Keymaps come last. The first large block of maps is extracted from LazyVim's

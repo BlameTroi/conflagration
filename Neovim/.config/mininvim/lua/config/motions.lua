@@ -1,8 +1,10 @@
 -- ~/.config/mininvim/lua/config/motions.lua
 
--- Jumping about in Vim.
+---Uncomment below to double check that your only undefined globals
+---are those you trust: eg, vim.*, MiniDeps.*.
+---@diagnostic disable:undefined-global
 
-local add = MiniDeps.add
+-- Jumping about in Vim.
 
 -- Move by "brackets". ] next or [ prior -- buffer, coment block, file, etc.
 
@@ -19,7 +21,7 @@ require("mini.jump2d").setup()
 -- Reopen a file at its last edit location. Note that this plugin is not being
 -- maintained but it still works fine.
 
-add({ source = "ethanholz/nvim-lastplace" })
+MiniDeps.add({ source = "ethanholz/nvim-lastplace" })
 require("nvim-lastplace").setup({
    lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
    lastplace_ignore_filetype = {

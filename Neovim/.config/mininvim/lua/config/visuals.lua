@@ -1,13 +1,15 @@
 -- ~/.config/mininvim/lua/config/visuals.lua
 
+---Uncomment below to double check that your only undefined globals
+---are those you trust: eg, vim.*, MiniDeps.*.
+---@diagnostic disable:undefined-global
+
 -- As I have the beginnings of cataracts, I am always look for a good scheme
 -- with high contrast and a color set that doesn't offend.
 
-local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
-
 vim.opt.background = "dark"
 
-add({ source = "projekt0n/github-nvim-theme" })
+MiniDeps.add({ source = "projekt0n/github-nvim-theme" })
 
 require("github-theme").setup({
    options = {
@@ -44,17 +46,15 @@ hipatterns.setup({
 
 -- Display keymap help.
 
-later(function()
-   add({ source = "folke/which-key.nvim" })
-   require("which-key").setup({
-      opts = {
-         keys = {
-            "<leader>?",
-            function() require("which-key").show({ global = false }) end,
-            desc = "Buffer Local Keymaps (which-key)",
-         },
-         -- preset = "helix",
-         win = { border = "single" },
+MiniDeps.add({ source = "folke/which-key.nvim" })
+require("which-key").setup({
+   opts = {
+      keys = {
+         "<leader>?",
+         function() require("which-key").show({ global = false }) end,
+         desc = "Buffer Local Keymaps (which-key)",
       },
-   })
-end)
+      -- preset = "helix",
+      win = { border = "single" },
+   },
+})

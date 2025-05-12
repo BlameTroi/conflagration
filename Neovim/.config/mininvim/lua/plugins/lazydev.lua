@@ -1,5 +1,9 @@
 -- ~/.config/mininvim/lua/plugins/lazydev.lua
 
+---Uncomment below to double check that your only undefined globals
+---are those you trust: eg, vim.*, MiniDeps.*.
+---@diagnostic disable:undefined-global
+
 local add = MiniDeps.add
 
 -- Lazydev helps link Lua libraries to your workspace. I attempt to use this
