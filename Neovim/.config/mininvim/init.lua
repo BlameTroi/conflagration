@@ -78,7 +78,7 @@ require("mini.deps").setup({ path = { package = path_package } })
 -- or base plugins such as mini, mason, conform, treesitter, and lsp.
 --
 -- Remember, requiring a directory name runs the init.lua in that
--- directory.
+-- directory. That init decides what to do next.
 
 require("config")
 require("plugins")
