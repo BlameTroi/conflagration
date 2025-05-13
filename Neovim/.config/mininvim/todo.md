@@ -1,4 +1,5 @@
 - [ ] get lsp diagnostics in quickfix
-- [ ] review key maps
+- [x] review key maps
 - [ ] grok lsp better
 - [ ] applescript to open quicklook on markdown files
+- [ ] keywordprg, use it for things like dictionary
