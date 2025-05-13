@@ -68,16 +68,23 @@
 --- * [Lua.workspace.library](https://luals.github.io/wiki/settings/#workspacelibrary)
 ---
 return {
-  cmd = { 'lua-language-server' },
-  filetypes = { 'lua' },
-  root_markers = {
-    '.luarc.json',
-    '.luarc.jsonc',
-    '.luacheckrc',
-    '.stylua.toml',
-    'stylua.toml',
-    'selene.toml',
-    'selene.yml',
-    '.git',
-  },
+   cmd = { "lua-language-server" },
+   filetypes = { "lua" },
+   root_markers = {
+      ".luarc.json",
+      ".luarc.jsonc",
+      ".luacheckrc",
+      ".stylua.toml",
+      "stylua.toml",
+      "selene.toml",
+      "selene.yml",
+      ".git",
+   },
+   init_options = {
+      provideFormatter = false,
+   },
+   settings = {
+      runtime = { version = "LuaJIT" },
+      signatureHelp = { enabled = true },
+   },
 }

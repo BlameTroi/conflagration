@@ -6,5 +6,5 @@
 
 -- Picker and chooser UI, perhaps other dialogs.
 
-require("mini.pick").setup()
-require("mini.extra").setup()
+-- require("mini.pick").setup()
+-- require("mini.extra").setup()

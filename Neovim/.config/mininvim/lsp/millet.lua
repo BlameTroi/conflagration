@@ -11,7 +11,10 @@
 --- 3. Run `cargo build --release --bin lang-srv`
 --- 4. Move `target/release/lang-srv` to somewhere on your $PATH as `millet`
 return {
-  cmd = { 'millet' },
-  filetypes = { 'sml' },
-  root_markers = { 'millet.toml' },
+   cmd = { "millet" },
+   filetypes = { "sml" },
+   root_markers = { "millet.toml" },
+   init_options = {
+      provideFormatter = false,
+   },
 }

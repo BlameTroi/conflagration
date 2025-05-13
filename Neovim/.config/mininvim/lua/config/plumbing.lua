@@ -67,8 +67,8 @@ require("nvim-treesitter.configs").setup({
 -- mason -> lspconfig -> mason-lspconfig.
 
 MiniDeps.add({ source = "mason-org/mason.nvim" })
-MiniDeps.add({ source = "neovim/nvim-lspconfig" })
-MiniDeps.add({ source = "mason-org/mason-lspconfig.nvim" })
+-- MiniDeps.add({ source = "neovim/nvim-lspconfig" })
+-- MiniDeps.add({ source = "mason-org/mason-lspconfig.nvim" })
 
 -- Mason can download and install external tools for linting, formatting, and to
 -- provide LSP support. These are installed under config("data")/mason. This
@@ -90,6 +90,9 @@ require("mason").setup({
 -- langauge server is configured.
 --
 -- These are *NOT* the binary names.
+vim.lsp.config("*", {
+   root_markers = ".git",
+})
 
 vim.lsp.enable({
    "bashls",
@@ -108,15 +111,6 @@ vim.lsp.enable({
    "tsls",
    "vimls",
    "yamlls",
-})
-
--- Mason-lspconfig will automatically enable installed servers. I'm not too
--- worried about startup time yet, so we'll just get them all.
---
--- Enabling is done by default. I included the value to be explicit.
-
-require("mason-lspconfig").setup({
-   automatic_enable = true,
 })
 
 -- Conform manages source code formatters. Use Mason to get the appropriate
