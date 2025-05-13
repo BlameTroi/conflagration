@@ -29,12 +29,12 @@ vim.g.maplocalleader = "\\"
 -- Just in case.
 
 require("mini.basics").setup({
-   options = { basic = true, extra_ui = true, win_borders = "single" },
+   options = { basic = true, extra_ui = true, win_borders = "double" },
    mappings = {
       basic = true,
       option_toggle_prefix = "",
       windows = true,
-      move_with_alt = true,
+      move_with_alt = false,
    },
    autocommands = { basic = true, relnum_in_visual_mode = false },
    silent = true,
