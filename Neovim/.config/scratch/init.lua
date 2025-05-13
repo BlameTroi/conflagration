@@ -1,8 +1,8 @@
 -- ~/.config/mininvim/lua/config/options.lua
 
----Uncomment below to double check that your only undefined globals
----are those you trust: eg, vim.*, MiniDeps.*.
---- diagnostic disable:undefined-global
+--- Remove the @ from @diagnostic below to see all the undefined
+--- globals that haven't been swatted yet.
+---@diagnostic disable:undefined-global
 
 -- Set various options and defaults that don't require any plugins. I'm
 -- going to use lazy for package management this trial, but avoid as much
@@ -36,24 +36,41 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
---- Set leader and local leader before any other plugins ------------
+--- Set a few things before any plugin code fires --------------------
 
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
+-- I think these should be set before doing much of anything else. Having
+-- `mapleader` and `maplocalleader` set before loading plugins avoids broken
+-- plugin keymaps. Space sometimes causes issues when used for leader but
+-- in my experience remaping it to nop clears them up. I'll set other
+-- options after plugins are loaded.
+
+local g = vim.g
+local o = vim.opt
 
 vim.cmd("nnoremap <space> <nop>")
-vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
-vim.opt.background = "dark"
+g.mapleader = " "
+g.maplocalleader = "\\"
+o.mouse = "" -- mouse clicks shouldn't move the cursor
+o.termguicolors = true
+o.background = "dark"
+g.have_nerd_font = true
+vim.schedule(function()
+   -- Schedule this setting after `UiEnter` because it can increase startup-time.
+   vim.opt.clipboard = "unnamedplus"
+end)
+o.updatetime = 250 -- Shorten some keyboard checks.
+o.timeoutlen = 300
 
---- Set leader and local leader before any other plugins -------------
+--- Plugin specifications for lazy.nvim ------------------------------
 
 -- Folke's examples load plugins first thing. They could be imported but
 -- I'm going single file for now.
 
 require("lazy").setup({
    spec = {
+
       --- First, let's get the color scheme set -----------------------
+
       {
          "projekt0n/github-nvim-theme",
          lazy = false,
@@ -182,8 +199,6 @@ require("lazy").setup({
    --- Treesitter has some post install requirements ---------------
    --- Treesitter has some post install requirements ---------------
 
-
-
    --- And finally the end of the lazy.nvim specs. -----------------
    },
    -- This is the scheme to use while installing, not that which we run
@@ -193,18 +208,17 @@ require("lazy").setup({
    checker = { enabled = true },
 })
 
--- I hate meeces to pieces. In terminal vim all I want the mouse to do
--- is return focus to a window. Don't move the pointer position.
-
-vim.opt.mouse = "" -- mouse clicks shouldn't move the cursor
-
+--- Set remaining options --------------------------------------------
 -- And now a raft of options to bend vim to my will. Some are standard, some are
--- not.
---
--- There may be some duplicates in here. I have made a pass to remove them but
--- I'm only human.
+-- not. While things like mini.basics and vim-sensible exist, I want to think
+-- about these as I set them. As grouping is a matter of opinion, I keep them
+-- in alphabetical order.
 
+vim.opt.autoindent = true
+vim.opt.breakindent = true
 vim.opt.confirm = true -- Confirm to save changes before exiting modified buffer
+vim.opt.cursorline = true
+vim.opt.expandtab = true
 vim.opt.formatoptions = "jcroqlnt" -- tcqj
 vim.opt.ignorecase = true -- Ignore case
 vim.opt.inccommand = "split" -- preview incremental substitute
@@ -213,12 +227,38 @@ vim.opt.list = true -- Show some invisibles
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.number = true -- I like them
 vim.opt.relativenumber = true -- And I'm learning to like this
+vim.opt.ruler = true
 vim.opt.scrolloff = 3 -- Lines of context
 vim.opt.shiftround = true -- Round indent
+vim.opt.shortmess:append("c")
+vim.opt.showcmd = true
+vim.opt.showmatch = true
+vim.opt.showmode = false -- status line should do this --
 vim.opt.sidescrolloff = 8 -- Columns of context
+vim.opt.signcolumn = "yes"
+vim.opt.smartcase = true
+vim.opt.splitbelow = true
 vim.opt.splitkeep = "screen"
+vim.opt.splitright = true
+vim.opt.syntax = "on"
+vim.opt.title = true
+vim.opt.wildmenu = true
+vim.opt.winborder = "rounded" -- others double, single, solid, shadow, none
 vim.opt.winminwidth = 5 -- Minimum window width
-vim.opt.clipboard = "unnamedplus" -- share with system clipboard
+
+--- Completion related, including popups -----------------------------
+
+vim.cmd("set completeopt+=fuzzy")
+vim.cmd("set completeopt+=noinsert")
+vim.cmd("set completeopt+=noselect")
+
+o.pumblend = 10
+vim.cmd("hi PmenuSel blend=0")
+o.pumheight = 10
+o.pummaxwidth = 50
+o.pumwidth = 15
+
+--- Prose and text for humans ---------------------------------------
 
 -- While more text/writing support is needed, for now I'll enable spelling and
 -- thesaurus. Note that my dictionary additions are in my config and not under
