@@ -78,11 +78,31 @@ require("lazy").setup({
          config = function() vim.cmd("colorscheme github_dark_high_contrast") end,
       },
 
+      { "nvim-tree/nvim-web-devicons", lazy = true },
+
+      {
+         "nvim-lualine/lualine.nvim",
+         dependencies = { "nvim-tree/nvim-web-devicons" },
+         opts = {
+            sections = {
+               lualine_x = {
+                  {
+                     "fileformat",
+                     icons_enabled = true,
+                     symbols = {
+                        unix = "LF",
+                        dos = "CRLF",
+                        mac = "CR",
+                     },
+                  },
+               },
+            },
+         },
+      },
+
       --- Several standard zero-configuration plugins -----------------
 
       { "folke/which-key.nvim", lazy = true },
-
-      { "nvim-tree/nvim-web-devicons", lazy = true },
 
       --- Treesitter has some post install requirements ---------------
 
@@ -92,7 +112,7 @@ require("lazy").setup({
       {
          "nvim-treesitter/nvim-treesitter",
          build = ":TSUpdate",
-         event = {  "VeryLazy" },
+         event = { "VeryLazy" },
          lazy = vim.fn.argc(-1) == 0,
          init = function(plugin)
             require("lazy.core.loader").add_to_rtp(plugin)
@@ -135,71 +155,75 @@ require("lazy").setup({
          end,
       },
 
-   -- This is paired with nvim-treesitter, see comments there.
+      -- This is paired with nvim-treesitter, see comments there.
 
-   { "nvim-treesitter/nvim-treesitter-textobjects", event = "VeryLazy" },
+      { "nvim-treesitter/nvim-treesitter-textobjects", event = "VeryLazy" },
 
-   --- Git diffs and hunks and stats -------------------------------
+      --- Git diffs and hunks and stats -------------------------------
 
-   { "lewis6991/gitsigns.nvim", event = "VeryLazy" },
+      { "lewis6991/gitsigns.nvim", event = "VeryLazy" },
 
-   --- Mason installs binary dependencies for lsp and ts -----------
+      --- Mason installs binary dependencies for lsp and ts -----------
 
-   {
-      "mason-org/mason.nvim",
-      opts = {
-         ui = {
-            icons = {
-               package_installed = "✓",
-               package_pending = "➜",
-               package_uninstalled = "✗",
+      {
+         "mason-org/mason.nvim",
+         opts = {
+            ui = {
+               icons = {
+                  package_installed = "✓",
+                  package_pending = "➜",
+                  package_uninstalled = "✗",
+               },
             },
          },
       },
-   },
 
-   --- Use conform.nvim for file formatting ------------------------
+      --- Use conform.nvim for file formatting ------------------------
 
-   -- The formatexpr being set to conform should prevent LSP from getting in the
-   -- way if I have a formatter configured. It is expected that the conform
-   -- formatexpr will fall back to the lsp formatexpr which should fall back to
-   -- normal Vim formatting.
+      -- The formatexpr being set to conform should prevent LSP from getting in the
+      -- way if I have a formatter configured. It is expected that the conform
+      -- formatexpr will fall back to the lsp formatexpr which should fall back to
+      -- normal Vim formatting.
 
-   {
-      "stevearc/conform.nvim",
-      event = "VeryLazy",
-      opts = {
-         formatters_by_ft = {
-            bash = { "shfmt" },
-            c = { "clang-format" },
-            fortran = { "fprettify" },
-            javascript = { "prettier" },
-            json = { "prettier" },
-            lua = { "stylua", opts = { args = "--search-parent-directories" } },
-            markdown = { "prettier" },
-            python = { "ruff" },
-            ruby = { "rubocop" },
-            toml = { "taplo" },
-            typescript = { "prettier" },
-            yaml = { "prettier" },
-            zsh = { "shfmt" },
+      {
+         "stevearc/conform.nvim",
+         event = { "BufWritePre" },
+         cmd = { "ConformInfo" },
+         opts = {
+            formatters_by_ft = {
+               bash = { "shfmt" },
+               c = { "clang-format" },
+               fortran = { "fprettify" },
+               javascript = { "prettier" },
+               json = { "prettier" },
+               lua = {
+                  "stylua",
+                  opts = { args = "--search-parent-directories" },
+               },
+               markdown = { "prettier" },
+               python = { "ruff" },
+               ruby = { "rubocop" },
+               toml = { "taplo" },
+               typescript = { "prettier" },
+               yaml = { "prettier" },
+               zsh = { "shfmt" },
+            },
+            format_on_save = { lsp_format = "fallback", timeout_ms = 5000 },
+            log_level = vim.log.levels.ERROR,
+            notify_no_formatters = true,
+            notify_on_error = true,
          },
-         format_on_save = { lsp_format = "fallback", timeout_ms = 5000 },
-         log_level = vim.log.levels.ERROR,
-         notify_no_formatters = true,
-         notify_on_error = true,
+         init = function(_, opts)
+            vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+         end,
       },
-      config = function(_, opts)
-         vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-      end,
-   },
 
-   --- Treesitter has some post install requirements ---------------
-   --- Treesitter has some post install requirements ---------------
-   --- Treesitter has some post install requirements ---------------
-   --- Treesitter has some post install requirements ---------------
+      --- Treesitter has some post install requirements ---------------
+      --- Treesitter has some post install requirements ---------------
+      --- Treesitter has some post install requirements ---------------
+      --- Treesitter has some post install requirements ---------------
 
-   --- And finally the end of the lazy.nvim specs. -----------------
+      --- And finally the end of the lazy.nvim specs. -----------------
    },
    -- This is the scheme to use while installing, not that which we run
    install = { colorscheme = { "github_dark_high_contrast" } },
