@@ -256,10 +256,10 @@ require("lazy").setup({
 
       --- Fast motion via mini.jump* ----------------------------------
 
+      -- Empty opts param will trigger setup().
+
       { "echasnovski/mini.jump", event = { "VeryLazy" }, opts = {} },
       { "echasnovski/mini.jump2d", event = { "VeryLazy" }, opts = {} },
-
-      -- config = function() require("mini.jump2d")setup() end,
 
       --- 512 words (actually 256 for me) daily journaling ------------
 
@@ -356,6 +356,22 @@ o.spellsuggest = "best,10"
 local spelldir = vim.fn.stdpath("config") .. "/spell"
 o.spellfile = spelldir .. "/en.utf-8.add"
 o.thesaurus = spelldir .. "/thesaurus.txt"
+
+--- LSP -------------------------------------------------------------
+
+-- I'm not fond of splitting the configuration out, but I can't get it
+-- to work if I use the vim.lsp.config() call here, but the same data
+-- in a file under lsp works fine. It's probably a bug and I should
+-- probably report it, but there seems to be so much going on in the
+-- area that I'll let it settle down before I worry about it.
+
+-- TODO: change this so it reads file names from the lsp directory and
+-- enables those.
+vim.lsp.config("*", { root_markers = ".git" })
+vim.lsp.enable({ "luals" })
+vim.lsp.enable({ "ruff" })
+vim.lsp.enable({ "bashls" })
+vim.lsp.enable({ "clangd" })
 
 --- Mappings --------------------------------------------------------
 
@@ -498,6 +514,13 @@ km.set({ "n", "i", "v" }, "<right>", "")
 km.set({ "n", "i", "v" }, "<up>", "")
 km.set({ "n", "i", "v" }, "<down>", "")
 
+--- Exploratory mappings that need to be reworked, but for now as is. ----
+
+-- Output the current syntax group -- does nothing at the moment, is TS in the
+-- way?
+vim.cmd([[
+   nnoremap <f10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'  . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"  . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<cr>
+   ]])
 --- Utility autocommands -------------------------------------------------
 
 local gr = vim.api.nvim_create_augroup("my-init", {})
