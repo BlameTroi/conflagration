@@ -55,12 +55,11 @@ o.mouse = "" -- mouse clicks shouldn't move the cursor
 o.termguicolors = true
 o.background = "dark"
 g.have_nerd_font = true
-vim.schedule(function()
-   -- Schedule this setting after `UiEnter` because it can increase startup-time.
-   o.clipboard = "unnamedplus"
-end)
 o.updatetime = 250 -- Shorten some keyboard checks.
 o.timeoutlen = 300
+
+-- Schedule this setting after `UiEnter` because it can increase startup-time.
+vim.schedule(function() o.clipboard = "unnamedplus" end)
 
 --- Plugin specifications for lazy.nvim ------------------------------
 
@@ -79,6 +78,8 @@ require("lazy").setup({
          config = function() vim.cmd("colorscheme github_dark_high_contrast") end,
       },
 
+      --- More bling ---------------------------------------------------
+
       { "nvim-tree/nvim-web-devicons", lazy = true },
 
       {
@@ -88,6 +89,7 @@ require("lazy").setup({
             sections = {
                lualine_x = {
                   {
+                     -- I don't like the icon choices.
                      "fileformat",
                      icons_enabled = true,
                      symbols = {
@@ -103,7 +105,11 @@ require("lazy").setup({
 
       --- Several standard zero-configuration plugins -----------------
 
-      { "folke/which-key.nvim", lazy = true },
+      { "folke/which-key.nvim", event = "VeryLazy", opts = { preset = "helix" } },
+
+      --- Git diffs and hunks and stats -------------------------------
+
+      { "lewis6991/gitsigns.nvim", event = "VeryLazy" },
 
       --- Treesitter has some post install requirements ---------------
 
@@ -158,10 +164,6 @@ require("lazy").setup({
 
       { "nvim-treesitter/nvim-treesitter-textobjects", event = "VeryLazy" },
 
-      --- Git diffs and hunks and stats -------------------------------
-
-      { "lewis6991/gitsigns.nvim", event = "VeryLazy" },
-
       --- Mason installs binary dependencies for lsp and ts -----------
 
       {
@@ -195,10 +197,7 @@ require("lazy").setup({
                fortran = { "fprettify" },
                javascript = { "prettier" },
                json = { "prettier" },
-               lua = {
-                  "stylua",
-                  opts = { args = "--search-parent-directories" },
-               },
+               lua = { "stylua", opts = { args = "--search-parent-directories" } },
                markdown = { "prettier" },
                python = { "ruff" },
                ruby = { "rubocop" },
@@ -212,21 +211,17 @@ require("lazy").setup({
             notify_no_formatters = true,
             notify_on_error = true,
          },
+         --- formatexpr! ---
          init = function(_, opts) vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
       },
 
-      --- Treesitter has some post install requirements ---------------
+      --- Resume editing where I left off -----------------------------
 
       {
          "ethanholz/nvim-lastplace",
          opts = {
             lastplace_ignore_bufftype = { "quickfix", "nofile", "help" },
-            lastplace_ignore_filetype = {
-               "gitcommit",
-               "gitrebase",
-               "svn",
-               "hgcommit",
-            },
+            lastplace_ignore_filetype = { "gitcommit", "gitrebase" },
             lastplace_open_folds = true,
          },
       },
@@ -235,8 +230,25 @@ require("lazy").setup({
       --- Treesitter has some post install requirements ---------------
       --- Treesitter has some post install requirements ---------------
 
+      --- 512 words (actually 256 for me) daily journaling ------------
+
+      {
+         "BlameTroi/512-words",
+         opts = {
+            buffer = { textwidth = 75 },
+            words = 0x100,
+            storage_directory = "~/Notepad",
+            date_prefix = "#",
+            file_extension = ".md",
+         },
+         init = function(_, opts)
+            vim.keymap.set("n", "gW", function() require("512-words").open() end)
+         end,
+      },
+
       --- And finally the end of the lazy.nvim specs. -----------------
    },
+
    -- This is the scheme to use while installing, not that which we run
    install = { colorscheme = { "github_dark_high_contrast" } },
 
@@ -245,34 +257,40 @@ require("lazy").setup({
 })
 
 --- Set remaining options --------------------------------------------
+
 -- And now a raft of options to bend vim to my will. Some are standard, some are
 -- not. While things like mini.basics and vim-sensible exist, I want to think
 -- about these as I set them. As grouping is a matter of opinion, I keep them
--- in alphabetical order.
+-- in alphabetical order at first and maybe regroup once I'm done tweaking.
 
 o.autoindent = true
 o.breakindent = true
+o.completeopt = "menuone,noselect" -- needs review
 o.confirm = true -- Confirm to save changes before exiting modified buffer
 o.cursorline = true
 o.expandtab = true
+-- TODO: check format options, maybe gjl1? don't format comments???
 o.formatoptions = "jcroqlnt" -- tcqj
 o.ignorecase = true -- Ignore case
 o.inccommand = "split" -- preview incremental substitute
+o.incsearch = true -- highlight partials
+o.infercase = true -- helps completion
 o.linebreak = true -- Wrap lines at convenient points
 o.list = true -- Show some invisibles
 o.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 o.number = true -- I like them
 o.relativenumber = true -- And I'm learning to like this
-o.ruler = true
+o.ruler = false -- status line should handle this
 o.scrolloff = 3 -- Lines of context
 o.shiftround = true -- Round indent
-o.shortmess:append("c")
+o.shortmess:append("WcC") -- reduce noise
 o.showcmd = true
 o.showmatch = true
 o.showmode = false -- status line should do this --
 o.sidescrolloff = 8 -- Columns of context
 o.signcolumn = "yes"
 o.smartcase = true
+o.smartindent = true
 o.splitbelow = true
 o.splitkeep = "screen"
 o.splitright = true
@@ -281,8 +299,9 @@ o.title = true
 o.wildmenu = true
 o.winborder = "rounded" -- others double, single, solid, shadow, none
 o.winminwidth = 5 -- Minimum window width
+o.wrap = false
 
---- Completion related, including popups -----------------------------
+-- Completion related, including popups -----------------------------
 
 vim.cmd("set completeopt+=fuzzy")
 vim.cmd("set completeopt+=noinsert")
@@ -293,8 +312,9 @@ vim.cmd("hi PmenuSel blend=0")
 o.pumheight = 10
 o.pummaxwidth = 50
 o.pumwidth = 15
+o.winblend = 10
 
---- Prose and text for humans ---------------------------------------
+-- Prose and text for humans ---------------------------------------
 
 -- While more text/writing support is needed, for now I'll enable spelling and
 -- thesaurus. Note that my dictionary additions are in my config and not under
@@ -308,9 +328,52 @@ o.thesaurus = spelldir .. "/thesaurus.txt"
 
 --- Mappings --------------------------------------------------------
 
+-- I borrow heavily from others, in particular mini.basics. Good clear code
+-- there. I prefer to keep all my mappings in one place, so there's copy and
+-- paste reuse here.
+
+-- Window navigation
+
+km.set("n", "<C-H>", "<C-w>h", { desc = "Focus on left window" })
+km.set("n", "<C-J>", "<C-w>j", { desc = "Focus on below window" })
+km.set("n", "<C-K>", "<C-w>k", { desc = "Focus on above window" })
+km.set("n", "<C-L>", "<C-w>l", { desc = "Focus on right window" })
+
+-- Window resize (respecting `v:count`)
+km.set(
+   "n",
+   "<C-Left>",
+   '"<Cmd>vertical resize -" . v:count1 . "<CR>"',
+   { expr = true, replace_keycodes = false, desc = "Decrease window width" }
+)
+km.set(
+   "n",
+   "<C-Down>",
+   '"<Cmd>resize -"          . v:count1 . "<CR>"',
+   { expr = true, replace_keycodes = false, desc = "Decrease window height" }
+)
+km.set(
+   "n",
+   "<C-Up>",
+   '"<Cmd>resize +"          . v:count1 . "<CR>"',
+   { expr = true, replace_keycodes = false, desc = "Increase window height" }
+)
+km.set(
+   "n",
+   "<C-Right>",
+   '"<Cmd>vertical resize +" . v:count1 . "<CR>"',
+   { expr = true, replace_keycodes = false, desc = "Increase window width" }
+)
+
 --- Intuitive line movement in a buffer -------------------------------
 
--- I do not use the "move_with_alt" setting of mini.basics, which offers
+-- Move by visible lines. Notes:
+-- - Don't map in Operator-pending mode because it severely changes behavior:
+--   like `dj` on non-wrapped line will not delete it.
+-- - Condition on `v:count == 0` to allow easier use of relative line numbers.
+km.set({ "n", "x" }, "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
+km.set({ "n", "x" }, "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true })
+
 -- <A-hjkl> as alternatives to arrows for cursor movement. I prefer to use the
 -- <A-hjkl> for moving lines in a buffer.
 
@@ -318,18 +381,22 @@ km.set("n", "<A-j>", "<cmd>execute 'move .+' . v:count1<cr>==", { desc = "Move D
 km.set("n", "<A-k>", "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = "Move Up" })
 km.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
 km.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
+km.set("v", "<A-j>", ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = "Move Down" })
+km.set("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = "Move Up" })
+
+-- Reselect latest changed/put/yanked
+
 km.set(
-   "v",
-   "<A-j>",
-   ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv",
-   { desc = "Move Down" }
+   "n",
+   "gV",
+   '"`[" . strpart(getregtype(), 0, 1) . "`]"',
+   { expr = true, replace_keycodes = false, desc = "Visually select changed text" }
 )
-km.set(
-   "v",
-   "<A-k>",
-   ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv",
-   { desc = "Move Up" }
-)
+
+-- Search inside visually highlighted text. Use `silent = false` for it to
+-- make effect immediately.
+
+km.set("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
 --- Better search next/previous mappings ------------------------------
 
@@ -358,16 +425,14 @@ km.set("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
 --- Open location list ------------------------------------------------
 
 km.set("n", "<leader>xl", function()
-   local success, err =
-      pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
+   local success, err = pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
    if not success and err then vim.notify(err, vim.log.levels.ERROR) end
 end, { desc = "Location List" })
 
 --- Open quickfix list ------------------------------------------------
 
 km.set("n", "<leader>xq", function()
-   local success, err =
-      pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
+   local success, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
    if not success and err then vim.notify(err, vim.log.levels.ERROR) end
 end, { desc = "Quickfix List" })
 
@@ -392,22 +457,22 @@ km.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 --- "Hard" mode Mappings -------------------------------------------------
 
--- Turn off arrow keys in normal mode to avoid mouse/touchpad scrolling.
+-- Turn off arrow keys in normal, input, and visual modes. The uber vimmers
+-- do this to demonstrate superiority. I do it avoid inadvertant touchpad
+-- clicks moving the cursor or changing a selection. But yeah, maybe it will
+-- make me less un-uber.
 
-km.set("n", "<left>", "")
-km.set("n", "<right>", "")
-km.set("n", "<up>", "")
-km.set("n", "<down>", "")
+km.set({ "n", "i", "v" }, "<left>", "")
+km.set({ "n", "i", "v" }, "<right>", "")
+km.set({ "n", "i", "v" }, "<up>", "")
+km.set({ "n", "i", "v" }, "<down>", "")
 
--- Turn off arrow keys for input and visual mode. Use the proper movements.
--- Spend most of your time in normal mode.
+--- Utility autocommands -------------------------------------------------
 
-km.set("i", "<left>", "")
-km.set("i", "<right>", "")
-km.set("i", "<up>", "")
-km.set("i", "<down>", "")
+local gr = vim.api.nvim_create_augroup("my-init", {})
 
-km.set("v", "<left>", "")
-km.set("v", "<right>", "")
-km.set("v", "<up>", "")
-km.set("v", "<down>", "")
+local au = function(event, pattern, callback, desc)
+   vim.api.nvim_create_autocmd(event, { group = gr, pattern = pattern, callback = callback, desc = desc })
+end
+
+au("TextYankPost", "*", function() vim.highlight.on_yank() end, "Highlight yanked tet")
