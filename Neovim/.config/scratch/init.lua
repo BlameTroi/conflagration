@@ -46,6 +46,7 @@ vim.opt.rtp:prepend(lazypath)
 
 local g = vim.g
 local o = vim.opt
+local km = vim.keymap
 
 vim.cmd("nnoremap <space> <nop>")
 g.mapleader = " "
@@ -56,7 +57,7 @@ o.background = "dark"
 g.have_nerd_font = true
 vim.schedule(function()
    -- Schedule this setting after `UiEnter` because it can increase startup-time.
-   vim.opt.clipboard = "unnamedplus"
+   o.clipboard = "unnamedplus"
 end)
 o.updatetime = 250 -- Shorten some keyboard checks.
 o.timeoutlen = 300
@@ -150,9 +151,7 @@ require("lazy").setup({
             incremental_selection = { enable = true },
             indent = { enable = true, disable = { "ruby" } },
          },
-         config = function(_, opts)
-            require("nvim-treesitter.configs").setup(opts)
-         end,
+         config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
       },
 
       -- This is paired with nvim-treesitter, see comments there.
@@ -213,12 +212,25 @@ require("lazy").setup({
             notify_no_formatters = true,
             notify_on_error = true,
          },
-         init = function(_, opts)
-            vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-         end,
+         init = function(_, opts) vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
       },
 
       --- Treesitter has some post install requirements ---------------
+
+      {
+         "ethanholz/nvim-lastplace",
+         opts = {
+            lastplace_ignore_bufftype = { "quickfix", "nofile", "help" },
+            lastplace_ignore_filetype = {
+               "gitcommit",
+               "gitrebase",
+               "svn",
+               "hgcommit",
+            },
+            lastplace_open_folds = true,
+         },
+      },
+
       --- Treesitter has some post install requirements ---------------
       --- Treesitter has some post install requirements ---------------
       --- Treesitter has some post install requirements ---------------
@@ -238,37 +250,37 @@ require("lazy").setup({
 -- about these as I set them. As grouping is a matter of opinion, I keep them
 -- in alphabetical order.
 
-vim.opt.autoindent = true
-vim.opt.breakindent = true
-vim.opt.confirm = true -- Confirm to save changes before exiting modified buffer
-vim.opt.cursorline = true
-vim.opt.expandtab = true
-vim.opt.formatoptions = "jcroqlnt" -- tcqj
-vim.opt.ignorecase = true -- Ignore case
-vim.opt.inccommand = "split" -- preview incremental substitute
-vim.opt.linebreak = true -- Wrap lines at convenient points
-vim.opt.list = true -- Show some invisibles
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-vim.opt.number = true -- I like them
-vim.opt.relativenumber = true -- And I'm learning to like this
-vim.opt.ruler = true
-vim.opt.scrolloff = 3 -- Lines of context
-vim.opt.shiftround = true -- Round indent
-vim.opt.shortmess:append("c")
-vim.opt.showcmd = true
-vim.opt.showmatch = true
-vim.opt.showmode = false -- status line should do this --
-vim.opt.sidescrolloff = 8 -- Columns of context
-vim.opt.signcolumn = "yes"
-vim.opt.smartcase = true
-vim.opt.splitbelow = true
-vim.opt.splitkeep = "screen"
-vim.opt.splitright = true
-vim.opt.syntax = "on"
-vim.opt.title = true
-vim.opt.wildmenu = true
-vim.opt.winborder = "rounded" -- others double, single, solid, shadow, none
-vim.opt.winminwidth = 5 -- Minimum window width
+o.autoindent = true
+o.breakindent = true
+o.confirm = true -- Confirm to save changes before exiting modified buffer
+o.cursorline = true
+o.expandtab = true
+o.formatoptions = "jcroqlnt" -- tcqj
+o.ignorecase = true -- Ignore case
+o.inccommand = "split" -- preview incremental substitute
+o.linebreak = true -- Wrap lines at convenient points
+o.list = true -- Show some invisibles
+o.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+o.number = true -- I like them
+o.relativenumber = true -- And I'm learning to like this
+o.ruler = true
+o.scrolloff = 3 -- Lines of context
+o.shiftround = true -- Round indent
+o.shortmess:append("c")
+o.showcmd = true
+o.showmatch = true
+o.showmode = false -- status line should do this --
+o.sidescrolloff = 8 -- Columns of context
+o.signcolumn = "yes"
+o.smartcase = true
+o.splitbelow = true
+o.splitkeep = "screen"
+o.splitright = true
+o.syntax = "on"
+o.title = true
+o.wildmenu = true
+o.winborder = "rounded" -- others double, single, solid, shadow, none
+o.winminwidth = 5 -- Minimum window width
 
 --- Completion related, including popups -----------------------------
 
@@ -288,8 +300,114 @@ o.pumwidth = 15
 -- thesaurus. Note that my dictionary additions are in my config and not under
 -- stdpath(data).
 
-vim.opt.spelllang = { "en_us" }
-vim.opt.spellsuggest = "best,10"
+o.spelllang = { "en_us" }
+o.spellsuggest = "best,10"
 local spelldir = vim.fn.stdpath("config") .. "/spell"
-vim.opt.spellfile = spelldir .. "/en.utf-8.add"
-vim.opt.thesaurus = spelldir .. "/thesaurus.txt"
+o.spellfile = spelldir .. "/en.utf-8.add"
+o.thesaurus = spelldir .. "/thesaurus.txt"
+
+--- Mappings --------------------------------------------------------
+
+--- Intuitive line movement in a buffer -------------------------------
+
+-- I do not use the "move_with_alt" setting of mini.basics, which offers
+-- <A-hjkl> as alternatives to arrows for cursor movement. I prefer to use the
+-- <A-hjkl> for moving lines in a buffer.
+
+km.set("n", "<A-j>", "<cmd>execute 'move .+' . v:count1<cr>==", { desc = "Move Down" })
+km.set("n", "<A-k>", "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = "Move Up" })
+km.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
+km.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
+km.set(
+   "v",
+   "<A-j>",
+   ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv",
+   { desc = "Move Down" }
+)
+km.set(
+   "v",
+   "<A-k>",
+   ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv",
+   { desc = "Move Up" }
+)
+
+--- Better search next/previous mappings ------------------------------
+
+-- Instead of trying to remember different keys for different search directions,
+-- n always searches next forward, N always searches previous backward.
+
+km.set("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "Next Search Result" })
+km.set("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next Search Result" })
+km.set("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next Search Result" })
+km.set("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "Prev Search Result" })
+km.set("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result" })
+km.set("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result" })
+
+--- Save file using the CUA standard key ------------------------------
+
+km.set({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
+
+--- Tell me about the word under the cursor ---------------------------
+
+-- LSP support steals K, moving it from :keywordprg to vim.lsp.buf.hover(). Use
+-- <leader>K for :keywordprg. I have to do some work to use it for more than
+-- just :man.
+
+km.set("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
+
+--- Open location list ------------------------------------------------
+
+km.set("n", "<leader>xl", function()
+   local success, err =
+      pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
+   if not success and err then vim.notify(err, vim.log.levels.ERROR) end
+end, { desc = "Location List" })
+
+--- Open quickfix list ------------------------------------------------
+
+km.set("n", "<leader>xq", function()
+   local success, err =
+      pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
+   if not success and err then vim.notify(err, vim.log.levels.ERROR) end
+end, { desc = "Quickfix List" })
+
+--- Treesitter information on item under cursor------------------------
+
+km.set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
+km.set("n", "<leader>uI", function()
+   vim.treesitter.inspect_tree()
+   vim.api.nvim_input("I")
+end, { desc = "Inspect Tree" })
+
+--- Window splits -----------------------------------------------------
+
+km.set("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
+km.set("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
+km.set("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
+
+--- Terminal Mappings -------------------------------------------------
+
+km.set("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+km.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+--- "Hard" mode Mappings -------------------------------------------------
+
+-- Turn off arrow keys in normal mode to avoid mouse/touchpad scrolling.
+
+km.set("n", "<left>", "")
+km.set("n", "<right>", "")
+km.set("n", "<up>", "")
+km.set("n", "<down>", "")
+
+-- Turn off arrow keys for input and visual mode. Use the proper movements.
+-- Spend most of your time in normal mode.
+
+km.set("i", "<left>", "")
+km.set("i", "<right>", "")
+km.set("i", "<up>", "")
+km.set("i", "<down>", "")
+
+km.set("v", "<left>", "")
+km.set("v", "<right>", "")
+km.set("v", "<up>", "")
+km.set("v", "<down>", "")
