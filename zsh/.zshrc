@@ -23,7 +23,7 @@ autoload -Uz add-zsh-hook vcs_info
 setopt prompt_subst
 add-zsh-hook precmd vcs_info
 precmd_vcs_info() { vcs_info }
-precmd_functions+=( precmd_vcs_info )
+precmd_functions+=(precmd_vcs_info)
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr ' +'
@@ -48,7 +48,7 @@ setopt PUSHD_TO_HOME
 setopt CHASE_LINKS
 setopt PUSHD_IGNORE_DUPS
 DIRSTACKSIZE=8
-setopt PUSHD_MINUS 
+setopt PUSHD_MINUS
 alias dh='dirs -v'
 
 # Completion:
@@ -138,13 +138,13 @@ alias rm="echo use path to rm if you are sure about this! or try trash"
 
 # Miscellaneous commands:
 
-alias less='less -r'                # raw control characters
+alias less='less -r' # raw control characters
 alias ls='ls -F --color=auto'
 alias l='ls -F --color=auto'
-alias ll='ls -lF --color=auto'      # long list
-alias la='ls -AF --color=auto'      # almost all (excludes . and ..)
-alias l='ls -CF --color=auto'       # list by columns, suffix type indicator
-alias lla='ls -lAF --color=auto'    # long list almost all
+alias ll='ls -lF --color=auto'   # long list
+alias la='ls -AF --color=auto'   # almost all (excludes . and ..)
+alias l='ls -CF --color=auto'    # list by columns, suffix type indicator
+alias lla='ls -lAF --color=auto' # long list almost all
 
 # I am a longtime Basic programmer:
 
@@ -152,11 +152,10 @@ alias cls='clear'
 
 # fzf should use ripgrep if available
 
-if type rg &> /dev/null 2>&1 ; then
+if type rg &>/dev/null 2>&1; then
 	export FZF_DEFAULT_COMMAND='rg --files'
 	export FZF_DEFAULT_OPTS='-m --color=bw'
 fi
-
 
 # fzf integration
 

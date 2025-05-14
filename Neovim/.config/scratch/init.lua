@@ -13,6 +13,9 @@
 -- 1) Is the config function argument of a lazy spec the right way to
 --    fire a mini plugig setup? NO: an empty opts argument will get the
 --    job done.
+-- 2) LSP and completion
+-- 3) Plugin review
+-- 4) Workspace issues for luals, finding stuff, lazydev? neodev?
 
 --- Boostrap Lazy.nvim -----------------------------------------------
 
@@ -367,11 +370,70 @@ o.thesaurus = spelldir .. "/thesaurus.txt"
 
 -- TODO: change this so it reads file names from the lsp directory and
 -- enables those.
-vim.lsp.config("*", { root_markers = ".git" })
+
+vim.lsp.config("*", { root_markers = ".git", init_options = { provideFormatter = false } })
 vim.lsp.enable({ "luals" })
 vim.lsp.enable({ "ruff" })
 vim.lsp.enable({ "bashls" })
 vim.lsp.enable({ "clangd" })
+
+--- Diagnostics and hover and the like ------------------------------
+
+-- So it's easy to just set up and work, huh? Hardly. There's a lot of
+-- indirection and worse the APIs are in flux so anything I find that might be
+-- helpful on the web is outdated. Neovim will be better for the work spent
+-- rationalizing the APIs, but it's a pain for me.
+
+-- Things are starting to work more. This next block of code enables virtual
+-- text for diagnostics. I still need to get completion figured out. That's
+-- next after some more testing of diagnostics.
+
+-- TODO: These are lifted from lunarvim and seem to work, but is this the right
+-- way to go about it?
+
+local default_diagnostic_config = {
+   signs = {
+      active = true,
+      -- values = {
+      --    { name = "DiagnosticSignError", text = lvim.icons.diagnostics.Error },
+      --    { name = "DiagnosticSignWarn", text = lvim.icons.diagnostics.Warning },
+      --    { name = "DiagnosticSignHint", text = lvim.icons.diagnostics.Hint },
+      --    { name = "DiagnosticSignInfo", text = lvim.icons.diagnostics.Information },
+      -- },
+   },
+   virtual_text = true,
+   update_in_insert = false,
+   underline = true,
+   severity_sort = true,
+   float = {
+      focusable = true,
+      style = "minimal",
+      border = "rounded",
+      source = "always",
+      header = "",
+      prefix = "",
+   },
+}
+
+vim.diagnostic.config(default_diagnostic_config)
+
+--- LSP opt in to some services ------------------------------------------
+
+vim.api.nvim_create_autocmd("LspAttach", {
+   callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      if client ~= nil then
+         -- It's not yet clear to me which I should opt in to, or rather
+         -- which need to be opted in to.
+         if client:supports_method("textDocument/completion") then
+            vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+         end
+         if client:supports_method("textDocument/inlayHint") then
+            vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+         end
+      end
+   end,
+})
 
 --- Mappings --------------------------------------------------------
 
@@ -529,4 +591,4 @@ local au = function(event, pattern, callback, desc)
    vim.api.nvim_create_autocmd(event, { group = gr, pattern = pattern, callback = callback, desc = desc })
 end
 
-au("TextYankPost", "*", function() vim.highlight.on_yank() end, "Highlight yanked tet")
+au("TextYankPost", "*", function() vim.highlight.on_yank() end, "Highlight yanked text")
