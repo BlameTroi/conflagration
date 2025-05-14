@@ -9,6 +9,11 @@
 -- of the snacks and noice as possible. One package manager should be
 -- sufficient for me to get a basic system going.
 
+-- TODO:
+-- 1) Is the config function argument of a lazy spec the right way to
+--    fire a mini plugig setup? NO: an empty opts argument will get the
+--    job done.
+
 --- Boostrap Lazy.nvim -----------------------------------------------
 
 -- This is the stock boostrap code.
@@ -101,6 +106,26 @@ require("lazy").setup({
                },
             },
          },
+      },
+
+      --- Highlights for TODO and #123456 #789abc ---------------------
+
+      {
+         "echasnovski/mini.hipatterns",
+         event = { "VeryLazy" },
+         config = function()
+            local hipatterns = require("mini.hipatterns")
+            hipatterns.setup({
+               highlighters = {
+                  fixme = { pattern = "BUG:", group = "MiniHipatternsFixme" },
+                  hack = { pattern = "HACK:", group = "MiniHipatternsHack" },
+                  todo = { pattern = "TODO:", group = "MiniHipatternsTodo" },
+                  note = { pattern = "NOTE:", group = "MiniHipatternsNote" },
+                  -- TODO: do this only for filetypes that it matters, lua, vim, css
+                  hex_color = hipatterns.gen_highlighter.hex_color(),
+               },
+            })
+         end,
       },
 
       --- Several standard zero-configuration plugins -----------------
@@ -228,7 +253,13 @@ require("lazy").setup({
 
       --- Treesitter has some post install requirements ---------------
       --- Treesitter has some post install requirements ---------------
-      --- Treesitter has some post install requirements ---------------
+
+      --- Fast motion via mini.jump* ----------------------------------
+
+      { "echasnovski/mini.jump", event = { "VeryLazy" }, opts = {} },
+      { "echasnovski/mini.jump2d", event = { "VeryLazy" }, opts = {} },
+
+      -- config = function() require("mini.jump2d")setup() end,
 
       --- 512 words (actually 256 for me) daily journaling ------------
 
