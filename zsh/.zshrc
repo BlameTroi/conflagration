@@ -192,6 +192,8 @@ alias idle='python -m idlelib'
 
 #export NVIM_APPNAME=nvim
 #export NVIM_APPNAME=lazyvim
-export NVIM_APPNAME=mininvim
+#export NVIM_APPNAME=mininvim
+#export NVIM_APPNAME=scratch
+export NVIM_APPNAME=kickstart
 
 echo neovim is $NVIM_APPNAME

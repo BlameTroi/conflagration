@@ -9,14 +9,6 @@
 -- of the snacks and noice as possible. One package manager should be
 -- sufficient for me to get a basic system going.
 
--- TODO:
--- 1) Is the config function argument of a lazy spec the right way to
---    fire a mini plugig setup? NO: an empty opts argument will get the
---    job done.
--- 2) LSP and completion
--- 3) Plugin review
--- 4) Workspace issues for luals, finding stuff, lazydev? neodev?
-
 --- Boostrap Lazy.nvim -----------------------------------------------
 
 -- This is the stock boostrap code.
@@ -376,6 +368,7 @@ vim.lsp.enable({ "luals" })
 vim.lsp.enable({ "ruff" })
 vim.lsp.enable({ "bashls" })
 vim.lsp.enable({ "clangd" })
+vim.lsp.enable({ "marksman" })
 
 --- Diagnostics and hover and the like ------------------------------
 
