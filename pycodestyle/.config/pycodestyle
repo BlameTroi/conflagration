@@ -1,0 +1,4 @@
+[pycodestyle]
+count = False
+ignore = E251,E301,E302,E303,E304,E305,E306
+statistics = True

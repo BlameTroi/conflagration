@@ -34,6 +34,7 @@ vim.o.winminwidth = 5
 vim.o.breakindent = true
 vim.o.linebreak = true
 vim.o.wrap = false
+vim.opt.formatoptions = "jcroqlnt" -- tcqj
 
 --- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 
@@ -65,7 +66,7 @@ vim.o.mouse = ""
 
 -- Schedule the setting after `UiEnter` because it can increase startup-time.
 vim.schedule(function()
-   vim.o.clipboard = "unnamedplus"
+  vim.o.clipboard = "unnamedplus"
 end)
 
 --- Save undo history.

@@ -75,7 +75,7 @@ fi
 # should follow en_US.
 
 export LANG="en_US.UTF-8"
-export LC_ALL=C
+#export LC_ALL=C
 export LC_COLLATE=C
 export LC_CTYPE=C
 export LC_MESSAGES="en_US.UTF-8"
