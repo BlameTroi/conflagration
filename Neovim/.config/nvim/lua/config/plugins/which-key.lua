@@ -7,9 +7,12 @@ return {
   event = "VimEnter",
   opts = {
 
+    preset = "helix",
+    win = { no_overlap = "false" },
+    -- win = { border = "single" },
     -- delay between pressing a key and opening which-key (milliseconds)
     -- this setting is independent of vim.o.timeoutlen
-    delay = 300,
+    delay = 400,
     icons = {
       -- set icon mappings to true if you have a Nerd Font
       mappings = vim.g.have_nerd_font,

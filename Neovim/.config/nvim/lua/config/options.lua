@@ -9,13 +9,17 @@
 vim.g.have_nerd_font = true
 vim.o.background = "dark"
 vim.o.number = true
-vim.o.relativenumber = true
+vim.o.relativenumber = false
 vim.o.showmode = false
 vim.o.signcolumn = "yes"
 vim.o.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.o.cursorline = true
 vim.o.scrolloff = 3
+
+-- This may or may not be advisable.
+
+vim.opt.shortmess:append("c")
 
 --- Popup and floating behavior and appearance.
 
@@ -50,7 +54,7 @@ vim.o.infercase = true
 
 -- While more text/writing support is needed, for now I'll enable spelling and
 -- thesaurus. Note that my dictionary additions are in my config and not under
--- stdpath(data).
+-- stdpath(data). NOTE: which-key will intercept spelling z=.
 
 vim.opt.spelllang = { "en_us" }
 vim.o.spellsuggest = "best,10"
