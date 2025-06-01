@@ -4,8 +4,21 @@
 
 -- And I finally learned the difference between vim.o and vim.opt.
 
---- General appearance.
+--- Editorconfig.
+-- Is more trouble than it's worth. The documentation says to set
+-- g.editorconfig to false, but that isn't working. Scanning through
+-- other configs I found EditorConfig_disable. That works at the
+-- buffer lavel and hopefully at the global level.
+vim.g.editorconfig = false
+vim.g.EditorConfig_disable = true
 
+--- And therefore we will set defaults:
+vim.o.expandtab = true
+vim.o.autoindent = true
+vim.o.tabstop = 3
+vim.o.shiftwidth = 3
+
+--- General appearance.
 vim.g.have_nerd_font = true
 vim.o.background = "dark"
 vim.o.number = true
@@ -97,3 +110,7 @@ vim.o.inccommand = "split"
 --- Don't accidently lose changes.
 
 vim.o.confirm = true
+
+--- Filetype tweaks.
+
+vim.cmd([[let filetype_bas = "qb64"]])

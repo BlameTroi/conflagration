@@ -89,6 +89,17 @@ export GUILE_LOAD_PATH="/opt/homebrew/share/guile/site/3.0"
 export GUILE_LOAD_COMPILED_PATH="/opt/homebrew/lib/guile/3.0/site-ccache"
 export GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
 
+# PureBasic paths -- the instructions in Install.txt are "wrong" in
+# describing the app bundle structure. I believe that they mean the
+# resources directory instead of the top level of the app. The IDE
+# executable is in ../MacOS from this.
+#
+# https://www.purebasic.fr/english/viewtopic.php?p=558520&hilit=command+line+compiler#p558520
+#
+# The forum post "what is the path of PUREBASIC_HOME" seems to agree with
+# this.
+export PUREBASIC_HOME="/Applications/PureBasic.app/Contents/Resources"
+
 # On Macos since Sequoia it seems that libmalloc is using a new zone
 # and that leads to warnings about failure to allocate or reserve space
 # in the new 'nano' zone.
@@ -110,12 +121,15 @@ export CMAKE_GENERATOR="Ninja Multi-Config"
 # it and not the system provided versions. This should be safe because any
 # system processes won't have my path extensions.
 
+# See back by setting PUREBASIC_HOME for explanation of path to compilers.
+
 typeset -U path PATH
 path=(${HOME}/.local/bin \
     /opt/homebrew/opt \
     /opt/homebrew/opt/node@20/bin \
     /opt/homebrew/opt/ruby/bin \
     /opt/homebrew/lib/ruby/gems/3.4.0/bin \
+    /Applications/PureBasic.app/Contents/Resources/compilers \
     $path[@])
 export PATH
 
@@ -129,9 +143,9 @@ export LDFLAGS="-L/opt/homebrew/opt/node@20/lib $LDFLAGS"
 export CPPFLAGS="-I/opt/homebrew/opt/node@20/include $CPPFLAGS"
 
 # `readline' is needed for Chicken Ccheme's `breadline' egg.
-# For compilers to find readline you may need to set:
-export LDFLAGS="-L/opt/homebrew/Cellar/readline/8.2.13/lib $LDFLAGS"
-export CPPFLAGS="-I/opt/homebrew/Cellar/readline/8.2.13/include $CPPFLAGS"
+# # For compilers to find readline you may need to set:
+# export LDFLAGS="-L/opt/homebrew/Cellar/readline/8.2.13/lib $LDFLAGS"
+# export CPPFLAGS="-I/opt/homebrew/Cellar/readline/8.2.13/include $CPPFLAGS"
 
 # For pkg-config to find readline you may need to set:
-export PKG_CONFIG_PATH="/opt/homebrew/Cellar/readline/8.2.13/lib/pkgconfig"
+# export PKG_CONFIG_PATH="/opt/homebrew/Cellar/readline/8.2.13/lib/pkgconfig"

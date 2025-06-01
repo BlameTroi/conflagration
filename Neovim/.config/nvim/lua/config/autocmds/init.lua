@@ -4,3 +4,4 @@
 -- add them here.
 
 require("config.autocmds.hiyank")
+require("config.autocmds.qb64")

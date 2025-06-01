@@ -23,6 +23,8 @@ vim.cmd("vnoremap <space> <nop>")
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.g.editorconfig = false
+
 -- And this is pretty straight forward. Bootstrap lazy.nvim and then fire things
 -- up. The following grouping seems reasonable to me.
 

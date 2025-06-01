@@ -21,7 +21,7 @@ else
       "jayp0521/mason-null-ls.nvim",
     },
 
-    config = function()
+    config = function ()
       local null_ls = require("null-ls")
       local formatting = null_ls.builtins.formatting -- to setup formatters
       local diagnostics = null_ls.builtins.diagnostics -- to setup linters
@@ -35,14 +35,18 @@ else
           "eslint_d", -- ts/js linter
           "shfmt",
           "yapf",
+          "markdownlint",
           --        "ruff",
         },
         -- auto-install configured formatters & linters (with null-ls)
         automatic_installation = true,
       })
-
       local sources = {
         diagnostics.checkmake,
+        -- MD013 is line length, I have switched to one long line of text per
+        -- paragraph.
+        -- "--" is required to end the disable list.
+        diagnostics.markdownlint.with({ args = { "--disable", "MD013", "--" } }),
         formatting.prettier.with({ filetypes = { "html", "json", "yaml", "markdown" } }),
         formatting.stylua,
         formatting.shfmt.with({ args = { "-i", "4" } }),
@@ -56,13 +60,13 @@ else
         -- debug = true, -- Enable debug mode. Inspect logs with :NullLsLog.
         sources = sources,
         -- you can reuse a shared lspconfig on_attach callback here
-        on_attach = function(client, bufnr)
+        on_attach = function (client, bufnr)
           if client.supports_method("textDocument/formatting") then
             vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
             vim.api.nvim_create_autocmd("BufWritePre", {
               group = augroup,
               buffer = bufnr,
-              callback = function()
+              callback = function ()
                 vim.lsp.buf.format({ async = false })
               end,
             })

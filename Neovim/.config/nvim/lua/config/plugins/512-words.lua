@@ -5,7 +5,7 @@
 return {
   "BlameTroi/512-words",
   opts = {
-    buffer = { textwidth = 75 },
+    -- buffer = { textwidth = 75 },
     words = 0x100,
     storage_directory = "~/Notepad",
     date_prefix = "#",
@@ -15,6 +15,7 @@ return {
     -- This doesn't appear to conflict with visual mode gw.
     vim.keymap.set("n", "gw", function()
       require("512-words").open()
+      vim.o.showbreak = ""
     end)
   end,
 }
