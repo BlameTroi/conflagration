@@ -100,6 +100,7 @@ setopt PROMPT_PERCENT
 # none at the moment:
 
 # Prefer Neovim if available:
+# NOTE: I'm doing compatability testing, so Vim is Vim and NVim is Neovim.
 
 # For most of my work I want the old ASCII C behavior, but visuals and moving
 # data into and out of vim need to deal with UTF-8. I think I've got the LANG
@@ -112,21 +113,26 @@ setopt PROMPT_PERCENT
 # vimdiff for 'real' vim checks hte command name $0 to determine if a session
 # should diff or edit.
 
-if type nvim >/dev/null 2>&1; then
+# Switching to vim9 by default for a while while I do some vim9script work.
+# if type nvim >/dev/null 2>&1; then
 	# alias nvim='LC_ALL=$LANG nvim'
-	alias vim='nvim'
-	alias vimdiff='nvim -d'
-	alias view='nvim -R'
-	export VISUAL="nvim"
-	export EDITOR="nvim"
-	export MANPAGER='nvim +Man!'
-else
+	# alias vim='nvim'
+	# alias vimdiff='nvim -d'
+	# alias view='nvim -R'
+	# export VISUAL="nvim"
+	# export EDITOR="nvim"
+	export MANPAGER=vimpager
+	export PAGER=vimpager
+alias less=$PAGER
+alias zless=$PAGER
+# else
 	# alias vim='LC_ALL $LANG vim'
 	# alias vimdiff='LC_ALL $LANG vimdiff'
 	export VISUAL="vim"
 	export EDITOR="vim"
-fi
+# fi
 
+alias vim9='/opt/homebrew/bin/vim'
 # Human readable figures:
 
 alias df='df -h'
@@ -138,7 +144,7 @@ alias rm="echo use path to rm if you are sure about this! or try trash"
 
 # Miscellaneous commands:
 
-alias less='less -r' # raw control characters
+# alias less='less -r' # raw control characters
 alias ls='ls -F --color=auto'
 alias l='ls -F --color=auto'
 alias ll='ls -lF --color=auto'   # long list
@@ -197,3 +203,6 @@ export NVIM_APPNAME=nvim
 #export NVIM_APPNAME=kickstart
 
 echo neovim is $NVIM_APPNAME
+
+# Supporting vi mode in zsh, i don't know how well this works yet.
+source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh

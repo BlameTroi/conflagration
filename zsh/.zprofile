@@ -149,3 +149,6 @@ export CPPFLAGS="-I/opt/homebrew/opt/node@20/include $CPPFLAGS"
 
 # For pkg-config to find readline you may need to set:
 # export PKG_CONFIG_PATH="/opt/homebrew/Cellar/readline/8.2.13/lib/pkgconfig"
+
+# I'm using OpenJDK.
+export JAVA_HOME=$(/usr/libexec/java_home)

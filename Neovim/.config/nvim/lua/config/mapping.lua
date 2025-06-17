@@ -63,9 +63,9 @@ vim.keymap.set("n", "<C-Right>", '"<Cmd>vertical resize +" . v:count1 . "<CR>"',
 -- Ask Treesitter about the current node.
 
 vim.keymap.set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
-vim.keymap.set("n", "<leader>uI", function()
-  vim.treesitter.inspect_tree()
-  vim.api.nvim_input("I")
+vim.keymap.set("n", "<leader>uI", function ()
+   vim.treesitter.inspect_tree()
+   vim.api.nvim_input("I")
 end, { desc = "Inspect Tree" })
 
 -- LSP support steals K, moving it from :keywordprg to vim.lsp.buf.hover(). Use
@@ -77,3 +77,10 @@ vim.keymap.set("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
 
 vim.keymap.set("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+vim.cmd([[nnoremap <F10> :call SyntaxAttr()<CR>]])
+-- vim.cmd([[
+-- nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+-- \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+-- \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+-- ]])

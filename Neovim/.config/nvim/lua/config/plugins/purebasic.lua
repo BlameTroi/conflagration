@@ -1,3 +1,3 @@
 return {
-  { dir = "/Users/troi/Projects/Neovim/vim-purebasic/" },
+  { dir = "/Users/troi/Projects/Neovim/PureBasic-ftplugin-vim/" },
 }
