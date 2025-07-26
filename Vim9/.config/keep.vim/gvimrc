@@ -1,0 +1,11 @@
+" ------------------------------------------------------------------------------
+" Fonts for MacViim.
+
+set guifont=JetBrainsMono\ Nerd\ Font\ Propo:h15
+"set guicursor= taking default
+" not on mac--set guiligatures=!\"#$%&()*+-./:<=>?@[]^_{\|~
+set macligatures
+"set noguipty only if problems with terminal ptty commands
+set guioptions=gTr
+
+" Todo: add mouse settings

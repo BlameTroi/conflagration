@@ -1,0 +1,25 @@
+" ------------------------------------------------------------------------------
+" Fonts for MacViim.
+
+set guifont=JetBrainsMono\ Nerd\ Font\ Propo:h15
+"set guicursor= taking default
+" not on mac--set guiligatures=!\"#$%&()*+-./:<=>?@[]^_{\|~
+set macligatures
+"set noguipty only if problems with terminal ptty commands
+set guioptions=gTr
+
+" Todo: add mouse settings
+set mousemodel=popup
+set mouse=
+set nomousefocus
+
+" Just say no to touchpad scrolling
+map <ScrollWheelDown> <Nop>
+map! <ScrollWheelDown> <Nop>
+map <ScrollWheelUp> <Nop>
+map! <ScrollWheelUp> <Nop>
+map <ScrollWheelLeft> <Nop>
+map! <ScrollWheelLeft> <Nop>
+map <ScrollWheelRight> <Nop>
+map! <ScrollWheelRight> <Nop>
+

@@ -13,6 +13,22 @@ let maplocalleader=","
 nnoremap <space> <leader>
 
 " ------------------------------------------------------------------------------
+" Set switches for MacVim options. Do this in the user vimrc, which is
+" sourced before the system gvimrc.
+if has('gui_macvim')
+   " This avoids the system gvimrc load of the MacVim color scheme.
+   let macvim_skip_colorscheme = 1
+   " Uncomment this of you want shift movement to extend selections.
+   " let macvim_hig_shift_movement = 1
+   " There are a bunch of touchbar options but I don't have a touchbar
+   " so I won't include them here.
+   " Finally, command and alt with arrow keys do what you would usually
+   " expect in MacVim. I probably want to keep that, but if not uncomment
+   " the following.
+   " let macvim_skip_cmd_opt_movement = 1
+endif
+
+" ------------------------------------------------------------------------------
 " Terminal configuration:
 "
 " I mostly use kitty, but sometimes iTerm2. All these &t_ settings should be
@@ -21,12 +37,16 @@ nnoremap <space> <leader>
 " Per the kitty faq, these changes should improve Vim's recognition of any
 " modern terminal, so this is unguarded.
 
-" Mouse support -- no mouse
-set mouse=
-"set mouse=a
-"set ttymouse=sgr
-"set balloonevalterm
-" Styled and colored underline support
+" Settings for gui mouse are in gvrimrc
+if !has('gui_macvim')
+   " Mouse support -- no mouse
+   set mouse=
+   "set mouse=a
+   "set ttymouse=sgr
+   "set balloonevalterm
+   " Styled and colored underline support
+endif
+" Todo: should this be gated for gui?
 let &t_AU = "\e[58:5:%dm"
 let &t_8u = "\e[58:2:%lu:%lu:%lum"
 let &t_Us = "\e[4:2m"
@@ -80,8 +100,8 @@ let &t_ut=''
 " Optional Vim built-ins.
 
 packadd! matchit                  " allows jumping via %
-packadd! hlyank                   " highlight yanked text
-let g:hlyank_duration = 150
+" packadd! hlyank                   " highlight yanked text
+" let g:hlyank_duration = 150
 
 " -----------------------------------------------------------------------------
 " Additional plugins.
@@ -97,6 +117,7 @@ Plug 'junegunn/vim-plug'
 " UI colors, appearance, and behavior ----------------------------------------
 Plug 'tpope/vim-sensible'
 Plug 'ryanoasis/vim-devicons'
+Plug 'chrisbra/unicode.vim'
 Plug 'BlameTroi/vim-lucius'
 Plug 'vim-scripts/SyntaxAttr.vim'
 Plug 'farmergreg/vim-lastplace'
@@ -135,10 +156,6 @@ Plug 'girishji/easyjump.vim'
 "nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
 "nnoremap <silent> <localleader> :<c-u>WhichKey  ','<CR>
 
-" Assorted completions --------------------------------------------------------
-Plug 'girishji/vimcomplete'
-Plug 'girishji/vimsuggest'
-Plug 'chrisbra/unicode.vim'
 
 " Fuzzy finder options, fuzzyy is vim9script with rg support ------------------
 Plug 'Donaldttt/fuzzyy'
@@ -289,10 +306,10 @@ inoremap <left> ""
 inoremap <right> ""
 inoremap <up> ""
 inoremap <down> ""
-vnoremap <left> ""
-vnoremap <right> ""
-vnoremap <up> ""
-vnoremap <down> ""
+" vnoremap <left> ""
+" vnoremap <right> ""
+" vnoremap <up> ""
+" vnoremap <down> ""
 
 " Use <A-hjkl> for shifting lines in a buffer.
 nnoremap <A-j> <cmd>execute 'move .+' . v:count1<cr>=="
@@ -324,7 +341,7 @@ nnoremap <C-Up> <Cmd>resize +1<CR>
 nnoremap <C-Right> <Cmd>vertical resize +1<CR>
 
 " Turn off the lights.
-nnoremap <Esc> "<cmd>nohlsearch<CR>"
+nnoremap <Esc> <cmd>nohlsearch<CR>
 
 " Terminal helpers.
 tnoremap <C-/> <cmd>close<cr>

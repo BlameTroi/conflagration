@@ -121,10 +121,10 @@ setopt PROMPT_PERCENT
 	# alias view='nvim -R'
 	# export VISUAL="nvim"
 	# export EDITOR="nvim"
-	export MANPAGER=vimpager
-	export PAGER=vimpager
-alias less=$PAGER
-alias zless=$PAGER
+	# export MANPAGER=vimpager
+	# export PAGER=vimpager
+# alias less=$PAGER
+# alias zless=$PAGER
 # else
 	# alias vim='LC_ALL $LANG vim'
 	# alias vimdiff='LC_ALL $LANG vimdiff'
@@ -205,4 +205,4 @@ export NVIM_APPNAME=nvim
 echo neovim is $NVIM_APPNAME
 
 # Supporting vi mode in zsh, i don't know how well this works yet.
-source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+# source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
