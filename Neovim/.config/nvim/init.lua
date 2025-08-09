@@ -33,3 +33,5 @@ require("config.options")
 require("config.mapping")
 require("config.load")
 require("config.autocmds")
+
+vim.cmd("colorscheme simple-dark")

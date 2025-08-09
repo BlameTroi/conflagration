@@ -125,6 +125,7 @@ export CMAKE_GENERATOR="Ninja Multi-Config"
 
 typeset -U path PATH
 path=(${HOME}/.local/bin \
+		$(go env GOPATH)/bin \
     /opt/homebrew/opt \
     /opt/homebrew/opt/node@20/bin \
     /opt/homebrew/opt/ruby/bin \

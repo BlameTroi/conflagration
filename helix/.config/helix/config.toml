@@ -1,0 +1,77 @@
+# Working on a helix configuration that feels comfortable. I am
+# going to avoid mimicking vim or emacs.
+
+theme = "github_dark_high_contrast"
+
+# General editor settings. 
+
+[editor]
+
+# Default settings that I probably won't override in languages.
+scrolloff = 0                  # Not a setting I like.
+line-number = "absolute"       # I never understood using relative.
+mouse = false                  # Just say no.
+cursorline = true              # Eye catcher.
+auto-save = false              # I prefer to stay in control.
+text-width = 80                # For :reflow and soft wrapping.
+auto-format = false            # Handle by language.
+color-modes = true             # This means editor mode indicstor.
+popup-border = "all"           # Bling.
+editor-config = false          # So not a fan of this.
+
+# TODO: completion settings.
+# TODO: jump label alphabet, should I try homekey style?
+# TODO: end of line diagnostics. Maybe this is by language?
+
+# Typical but overrideable settings.
+rulers = [80]                  # Eye guides.
+
+# I'm used to these this triad. Remeber that only the primary cursor
+# changes shape by mode.
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+# TODO: Grok this.
+[editor.smart-tab]
+enable = false
+
+# The defaults look OK but I prefer to expose hidden files.
+[editor.file-picker]
+hidden = false
+
+# This is going to be tweaked as I learn what I want to see. The defaults
+# come close.
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control", "file-name", "file-type", "read-only-indicator", "file-modification-indicator"]
+center = ["diagnostics", "workspace-diagnostics"]
+right = ["file-encoding", "selections", "register", "separator", "position", "position-percentage"]
+
+# Using soft-wrap requires that it be explicitly mentioned in the helix
+# config. This can be overridden on a per language basis or explicitly
+# :toggle'd.
+
+[editor.soft-wrap]
+enable = false              # have to configure here to override in languages
+max-wrap = 25               # increase value to reduce forced mid-word wrapping
+max-indent-retain = 30
+wrap-indicator = ""         # set wrap-indicator to "" to hide it
+wrap-at-text-width = false  # same as enabled
+
+# Most of the LSP defaults are fine.
+
+[editor.lsp]
+display-inlay-hints = true      # I might end up removing these.
+inlay-hints-length-limit  = 35  # And I'm not sure about length.
+
+# Uses space like vim uses leader. Let's try to keep this small.
+
+[keys.normal.space]
+# Custom command for word count. This was found online and it doesn't work
+# right.
+A-w = "@<A-|>tee /tmp/helix-wc.file<ret>:sh cat /tmp/test.file | wc -w<ret>"
+
+# An example of a toggle command.
+# x = ":toggle whitespace.render all none"

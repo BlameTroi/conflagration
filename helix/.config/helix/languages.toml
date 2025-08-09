@@ -1,0 +1,93 @@
+# languages.toml -- helix language suppport configuration
+
+# toml configuration format:
+#
+# The lsp options appear to be taplo and tombi. Tombi appears to be well
+# supported. I had some weird problems trying to get taplo to work with
+# Neovim.
+[[language]]
+name = "toml"
+language-servers = ["tombi"]
+
+# The Go Language:
+#
+# There are several formatters available but gopls will use gofumpt if
+# auto-format is on.
+[[language]]
+name = "go"
+auto-format = true
+language-servers = ["gopls"]
+
+# Markdown (gfm) for text and prose:
+#
+# I have tried several lsp combinations for grammar, spelling, and preview,
+# but I haven't found a perfect solution. I'm hoping Harper will fit my
+# workflow and allow for a dictionary in a file. It seems that ltex-ls and
+# variants don't do this, at least not for non-vscode configurations.
+#
+# - Marksman is the standard LSP
+# - harper-ls is a grammar and spelling LSP. 
+# - mpls is a markdown preview server that supports Github Flavored Markdown.
+# - replacing prettier with dprint.
+[[language]]
+name = "markdown"
+file-types = [
+  "md",
+  "markdown",
+  "markdn",
+  "mdown",
+  "mdtxt",
+  "mkd",
+  "mdtext",
+  "txt",
+  "text",
+]
+soft-wrap.enable = true
+soft-wrap.wrap-at-text-width = false
+auto-format = true
+formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
+language-servers = ["marksman", "mpls", "harper-ls"]
+
+# Language Server Settings.
+#
+# Tombi tells me it is not an accepted practice to group all of the
+# entries relating to an entity together. Instead it wants the [[langauge]]
+# definitions grouped and then the [language-server.*] definitions.
+
+# Go has a "one true way" approach so there isn't much configuration
+# needed.
+[language-server.gopls.config]
+gofumpt = true
+
+# Only fire off the preview on demand.
+[language-server.mpls]
+command = "mpls"
+args = ["--no-auto", "--dark-mode", "--enable-emoji", "--browser", "Safari"]
+
+# Harper uses the usual stdin/stdout method of parsing. The more nitty-gritty
+# settings under .config.harper-ls are copied from a sample I found with only
+# a change to the dictionary location (so far).
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
+[language-server.harper-ls.config.harper-ls]
+userDictPath = "~/Notepad/harper-user-dictionary"
+fileDictPath = ""
+diagnosticSeverity = "warning"
+isolateEnglish = false
+dialect = "American"
+
+[language-server.harper-ls.config.harper-ls.linters]
+SpellCheck = true
+SpelledNumbers = false
+AnA = true
+SentenceCapitalization = true
+UnclosedQuotes = true
+WrongQuotes = false
+LongSentences = true
+RepeatedWords = true
+Spaces = true
+Matcher = true
+CorrectNumberSuffix = true
+

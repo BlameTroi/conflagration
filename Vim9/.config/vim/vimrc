@@ -202,6 +202,7 @@ Plug '~/Projects/Neovim/PureBasic-ftplugin-vim9/'
 Plug '~/Projects/Neovim/Amber-theme-preview/'
 Plug '~/Projects/Neovim/vim-open-recent/'
 
+Plug 'tek256/simple-dark'
 call plug#end()
 
 " ------------------------------------------------------------------------------
@@ -209,7 +210,8 @@ call plug#end()
 
 set background=dark
 set termguicolors
-colorscheme retrobox
+colorscheme simple-dark
+"colorscheme retrobox
 "colorscheme slate
 "colorscheme lucius
 "LuciusBlackHighContrast
@@ -412,3 +414,8 @@ augroup END
 "  ]])
 "   end,
 " })
+
+" ----------------------------------------------------------------------------
+" fzf integration
+
+set rtp+=/opt/homebrew/opt/fzf

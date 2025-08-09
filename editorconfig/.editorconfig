@@ -56,8 +56,6 @@ root = true
 
 [*]
 indent_style = tab
-# indent_size = 8
-# tab_width = 8
 trim_trailing_whitespace = false
 max_line_length = unset
 
@@ -76,6 +74,17 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+# --------------------------------------------------------------------
+# Spaces for indenting is wrong. Unfortunately I have to pop in and
+# out of the QB64pe IDE and it wants 4 spaces. Sigh.
+
+[*.{bas,bi,bm,BAS,BI,BM}]
+charset = utf-8
+indent_style = spaces
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
 
 # --------------------------------------------------------------------
 # Several configuration file formats follow these conventions.
@@ -154,6 +163,7 @@ trim_trailing_whitespace = false
 [*.{sh,zsh,bat}]
 indent_style = tab
 insert_final_newline = true
+
 [*.vim]
 end_of_line = lf
 charset = utf-8
@@ -190,11 +200,11 @@ insert_final_newline = true
 # lot of "extended" properties. Today I expect most of these aren't supported,
 # but it seems that some tools can see them and use them.
 #
-# for unspecified files. I do wish end_of_line could be "file"
+# For unspecified files. I do wish end_of_line could be "file"
 # but that makes too much sense. The intent here is to not change a file
 # and for tabs to be tabs.
 #
-# *** as we can't be sure of support for these extensions, this section should
+# *** As we can't be sure of support for these extensions, this section should
 # be last in the .editorconfig. ***
 
 [*.lua]

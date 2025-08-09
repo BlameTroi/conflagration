@@ -1,0 +1,194 @@
+# Author: typable <contact@typable.dev>
+
+################################################################################
+# Syntax highlighting                                                          #
+################################################################################
+
+"attribute" = { fg = "fg3" }
+"type" = { fg = "fg0" }
+"type.builtin" = { fg = "fg0" }
+"type.parameter" = { fg = "fg0" }
+# "type.enum" = {}
+"type.enum.variant" = { fg = "fg0" }
+"constructor" = { fg = "swirly" }
+"constant" = { fg = "fg0" }
+"constant.builtin" = { fg = "copper" }
+"constant.builtin.boolean" = { fg = "copper" }
+"constant.character" = { fg = "green" }
+"constant.character.escape" = { fg = "fg0" }
+"constant.numeric" = { fg = "copper" }
+"constant.numeric.integer" = { fg = "coper" }
+"constant.numeric.float" = { fg = "copper" }
+"string" = { fg = "green" }
+# "string.regex" = {}
+# "string.special" = {}
+# "string.special.path" = {}
+# "string.special.url" = {}
+# "string.special.symbol" = {}
+"comment" = { fg = "fg4" }
+"comment.line" = { fg = "fg4" }
+"comment.block" = { fg = "fg4" }
+"comment.block.documentation" = { fg = "fg4" }
+"variable" = { fg = "fg2" }
+"variable.builtin" = { fg = "fg2" }
+"variable.parameter" = { fg = "fg2" }
+"variable.other" = { fg = "fg2" }
+"variable.other.member" = { fg = "fg2" }
+"label" = { fg = "fg0" }
+# "punctuation" = {}
+# "punctuation.delimiter" = {}
+# "punctuation.bracket" = {}
+"punctuation.special" = { fg = "fg1" }
+"keyword" = { fg = "yellow" }
+"keyword.control" = { fg = "yellow" }
+"keyword.control.conditional" = { fg = "yellow" }
+"keyword.control.repeat" = { fg = "yellow" }
+"keyword.control.import" = { fg = "yellow" }
+"keyword.control.return" = { fg = "yellow" }
+"keyword.control.exception" = { fg = "yellow" }
+"keyword.operator" = { fg = "yellow" }
+"keyword.directive" = { fg = "fg3" }
+"keyword.function" = { fg = "yellow" }
+"keyword.storage" = { fg = "yellow" }
+"keyword.storage.type" = { fg = "yellow" }
+"keyword.storage.modifier" = { fg = "yellow" }
+"operator" = { fg = "fg2" }
+"function" = { fg = "swirly" }
+"function.builtin" = { fg = "swirly" }
+"function.method" = { fg = "swirly" }
+"function.macro" = { fg = "swirly" }
+"function.special" = { fg = "swirly" }
+"tag" = { fg = "copper" }
+"tag.builtin" = { fg = "copper" }
+"namespace" = { fg = "fg3" }
+"special" = { fg = "yellow" }
+# "markup" = {}
+"markup.heading" = { fg = "fg0" }
+"markup.heading.marker" = { fg = "yellow" }
+# "markup.heading.1" = {}
+# "markup.heading.2" = {}
+# "markup.heading.3" = {}
+# "markup.heading.4" = {}
+# "markup.heading.5" = {}
+# "markup.heading.6" = {}
+"markup.list" = { fg = "fg0" }
+# "markup.list.unnumbered" = {}
+# "markup.list.numbered" = {}
+"markup.list.checked" = { fg = "fg0" }
+"markup.list.unchecked" = { fg = "yellow" }
+"markup.bold" = { modifiers = ["bold"] }
+"markup.italic" = { modifiers = ["italic"] }
+"markup.strikethrough" = { modifiers = ["crossed_out"] }
+# "markup.link" = {}
+"markup.link.url" = { fg = "green" }
+# "markup.link.label" = {}
+# "markup.link.text" = {}
+"markup.quote" = { fg = "fg4" }
+"markup.raw" = { fg = "green" }
+# "markup.raw.inline" = {}
+# "markup.raw.block" = {}
+# "diff" = {}
+# "diff.plus" = {}
+"diff.plus.gutter" = { fg = "green" }
+# "diff.minus" = {}
+"diff.minus.gutter" = { fg = "alert" }
+# "diff.delta" = {}
+# "diff.delta.moved" = {}
+"diff.delta.gutter" = { fg = "ocean" }
+
+################################################################################
+# Interface                                                                    #
+################################################################################
+
+# "markup.normal.completion" = {}
+# "markup.normal.hover" = {}
+# "markup.heading.completion" = {}
+# "markup.heading.hover" = {}
+# "markup.raw.inline.completion" = {}
+# "markup.raw.inline.hover" = {}
+"ui.background" = { bg = "bg0" }
+"ui.background.separator" = { fg = "fg3" }
+"ui.cursor" = { fg = "fg2", modifiers = ["reversed"] }
+"ui.cursor.normal" = { fg = "fg2", modifiers = ["reversed"] }
+# "ui.cursor.insert" = {}
+# "ui.cursor.select" = {}
+# "ui.cursor.match" = {}
+"ui.cursor.primary" = { fg = "yellow", modifiers = ["reversed"] }
+"ui.cursor.primary.normal" = { fg = "yellow", modifiers = ["reversed"] }
+# "ui.cursor.primary.insert" = {}
+# "ui.cursor.primary.select" = {}
+"ui.debug.breakpoint" = { fg = "fg0" }
+"ui.debug.active" = { fg = "yellow" }
+"ui.gutter" = { bg = "bg0" }
+# "ui.gutter.selected" = {}
+"ui.highlight.frameline" = { bg = "bg3" }
+"ui.linenr" = { fg = "fg4" }
+"ui.linenr.selected" = { fg = "yellow" }
+"ui.statusline" = { fg = "fg3", bg = "bg2" }
+"ui.statusline.inactive" = { fg = "fg4", bg = "bg1" }
+# "ui.statusline.normal" = {}
+# "ui.statusline.insert" = {}
+# "ui.statusline.select" = {}
+# "ui.statusline.separator" = {}
+# "ui.bufferline" = {}
+# "ui.bufferline.active" = {}
+# "ui.bufferline.background" = {}
+"ui.popup" = { bg = "bg2" }
+"ui.popup.info" = { fg = "fg3", bg = "bg2" }
+"ui.window" = { fg = "fg4" }
+"ui.help" = { fg = "fg3", bg = "bg2" }
+"ui.text" = { fg = "fg3" }
+"ui.text.focus" = { fg = "fg0", bg = "bg3" }
+"ui.text.inactive" = { fg = "fg4" }
+"ui.text.info" = { fg = "fg1" }
+"ui.virtual.ruler" = { bg = "bg1" }
+"ui.virtual.whitespace" = { fg = "fg4" }
+"ui.virtual.indent-guide" = { fg = "bg3" }
+"ui.virtual.inlay-hint" = { fg = "fg4" }
+"ui.virtual.inlay-hint.parameter" = { fg = "fg4" }
+"ui.virtual.inlay-hint.type" = { fg = "fg4" }
+"ui.virtual.wrap" = { fg = "fg4" }
+"ui.virtual.jump-label" = { fg = "fg4" }
+"ui.menu" = { fg = "fg3", bg = "bg1" }
+"ui.menu.selected" = { fg = "fg2", modifiers = ["reversed"] }
+"ui.menu.scroll" = { fg = "fg2", bg = "bg2" }
+"ui.selection" = { bg = "bg2" }
+"ui.selection.primary" = { bg = "bg4" }
+"ui.highlight" = { bg = "bg2" }
+"ui.cursorline.primary" = { bg = "bg2" }
+"ui.cursorline.secondary" = { bg = "bg1" }
+"ui.cursorcolumn.primary" = { bg = "bg2" }
+"ui.cursorcolumn.secondary" = { bg = "bg1" }
+"warning" = { fg = "yellow" }
+"error" = { fg = "alert" }
+"info" = { fg = "fg1" }
+"hint" = { fg = "fg3" }
+"diagnostic" = { modifiers = ["underlined"] }
+# "diagnostic.hint" = {}
+# "diagnostic.info" = {}
+# "diagnostic.warning" = {}
+# "diagnostic.error" = {}
+# "diagnostic.unnecessary" = {}
+# "diagnostic.deprecated" = {}
+
+################################################################################
+# Palette                                                                      #
+################################################################################
+
+[palette]
+bg0 = "#000000"
+bg1 = "#141414"
+bg2 = "#222222"
+bg3 = "#333333"
+bg4 = "#383838"
+fg0 = "#ffffff"
+fg1 = "#e8e8e8"
+fg2 = "#bbbbbb"
+fg3 = "#b8b8b8"
+fg4 = "#777777"
+yellow = "#ffdd47"
+green = "#7cb654"
+copper = "#dc9656"
+swirly = "#a5afc0"
+alert = "#e03529"
+ocean = "#6366f1"
