@@ -10,11 +10,31 @@ The command is:
 stow --(re)stow --target=$HOME emacs vim ...
 ```
 
+Sometimes `--adopt` may be needed when copying over existing files that you have set up in Conflagration.
+
 This will either create or correct symbolic links from where applications expect to find configuration files to the actual files here.
 
 If there a file already exists in the target location, Stow will not overwrite it. You would need to manually delete the duplicate file (or merge it) and issue the `stow` command again.
 
+## Missing or To Do
+
+The following are in `.config` but I am not managing them yet.
+
+- `dlv`
+- `gh`
+- `irb`
+- `lazarus`
+- `lazygit`
+- `marksman`
+- `pycodestyle`
+- `uv`
+- `yapf`
+
+There are also old backups and transient configurations for things I use but only take the defaults for (`fish`, `htop`, `github-copilot`).
+
 ## Packages to Stow
+
+These are the packages I currently stow. Vim/Neovim/Emacs are not in use but still reside in the Conflagration repository.
 
 - `clang`
 - `clangd`
