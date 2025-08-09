@@ -1,0 +1,13 @@
+- stow --(re)stow --target=$HOME emacs vim ...
+- `clang`
+- `clangd`
+- `clang-format`
+- `kitty`
+- `astyle`
+- `git`
+- `bash`
+- `zsh`
+- `editorconfig`
+- `harper-ls`
+- `helix`
+- `dprint`
