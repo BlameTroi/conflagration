@@ -69,9 +69,22 @@ inlay-hints-length-limit  = 35  # And I'm not sure about length.
 # Uses space like vim uses leader. Let's try to keep this small.
 
 [keys.normal.space]
-# Custom command for word count. This was found online and it doesn't work
-# right.
-A-w = "@<A-|>tee /tmp/helix-wc.file<ret>:sh cat /tmp/test.file | wc -w<ret>"
+
+# Custom command for count of words in a selection. So, to get the word
+# count of the whole file:
+#
+# %<space><A-w>
+#
+# Sources are:
+# 
+# https://github.com/helix-editor/helix/discussions/10211
+# which points to
+# https://www.reddit.com/r/HelixEditor/comments/1h1w8dh/pipe_to_shell_command_and_get_output_in_popup/
+# which explains how the result is put in a popup.
+#
+# TODO: avoid leaving a copy of the selection in /tmp, security.
+
+A-w = "@<A-|>tee /tmp/helix-wc.file<ret>:sh cat /tmp/helix-wc.file | wc -w<ret>"
 
 # An example of a toggle command.
 # x = ":toggle whitespace.render all none"
