@@ -164,7 +164,7 @@ Makefile
 *.pch
 *.dylib
 *.mod
-*.smod
+!go.mod
 *.lai
 *.la
 *.a
@@ -560,3 +560,8 @@ FodyWeavers.xsd
 *.msm
 *.msp
 *.sln.iml
+
+# yeah, that was overkill. I'll clean it up someday. In the meantime, we need
+# to allow some go artifacts that *.mod filters out above.
+!go.mod
+!go.sum

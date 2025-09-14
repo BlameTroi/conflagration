@@ -85,9 +85,9 @@ export LC_TIME="en_US.UTF-8"
 
 # Guile paths
 
-export GUILE_LOAD_PATH="/opt/homebrew/share/guile/site/3.0"
-export GUILE_LOAD_COMPILED_PATH="/opt/homebrew/lib/guile/3.0/site-ccache"
-export GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
+#export GUILE_LOAD_PATH="/opt/homebrew/share/guile/site/3.0"
+#export GUILE_LOAD_COMPILED_PATH="/opt/homebrew/lib/guile/3.0/site-ccache"
+#export GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
 
 # PureBasic paths -- the instructions in Install.txt are "wrong" in
 # describing the app bundle structure. I believe that they mean the
@@ -127,9 +127,10 @@ typeset -U path PATH
 path=(${HOME}/.local/bin \
 		$(go env GOPATH)/bin \
     /opt/homebrew/opt \
-    /opt/homebrew/opt/node@20/bin \
+#    /opt/homebrew/opt/node@20/bin \
     /opt/homebrew/opt/ruby/bin \
     /opt/homebrew/lib/ruby/gems/3.4.0/bin \
+    /opt/homebrew/opt/openjdk/bin \
     /Applications/PureBasic.app/Contents/Resources/compilers \
     $path[@])
 export PATH
@@ -140,8 +141,8 @@ export PATH
 #  export PKG_CONFIG_PATH="/opt/homebrew/opt/ruby/lib/pkgconfig"
 
 # if you need compilers to find node ...
-export LDFLAGS="-L/opt/homebrew/opt/node@20/lib $LDFLAGS"
-export CPPFLAGS="-I/opt/homebrew/opt/node@20/include $CPPFLAGS"
+#export LDFLAGS="-L/opt/homebrew/opt/node@20/lib $LDFLAGS"
+#export CPPFLAGS="-I/opt/homebrew/opt/node@20/include $CPPFLAGS"
 
 # `readline' is needed for Chicken Ccheme's `breadline' egg.
 # # For compilers to find readline you may need to set:
@@ -153,3 +154,7 @@ export CPPFLAGS="-I/opt/homebrew/opt/node@20/include $CPPFLAGS"
 
 # I'm using OpenJDK.
 export JAVA_HOME=$(/usr/libexec/java_home)
+# echo 'export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"' >> ~/.zshrc
+
+# For compilers to find openjdk you may need to set:
+#  export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"

@@ -7,6 +7,7 @@
 # Neovim.
 [[language]]
 name = "toml"
+auto-format = true
 language-servers = ["tombi"]
 
 # The Go Language:
@@ -26,7 +27,7 @@ language-servers = ["gopls"]
 # variants don't do this, at least not for non-vscode configurations.
 #
 # - Marksman is the standard LSP
-# - harper-ls is a grammar and spelling LSP. 
+# - harper-ls is a grammar and spelling LSP.
 # - mpls is a markdown preview server that supports Github Flavored Markdown.
 # - replacing prettier with dprint.
 [[language]]
@@ -39,13 +40,11 @@ file-types = [
   "mdtxt",
   "mkd",
   "mdtext",
-  "txt",
-  "text",
 ]
 soft-wrap.enable = true
 soft-wrap.wrap-at-text-width = false
 auto-format = true
-formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
+formatter = { command = "dprint", args = ["fmt", "--stdin", "md"] }
 language-servers = ["marksman", "mpls", "harper-ls"]
 
 # Language Server Settings.

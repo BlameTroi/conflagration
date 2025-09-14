@@ -1,32 +1,33 @@
 # Working on a helix configuration that feels comfortable. I am
 # going to avoid mimicking vim or emacs.
 
-theme = "github_dark_high_contrast"
+theme = "term16_dark"
 
-# General editor settings. 
+# General editor settings.
 
 [editor]
-
 # Default settings that I probably won't override in languages.
-scrolloff = 0                  # Not a setting I like.
-line-number = "absolute"       # I never understood using relative.
-mouse = false                  # Just say no.
-cursorline = true              # Eye catcher.
-auto-save = false              # I prefer to stay in control.
-text-width = 80                # For :reflow and soft wrapping.
-auto-format = false            # Handle by language.
-color-modes = true             # This means editor mode indicstor.
-popup-border = "all"           # Bling.
-editor-config = false          # So not a fan of this.
-
+# Note: Apparently the editor.auto-format is whether or not helix
+# _allows_ auto formatting. This is clearly misnamed. There's a
+# discussion where most everyone seems to think this is silly, but
+# there you go.
+scrolloff = 0  # Not a setting I like.
+line-number = "absolute"  # I never understood using relative.
+mouse = false  # Just say no.
+cursorline = true  # Eye catcher.
+auto-save = false  # I prefer to stay in control.
+text-width = 80  # For :reflow and soft wrapping.
+auto-format = true  # Handle by language.
+color-modes = true  # This means editor mode indicstor.
+popup-border = "all"  # Bling.
+editor-config = false  # So not a fan of this.
 # TODO: completion settings.
 # TODO: jump label alphabet, should I try homekey style?
 # TODO: end of line diagnostics. Maybe this is by language?
-
 # Typical but overrideable settings.
-rulers = [80]                  # Eye guides.
+rulers = [80]  # Eye guides.
 
-# I'm used to these this triad. Remeber that only the primary cursor
+# I'm used to this triad. Remeber that only the primary cursor
 # changes shape by mode.
 [editor.cursor-shape]
 insert = "bar"
@@ -45,38 +46,52 @@ hidden = false
 # come close.
 
 [editor.statusline]
-left = ["mode", "spinner", "version-control", "file-name", "file-type", "read-only-indicator", "file-modification-indicator"]
+left = [
+  "mode",
+  "spinner",
+  "version-control",
+  "file-name",
+  "file-type",
+  "read-only-indicator",
+  "file-modification-indicator",
+]
 center = ["diagnostics", "workspace-diagnostics"]
-right = ["file-encoding", "selections", "register", "separator", "position", "position-percentage"]
+right = [
+  "file-encoding",
+  "selections",
+  "register",
+  "separator",
+  "position",
+  "position-percentage",
+]
 
 # Using soft-wrap requires that it be explicitly mentioned in the helix
 # config. This can be overridden on a per language basis or explicitly
 # :toggle'd.
 
 [editor.soft-wrap]
-enable = false              # have to configure here to override in languages
-max-wrap = 25               # increase value to reduce forced mid-word wrapping
+enable = false  # have to configure here to override in languages
+max-wrap = 25  # increase value to reduce forced mid-word wrapping
 max-indent-retain = 30
-wrap-indicator = ""         # set wrap-indicator to "" to hide it
+wrap-indicator = ""  # set wrap-indicator to "" to hide it
 wrap-at-text-width = false  # same as enabled
 
 # Most of the LSP defaults are fine.
 
 [editor.lsp]
-display-inlay-hints = true      # I might end up removing these.
-inlay-hints-length-limit  = 35  # And I'm not sure about length.
+display-inlay-hints = true  # I might end up removing these.
+inlay-hints-length-limit = 35  # And I'm not sure about length.
 
 # Uses space like vim uses leader. Let's try to keep this small.
 
 [keys.normal.space]
-
 # Custom command for count of words in a selection. So, to get the word
 # count of the whole file:
 #
 # %<space><A-w>
 #
 # Sources are:
-# 
+#
 # https://github.com/helix-editor/helix/discussions/10211
 # which points to
 # https://www.reddit.com/r/HelixEditor/comments/1h1w8dh/pipe_to_shell_command_and_get_output_in_popup/

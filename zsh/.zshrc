@@ -28,10 +28,10 @@ zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr ' +'
 zstyle ':vcs_info:*' unstagedstr ' *'
-zstyle ':vcs_info:*' formats ' [%b%u%c]'
-zstyle ':vcs_info:*' actionformats ' [%b|%a%u%c]'
-export PROMPT='%2~ +++ '
-export RPROMPT='$vcs_info_msg_0_ [%*]'
+zstyle ':vcs_info:*' formats '%r [%b%u%c]'
+zstyle ':vcs_info:*' actionformats '%r [%b|%a%u%c]'
+#export RPROMPT=''
+export PROMPT='$vcs_info_msg_0_ %1d %# '
 
 # Shell options:
 
@@ -128,11 +128,11 @@ setopt PROMPT_PERCENT
 # else
 	# alias vim='LC_ALL $LANG vim'
 	# alias vimdiff='LC_ALL $LANG vimdiff'
-	export VISUAL="vim"
-	export EDITOR="vim"
+	export VISUAL="hx"
+	export EDITOR="hx"
 # fi
 
-alias vim9='/opt/homebrew/bin/vim'
+#alias vim9='/opt/homebrew/bin/vim'
 # Human readable figures:
 
 alias df='df -h'
@@ -183,11 +183,11 @@ fi
 # The alias for pip is important. I am going to assume that I'm always in
 # a virutal environment.
 
-source ~/.global/bin/activate
-alias pip='uv pip'
+#source ~/.global/bin/activate
+#alias pip='uv pip'
 
 # Shorter names are usually good for me.
-alias idle='python -m idlelib'
+# alias idle='python -m idlelib'
 
 # Tweaking around nvim. My old configuration is in .config/nvim, which
 # is the default. It can be overridden by setting NVIM_APPNAME to the
@@ -196,13 +196,13 @@ alias idle='python -m idlelib'
 # easier for me so I'm trying to build a config with it. What I have
 # is now stable enough to move to production.
 
-export NVIM_APPNAME=nvim
+#export NVIM_APPNAME=nvim
 #export NVIM_APPNAME=lazyvim
 #export NVIM_APPNAME=mininvim
 #export NVIM_APPNAME=scratch
 #export NVIM_APPNAME=kickstart
 
-echo neovim is $NVIM_APPNAME
+#echo neovim is $NVIM_APPNAME
 
 # Supporting vi mode in zsh, i don't know how well this works yet.
 # source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
