@@ -1,7 +1,7 @@
 # Working on a helix configuration that feels comfortable. I am
 # going to avoid mimicking vim or emacs.
 
-theme = "term16_dark"
+theme = "barebone"
 
 # General editor settings.
 

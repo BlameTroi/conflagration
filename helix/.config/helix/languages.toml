@@ -10,6 +10,13 @@ name = "toml"
 auto-format = true
 language-servers = ["tombi"]
 
+# Pascal support is rather limited but it's not completely useless.
+[[language]]
+name = "pascal"
+auto-format = false
+file-types = [ "pascal", {glob = "*.pas"}, {glob = "*.p"}, {glob = "*.pp"}]
+indent = { tab-width = 3, unit = " " }
+
 # The Go Language:
 #
 # There are several formatters available but gopls will use gofumpt if
@@ -32,15 +39,7 @@ language-servers = ["gopls"]
 # - replacing prettier with dprint.
 [[language]]
 name = "markdown"
-file-types = [
-  "md",
-  "markdown",
-  "markdn",
-  "mdown",
-  "mdtxt",
-  "mkd",
-  "mdtext",
-]
+file-types = ["md", {glob = "*.md"}]
 soft-wrap.enable = true
 soft-wrap.wrap-at-text-width = false
 auto-format = true
