@@ -14,8 +14,23 @@ language-servers = ["tombi"]
 [[language]]
 name = "pascal"
 auto-format = false
-file-types = [ "pascal", {glob = "*.pas"}, {glob = "*.p"}, {glob = "*.pp"}]
-indent = { tab-width = 3, unit = " " }
+scope = "source.pascal"
+injection-regex = "pascal"
+# file-types = ["pascal", "pas", "pp", "inc", "lpr", "lfm"]
+file-types = [ "pascal", {glob = "*.pas"}, {glob = "*.p"}, {glob = "*.pp"}, {glob = "*.lpr"}, {glob = "*.lfm"}]
+indent = { tab-width = 2, unit = " " }
+language-servers = ["pasls"]
+
+[language-server.pasls]
+command = "/Users/troi/Projects/pascal-language-server/lib/aarch64-darwin/pasls"
+args = []
+#"--no-auto", "--dark-mode", "--enable-emoji", "--browser", "Safari"]
+# [[language-server]]
+# name = "pasls"
+# command = { "/Users/troi/Projects/pascal-language-server/lib/aarch64-darwin/pasls", args=[] }
+# [[grammar]]
+# name = "pascal"
+# source = { git = "https://github.com/Isopod/tree-sitter-pascal", rev = "2fd40f477d3e2794af152618ccfac8d92eb72a66" }
 
 # The Go Language:
 #

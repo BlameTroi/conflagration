@@ -126,6 +126,8 @@ export CMAKE_GENERATOR="Ninja Multi-Config"
 typeset -U path PATH
 path=(${HOME}/.local/bin \
 		$(go env GOPATH)/bin \
+		/opt/homebrew/opt/ncurses/bin \
+		${HOME}/Projects/lazarus \
     /opt/homebrew/opt \
 #    /opt/homebrew/opt/node@20/bin \
     /opt/homebrew/opt/ruby/bin \
@@ -144,6 +146,9 @@ export PATH
 #export LDFLAGS="-L/opt/homebrew/opt/node@20/lib $LDFLAGS"
 #export CPPFLAGS="-I/opt/homebrew/opt/node@20/include $CPPFLAGS"
 
+# curses
+export LDFLAGS="-L/opt/homebrew/opt/ncurses/lib"
+export CPFLAGS="-I/opt/homebrew/opt/ncurses/include"
 # `readline' is needed for Chicken Ccheme's `breadline' egg.
 # # For compilers to find readline you may need to set:
 # export LDFLAGS="-L/opt/homebrew/Cellar/readline/8.2.13/lib $LDFLAGS"

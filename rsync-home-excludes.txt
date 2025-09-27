@@ -1,0 +1,210 @@
+# rsync-homedir-excludes
+#
+# A list of files to exclude when backing up *nix home directories using rsync.
+#
+# Author: Ruben Barkow-Kuder <https://github.com/rubo77/rsync-homedir-excludes>
+# Version: 2019-11-30
+#
+# #Usage:
+#    USER=<homedir username here>
+#    rsync -aP --exclude-from=rsync-homedir-excludes.txt /home/$USER/ /media/$USER/linuxbackup/home/$USER/
+
+# I've stripped this down and reoganized a bit for my own use.
+# Troy Brumley, October 2022.
+
+
+.cache
+.mozilla
+.local/share/Trash
+.wine
+Downloads
+Games
+.local/share/lutris/runners/wine/
+.python_history
+.bash_history
+.zsh_history
+
+################################################
+# These directories may definitely be excluded #
+################################################
+
+# Contains mounted file systems:
+
+.gvfs
+.local/share/gvfs-metadata
+# contains the actual encrypted home directory
+/.Private
+
+# Session-specific:
+/.dbus
+.cache
+.var/app/*/cache
+.var/app/*/.cache
+/.Trash
+.Trash-1*
+.local/share/Trash
+/Trash
+
+# Cached info about audio CDs:
+.cddb
+
+# Cached packages lists:
+.aptitude
+
+# Node Package Manager cache
+.npm
+
+# Node Version Manager
+.nvm
+
+#Flash-specific:
+
+# Cache for flash, maybe others?
+.adobe
+# except for Flash persistence, there is no reason to keep this
+.macromedia
+
+#Files:
+
+# Contains errors from the current graphical session
+.xsession-errors
+.xsession-errors.old
+.wayland-errors
+
+# Recently used files
+.local/share/RecentDocuments
+.recently-used
+.recently-used.xbel
+recently-used.xbel
+.thumbnails
+.thumb
+Thumbs.db
+.DS_Store
+.localised
+.CFUserTextEncoding
+.zcompdump*
+.wget-hsts
+
+# Common Unix Printing System
+/.cups
+
+# Session-specific
+.Xauthority
+.ICEauthority
+
+.local/share/tracker
+
+#Tor Browser supposed to not be backupped ;)
+.local/share/torbrowser
+
+# Keychain dir (manage SSH and GPG keys, front-end to ssh-agent and ssh-add)
+/.keychain
+
+# I can't think of a reason I'd want to backup snaps
+snap
+
+#GnuPG:
+
+.gnupg/rnd
+.gnupg/random_seed
+.gnupg/.#*
+.gnupg/*.lock
+.gnupg/gpg-agent-info-*
+
+#Google Earth:
+#.googleearth/Temp
+#.googleearth/Cache
+
+#Google Chrome:
+
+#.config/google-chrome/ShaderCache
+#.config/google-chrome/*/Local Storage
+#.config/google-chrome/*/Session Storage
+#.config/google-chrome/*/Application Cache
+#.config/google-chrome/*/History Index *
+#.config/google-chrome/*/Service Worker/CacheStorage
+
+#Chromium:
+
+#.config/chromium/*/Local Storage
+#.config/chromium/*/Session Storage
+#.config/chromium/*/Service Worker/CacheStorage
+#.config/chromium/*/Application Cache
+#.config/chromium/*/History Index *
+#/snap/chromium/common/.cache
+#/snap/chromium/*/.config/chromium/*/Service Worker/CacheStorage
+#/snap/chromium/*/.local/share/
+
+#indexer
+#.local/share/baloo
+#.local/share/zeitgeist
+#.local/share/akonadi
+
+#Other apps:
+
+# Pidgin
+#.purple/icons
+# Cached applets
+#.guayadeque/cache.db
+#.java/deployment/cache
+#.icedteaplugin
+#.icedtea
+#.gnome2/epiphany/favicon_cache
+
+# other temporary files
+nohup.out
+
+# LibreOffice cache files
+.config/libreoffice/4/cache
+
+# freshplayerplugin LSO
+#.config/freshwrapper-data/Shockwave Flash/WritableRoot/#SharedObjects
+
+# Snap caches
+.config/*/Cache
+
+# Vim
+#.vim/bundle/*
+.viminfo
+
+# VS Code
+.vscode-oss/extensions/*
+.vscode/extensions/*
+.config/Code - OSS/logs/
+.config/Code/logs/
+.config/Code/CachedData/*
+
+# VS Codium
+.config/VSCodium/CachedExtensionVSIXs
+
+# VirtualBox
+.config/VirtualBox/VBoxSVC.log*
+.config/VirtualBox/VBoxGuestAdditions_*
+
+# Rust artefacts
+.cargo
+.rustup
+
+# golang Cache
+go/pkg/mod/cache
+
+# Nvidia OpenGL Shader Cache
+.nv/GLCache
+
+# discord
+.config/discord
+
+# Electron Apps
+.config/*/blob_storage
+.config/*/Application Cache
+.config/*/Cache
+.config/*/CachedData
+.config/*/Code Cache
+.config/*/GPUCache
+.var/app/**/blob_storage
+.var/app/**/Application Cache
+.var/app/**/Cache
+.var/app/**/CachedData
+.var/app/**/Code Cache
+.var/app/**/GPUCache
+

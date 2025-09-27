@@ -165,9 +165,9 @@ fi
 
 # fzf integration
 
-if type fzf >/dev/null 2>&1; then
-	source <(fzf --zsh)
-fi
+# if type fzf >/dev/null 2>&1; then
+# 	source <(fzf --zsh)
+# fi
 
 #[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 #export FZF_DEFAULT_COMMAND='fd --type file'
