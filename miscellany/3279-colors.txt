@@ -1,18 +1,26 @@
-base mode:
+# 3270 and 3290 colors
 
-unprotected normal      green
-unprotected intensified red
-protected   normal      blue
-protected   intensified white
+## Base mode
 
-extended color mode:
+| Modifiable  | Emphasis    | color |
+| ----------- | ----------- | ----- |
+| unprotected | normal      | Green |
+| unprotected | intensified | Red   |
+| protected   | normal      | Blue  |
+| protected   | intensified | White |
 
-neutral (white)
-red
-blue
-green (default)
-pink (magenta)
-yellow
-turquoise (cyan)
+## Extended color mode:
 
-both have black backgrounds.
+See [ANSI escape codes color table](https://en.wikipedia.org/wiki/ANSI_escape_code) for adjustments, particularly to blue.
+
+Guesses at HTML hex colors
+
+| HTML    | HEX      | 3279   | NOTES                     |
+| ------- | -------- | ------ | ------------------------- |
+| White   | 0xFFFFFF | White  |                           |
+| Red     | 0xFF0000 | Red    |                           |
+| Blue    | 0x0000FF | Blue   | This won't work on black. |
+| Lime    | 0x00FF00 | Green  |                           |
+| Magenta | 0xFF00FF | Pink   |                           |
+| Yellow  | 0xFFFF00 | Yellow |                           |
+| Aqua    | 0x00FFFF | Cyan   |                           |

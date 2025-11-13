@@ -1,0 +1,74 @@
+
+"ui.background" = "3270g_bg"
+"ui.text" = "3270g_text"
+"ui.gutter" = "3270g_bg"
+"ui.linenr" = "muted_green"
+"ui.linenr.selected" = { fg = "black", bg = "light-gray" }
+"ui.selection" = { fg = "yellow", bg= "background_green" }
+"ui.cursorline" = { bg="3270g_bar_bg" }
+"ui.statusline" = { fg="black", bg="faded_green" }
+"ui.statusline.inactive" = { fg="black", bg="3270g_bar_inactive" }
+"ui.virtual" = "indent"
+"ui.virtual.ruler" = { bg = "#252530" }
+"ui.cursor.match" = { bg="3270g_bar_bg" }
+"ui.cursor" = { bg="cursor", fg="white" }
+"ui.debug" = { fg="orange"}
+"ui.highlight.frameline" = { bg="#da8581" }
+"ui.help" = { fg="3270g_text", bg="3270g_bg" }
+"ui.popup" = { fg="3270g_text", bg="3270g_bg" }
+"ui.menu" = { fg="3270g_text", bg="3270g_bg" }
+"ui.menu.selected" = { modifiers = ["reversed"] } #{ fg = "muted_green" } #{ fg = "black", bg = "light-gray" } #{bg="selected"}
+"ui.window" = { bg="3270g_bg" }
+"ui.bufferline" = { fg = "black", bg = "3270g_bar_bg" }
+"ui.bufferline.active" = { fg = "black", bg = "3270g_bg" }
+
+# Errors, lsp, lint, and from helix
+
+"diagnostic.error" = { underline = { style = "line", color = "red" } }
+"diagnostic.warning" = { underline = { style = "line", color = "red" } }
+"diagnostic.info" = { underline = { style = "line", color = "red" } }
+"diagnostic.hint" = { underline = { style = "line", color = "red" } }
+"diagnostic.label" = { fg = "red", modifiers = ["bold"] }
+
+"error" = { fg="red" }
+"warning" = { fg="yellow" }
+"hint" = { fg="white" }
+"info" = { fg = "cyan" }
+"unnecessary" = { modifiers = ["dim"] }
+"deprecated" = { modifiers = ["crossed_out"] }
+
+# Diffs
+
+"diff.plus" = { fg = "green" }
+"diff.delta" = { fg = "yellow" }
+"diff.minus" = { fg = "red" }
+
+# Text/language elements:
+
+"punctuation" = "bright_yellow"
+"string" = "bright_cyan"
+"comment" = { fg = "3270g_comment", modifiers = [ "italic" ] }
+"keyword" = { modifiers = [ "italic" ] }
+"constant" = "blue"
+
+[palette]
+3270g_bg = "#000000"
+3270g_text = "#38DD00"                 # base text, brighter green
+3270g_comment = "#4B852E"              # comment text, a bit faded
+selected = "#EEEE9E"
+3270g_bar_bg = "#343434"
+3270g_bar_inactive = "#EAFFFF"
+muted_green = "#99B98A"
+faded_green = "#4B852E"
+background_green = "#192613"
+neutral_green = "#4BE500"
+cursor = "#114444"
+red = "#A0342F"
+green = "#065905"
+indent = "#AAAAAA"
+orange = "#F0AD4E"
+gray = "#777777"
+
+bright_yellow = "#FFFF00"
+lighter_yellow = "#424200"
+bright_cyan   = "#00FFFF"

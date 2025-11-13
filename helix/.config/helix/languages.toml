@@ -1,5 +1,30 @@
 # languages.toml -- helix language suppport configuration
 
+# introduce the new language server (simple completions)
+# installed via:
+# $ cargo install --locked --git https://github.com/estin/simple-completion-language-server.git
+# with instructions on the readme there.
+
+[language-server.scls]
+command = "simple-completion-language-server"
+
+[language-server.scls.config]
+feature_words = true             # enable completion by word
+feature_snippets = false         # disable snippets
+snippets_first = false           # order of presentation
+snippets_inline_by_word_tail = false # suggest snippets by WORD tail, for example `xsq|` becomes `x^2|` when
+feature_unicode_input = false    # enable unicode input
+feature_paths = false            # enable path completion
+feature_citations = false        # enable citation completion
+
+# write logs into the ~/.cache
+[language-server.scls.environment]
+RUST_LOG = "info,simple-completion-language-server=info"
+LOG_FILE = "/Users/troi/.cache/simple-comletion-language-server/scls.log" 
+
+# add scls to existing languages as desired. so far i only do this
+# for pascal which does not have a functioning language server.
+
 # toml configuration format:
 #
 # The lsp options appear to be taplo and tombi. Tombi appears to be well
@@ -19,11 +44,24 @@ injection-regex = "pascal"
 # file-types = ["pascal", "pas", "pp", "inc", "lpr", "lfm"]
 file-types = [ "pascal", {glob = "*.pas"}, {glob = "*.p"}, {glob = "*.pp"}, {glob = "*.lpr"}, {glob = "*.lfm"}]
 indent = { tab-width = 2, unit = " " }
-language-servers = ["pasls"]
+block-comment-tokens = { start = "{", end = "}" }
+# language-servers = ["pasls", "scls"]
+language-servers = ["scls"]
 
-[language-server.pasls]
-command = "/Users/troi/Projects/pascal-language-server/lib/aarch64-darwin/pasls"
-args = []
+[[language]]
+name = "forth"
+auto-format = false
+scope = "source.forth"
+block-comment-tokens = { start = "( ", end = " )" }
+injection-regex = "forth"
+file-types = [ "forth", {glob = "*.f" }, {glob = "*.fs"}, {glob = "*.fth"}]
+indent = { tab-width = 4, unit = " " }
+language-servers = ["scls"]
+# "forth-lsp"]
+# ### this needs to be built ###
+# [language-server.pasls]
+# command = "/Users/troi/Projects/pascal-language-server/lib/aarch64-darwin/pasls"
+# args = []
 #"--no-auto", "--dark-mode", "--enable-emoji", "--browser", "Safari"]
 # [[language-server]]
 # name = "pasls"
@@ -55,8 +93,8 @@ language-servers = ["gopls"]
 [[language]]
 name = "markdown"
 file-types = ["md", {glob = "*.md"}]
-soft-wrap.enable = true
-soft-wrap.wrap-at-text-width = false
+# soft-wrap.enable = true
+# soft-wrap.wrap-at-text-width = false
 auto-format = true
 formatter = { command = "dprint", args = ["fmt", "--stdin", "md"] }
 language-servers = ["marksman", "mpls", "harper-ls"]
@@ -86,7 +124,7 @@ args = ["--stdio"]
 
 [language-server.harper-ls.config.harper-ls]
 userDictPath = "~/Notepad/harper-user-dictionary"
-fileDictPath = ""
+fileDictPath = "~/Notepad/harper-file-dictionaries"
 diagnosticSeverity = "warning"
 isolateEnglish = false
 dialect = "American"
@@ -95,7 +133,7 @@ dialect = "American"
 SpellCheck = true
 SpelledNumbers = false
 AnA = true
-SentenceCapitalization = true
+SentenceCapitalization = false
 UnclosedQuotes = true
 WrongQuotes = false
 LongSentences = true
@@ -103,4 +141,14 @@ RepeatedWords = true
 Spaces = true
 Matcher = true
 CorrectNumberSuffix = true
-
+ElipsisLength = false
+ExpandStandardInputAndOutput = false
+PhrasalVerbAsCompoundNoun = false
+CapitalizePersonalPronouns = false
+ExpandArgument = false
+ExpandMinimum = false
+ExpandMemoryShorthands = false
+AvoidCurses = false
+BoringWords = true
+Months = false
+ExpandTimeShorthands = false

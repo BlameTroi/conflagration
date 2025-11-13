@@ -32,6 +32,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # Zsh site function extensions:
 fpath[1,0]="/opt/homebrew/share/zsh/site-functions";
 
+fpath=( ~/.zfunc "${fpath[@]}" )
 # standard proper locations. use these!
 
 export XDG_DATA_HOME="$HOME/.local/share"
@@ -127,7 +128,8 @@ typeset -U path PATH
 path=(${HOME}/.local/bin \
 		$(go env GOPATH)/bin \
 		/opt/homebrew/opt/ncurses/bin \
-		${HOME}/Projects/lazarus \
+		${HOME}/.cargo/bin \
+#		${HOME}/Projects/lazarus \
     /opt/homebrew/opt \
 #    /opt/homebrew/opt/node@20/bin \
     /opt/homebrew/opt/ruby/bin \
@@ -148,7 +150,7 @@ export PATH
 
 # curses
 export LDFLAGS="-L/opt/homebrew/opt/ncurses/lib"
-export CPFLAGS="-I/opt/homebrew/opt/ncurses/include"
+export CPPFLAGS="-I/opt/homebrew/opt/ncurses/include"
 # `readline' is needed for Chicken Ccheme's `breadline' egg.
 # # For compilers to find readline you may need to set:
 # export LDFLAGS="-L/opt/homebrew/Cellar/readline/8.2.13/lib $LDFLAGS"

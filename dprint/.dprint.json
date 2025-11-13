@@ -4,9 +4,10 @@
   "json": {
   },
   "markdown": {
-    "lineWidth": "80",
-    "textWrap": "never",
-    "emphasisKind": "asterisks"
+    "lineWidth": "65",
+    "textWrap": "always",
+    "emphasisKind": "underscores"
+    "strongKind": "asterisks"
   },
   "toml": {
   },

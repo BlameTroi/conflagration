@@ -1,0 +1,238 @@
+# Theme: TroiRetroGreen
+# Author: troi
+
+# A Helix theme reminescent of mainframe green screen displays.
+# Colors and syntax highlights are few and meant to help focus
+# on program source code.
+#
+# Primary text is one of two shades of green. Constants, literals,
+# and punctuation are colored to stand out slightly from the
+# text. Comments are dimmed and italicized.
+#
+# Markup(down) languages use similar conventions.
+#
+# Diffs use red for deletions, yellow for changes, and green for
+# additions.
+#
+# Similarly, diagnostics use red for errors, yellow for warnings,
+# white for hints, and cyan for information.
+#
+# Helix UI features are using muted greens and greys.
+
+
+#             *** Syntax Highlighting ***
+# 
+# There are way more things to distinctly highlight than I 
+# will benefit from. My base list of highlight keys is from
+# the built-in `ao` theme. I keep the unused keys as comments.
+#
+# The key names are taken on a language's Tree-sitter grammar.
+#
+# The goal is enough visual variety to easily find and focus
+# on the code. The color for the base source appears to be
+# taken from "ui.text" which is green_text, a green.
+
+"constant" = { fg = "bright_cyan" }
+"string" = { fg = "bright_cyan" }
+"comment" = { fg = "green_comment", modifiers = [ "italic" ] }
+"punctuation" = { fg = "bright_yellow" }
+"keyword" = { modifiers = [ "italic" ] }
+
+# Some other possible highlighting keys: attribute type
+# type.builtin type.parameter type.enum type.enum.variant
+# constructor constant.character.escape string.regexp variable
+# variable.parameter variable.other variable.other.member
+# label punctuation.bracket punctuation.special keyword.operator
+# keyword.directive keyword.function keyword.storage
+# keyword.storage.modifier operator function function.method
+# function.macro function.special tag namespace
+
+
+#             *** Source Control Diffs ***
+
+"diff.plus" = { fg = "bright_green" }
+"diff.delta" = { fg = "bright_yellow" }
+"diff.minus" = { fg = "bright_red" }
+
+
+#              *** Markup and Markdown ***
+# 
+# Text follows the same conventions as source code. Comments
+# and the base text are different shades of green, as are
+# quotes.
+# 
+# Markup directive characters (header, list, etc.) are yellow.
+# In text emphasis directives are cyan. Raw text and links are
+# subject to change.
+# 
+# Heading inheritance requires some work to get right
+
+"markup.heading" = { fg = "yellow" }
+"markup.heading.1" = { fg = "green_text", modifiers = ["bold"] }
+"markup.heading.2" = { modifiers = ["italic"] }
+"markup.heading.3" = { modifiers = ["italic"] }
+"markup.heading.4" = { modifiers = ["italic"] }
+"markup.heading.5" = { modifiers = ["italic"] }
+"markup.heading.6" = { modifiers = ["italic"] }
+"markup.list" = { fg = "yellow" }
+"markup.bold" = { fg = "bright_cyan", modifiers = ["bold"] }
+"markup.italic" = { fg = "bright_cyan", modifiers = ["italic"] }
+"markup.strikethrough" = { fg = "green_comment", modifiers = ["crossed_out"] }
+"markup.quote" = { fg = "muted_green", modifiers = ["italic"] }
+"markup.raw" = { fg = "white" } 
+"markup.raw.block" = { fg = "white" }
+"markup.link" = { fg = "blue", underline = { color = "blue", style = "line" } }
+"markup.link.url" = { fg = "blue", underline = { color = "blue", style = "line" } }
+"markup.link.label" = { fg = "blue" }
+"markup.link.text" = { fg = "blue", modifiers = ["bold"] }
+
+
+#              *** Basic User Interface ***
+#
+# Generally dark backgrounds with greens in the foreground. Some
+# popup/dialogs have shaded backgrounds to help them stand out
+# from the editing area.
+#
+# Grouped by general area of the UI. 
+
+"ui.background" = { bg = "hard_black" }                                            # workspace background
+"ui.background.separator" = { fg = "winter_sky" }                                  # picker separator below input line (space + j)
+
+"ui.gutter" = { bg = "hard_black" }                                                # gutter
+# "ui.gutter.selected" = { bg = "slate_gray" }                                     # gutter for the line the cursor is on
+
+"ui.linenr" = { fg = "muted_green" }                                               # line numbers
+"ui.linenr.selected" = { bg = "faded_green", fg = "hard_black" }  # line number for the line the cursor is on
+
+"ui.statusline" = { bg = "hard_black", fg = "muted_green" }                        # statusline, fucused
+"ui.statusline.inactive" = { fg = "slate_gray" }               # statusline, unfocused
+"ui.statusline.normal" = { fg = "leafy_green"}         # statusline normal mode (if editor.color-modes is enabled)
+"ui.statusline.insert" = { fg = "blaze_orange"}  # statusline insert mode (if editor.color-modes is enabled)
+"ui.statusline.select" = { fg = "sky_blue"}      # statusline select mode (if editor.color-modes is enabled)
+# "ui.statusline.separator" = { fg = "blue" }                                              # separator character is statusline
+ 
+# I don't use the bufferline.
+# "ui.bufferline" = { fg = "slate_gray", modifiers = ["bold"] }                            # bufferline inactive tab
+# "ui.bufferline.active" = { fg = "winter_sky", bg = "twilight_blue" }                     # bufferline active tab
+# "ui.bufferline.background" = { bg = "pitch_black" }                                      # bufferline background
+
+"ui.selection" = { bg = "#faint_green" }                                                    # slave selections in the editing area
+"ui.selection.primary" = { bg = "#444444" }                                                 # primary selection in the editing area
+
+"ui.cursor" = { modifiers = ["reversed"] }                                                 # only if "ui.cursor.primary.normal" isn't set
+# "ui.cursor.normal" = { fg = "winter_sky", bg = "twilight_blue" }                         # slave cursor block in normal mode
+# "ui.cursor.insert" = { bg = "rustic_red" }                                               # slave cursor block in insert mode
+# "ui.cursor.select" = { bg = "deep_purple" }                                              # slave cursor block in select mode
+"ui.cursor.match" = { fg = "white" } #fg = "deep_abyss", bg = "blaze_orange" }     # matching bracket etc
+"ui.cursor.primary" = { modifiers = ["reversed"] }                                       # cursor with primary selection (has no effect due to "ui.cursor.primary.normal" is set)
+# "ui.cursor.primary.normal" = { fg = "deep_abyss", bg = "sky_blue" }                      # cursor block in normal mode
+# "ui.cursor.primary.insert" = { fg = "deep_abyss", bg = "ruby_glow" }                     # cursor block in insert mode
+# "ui.cursor.primary.select" = { fg = "winter_sky", bg = "deep_purple" }                   # cursor block in select mode (not the selected color)
+"ui.cursorline.primary" = { bg = "#222222" }                                       # line of the primary cursor
+"ui.cursorline.secondary" = { bg = "#121212" }                                   # lines of secondary cursors
+# "ui.cursorcolumn.primary" = { bg = "#222222" }                                    # column of the primary cursor
+# "ui.cursorcolumn.secondary" = { bg = "#121212" }                                # columns of secondary cursors
+
+
+#                *** Virtual Text ***
+# 
+# Text that overlays the main edit text. Some are from an
+# LSP while the others are visual guides for Helix functions.
+
+"ui.virtual.ruler" = { bg = "faint_green" }                     # ruler columns
+"ui.virtual.whitespace" = { fg = "stormy_night" }               # whitespace characters
+"ui.virtual.indent-guide" = { fg = "stormy_night" }             # vertical indent width guides
+"ui.virtual.inlay-hint" = { fg = "slate_gray" }                 # inlay hints of all kinds
+# "ui.virtual.inlay-hint.parameter" = { fg = "slate_gray" }       # inlay hints of kind parameter (lsps are not required to set a kind)
+# "ui.virtual.inlay-hint.type" = { fg = "slate_gray" }            # inlay hints of kind type (lsps are not required to set a kind)
+"ui.virtual.wrap" = { fg = "slate_gray" }                       # soft-wrap indicator
+"ui.virtual.jump-label" = { modifiers = ["reversed", "bold"] }          # virtual jump labels (g + w)
+
+
+#          *** User Interface Menus and Popups ***
+
+"ui.window" = { fg = "green_text" }                                        # borderlines separating splits
+"ui.text" = { fg = "green_text" }                                          # default text style, command prompts, popup text, etc
+"ui.popup" = { fg = "green_text", bg = "midnight_thunder" }                # documentation popups (space + k)
+"ui.popup.info" = { fg = "green_text", bg = "nightfall_blue" }             # prompt for multiple key options, menu border (space, g, z, m, etc)
+"ui.help" = { fg = "green_text", bg = "nightfall_blue" }                   # description box for commands
+"ui.text.focus" = { fg = "dreamy_blue" }                                   # the currently selected line in the picker (space j, space f, space s, etc)
+"ui.text.inactive" = { fg = "slate_gray" }                                 # same as ui.text but when the text is inactive e.g. suggestions
+"ui.text.info" = { fg = "green_text", bg = "nightfall_blue" }              # the key: command in ui.popup.info boxes (space, g, z, m, etc)
+"ui.menu" = { fg = "green_text", bg = "nightfall_blue" }                 # code and command completion menus ":"
+"ui.menu.selected" = { bg = "hard_black" }                               #{ fg = "winter_sky", bg = "twilight_blue" }           # selected autocomplete item
+"ui.menu.scroll" = { fg = "crystal_blue", bg = "moonlight_ocean" }         # scrollbar
+"ui.highlight" = { underline = { color = "sky_blue", style = "line" } }    # highlighted lines in the picker preview
+
+
+#                *** Diagnostics ***
+#
+# These follow the usual red bad yellow check other colors not
+# to worry conventions.
+
+# These diagnostics show up in the gutter.
+"error" = { fg = "bright_red" }
+"warning" = { fg = "bright_yellow" }
+"hint" = { fg = "white" }
+"info" = { fg = "bright_cyan" }
+
+# I'm not clear on where these two show up.
+"unnecessary" = { modifiers = [ "dim" ] }
+"deprecated" = { modifiers = [ "crossed_out" ] }
+
+# These are from LSP and linters and show up in the editing area,
+# usually with a marker in the left gutter and in the edit area.
+# Many expand with more text if selected.
+"diagnostic.error" = { underline = { style = "line", color = "red" } }
+"diagnostic.warning" = { underline = { style = "line", color = "red" } }
+"diagnostic.info" = { underline = { style = "line", color = "red" } }
+"diagnostic.hint" = { underline = { style = "line", color = "red" } }
+"diagnostic.label" = { fg = "red", modifiers = ["bold"] }
+
+
+#                     *** Color Palette ***
+#
+# This section must be last in the theme file.
+
+[palette] 
+
+# PALETTE USER INTERFACE
+stormy_night = "#254862"
+nightfall_blue = "#1f2937"
+midnight_thunder = "#0d1526"
+winter_sky = "#f3f4f6"
+slate_gray = "#838a97"
+blaze_orange = "#ff9000"
+leafy_green = "#81be83"
+dreamy_blue = "#6eb0ff"
+crystal_blue = "#99c7ff"
+sky_blue = "#45b1e8"
+moonlight_ocean = "#0c1420"
+
+# SYNTAX HIGHLIGHTING
+red = "#fa7970"
+green = "#81be83"
+yellow = "#ffba00"
+orange = "#ff9000"
+blue = "#45b1e8"
+purple = "#d2a8ff"
+brown = "#987654"
+gray = "#838a97"
+white = "#dadada"
+
+# ### based on the vegetative.el palette ###
+hard_black = "#000000"
+green_text = "#38DD00"                 # base text, brighter green
+green_comment = "#4B852E"              # comment text, a bit faded
+green_bar_bg = "#343434"
+green_bar_inactive = "#EAFFFF"
+muted_green = "#99B98A"
+faded_green = "#4B852E"
+background_green = "#192613"
+neutral_green = "#4BE500"
+faint_green = "#013301"
+bright_green = "#00FF00"
+bright_red = "#FF0000"
+bright_yellow = "#FFFF00"
+bright_cyan   = "#00FFFF"
+lighter_yellow = "#424200"

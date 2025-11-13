@@ -1,0 +1,106 @@
+# 3270g green screen inspired theme for helix
+
+# these items are still in flux
+# these items are still in flux
+# these items are still in flux
+
+"ui.debug" = { fg="orange"}
+"ui.highlight.frameline" = { bg="#da8581" }
+"ui.popup" = { fg="3270g_text", bg="3270g_bg" }
+"ui.menu" = { fg="3270g_text", bg="3270g_bg" }
+"ui.menu.selected" = { modifiers = ["reversed"] } #{ fg = "muted_green" } #{ fg = "black", bg = "light-gray" } #{bg="selected"}
+"ui.bufferline" = { fg = "black", bg = "3270g_bar_bg" }
+"ui.bufferline.active" = { fg = "black", bg = "3270g_bg" }
+
+"ui.picker" = { fg = "3270g_text", bg = "3270g_bg" }
+"ui.picker.header" = { underline = { color = "3270g_text", style = "line" } }
+"ui.picker.header.column.active" = { modifiers = ["bold"] }
+
+# these items are pretty settled 
+# these items are pretty settled 
+# these items are pretty settled 
+ 
+# The basic UI elements, the frame if you will.
+
+"ui.window" = "3270g_text"
+"ui.background" = "3270g_bg"
+"ui.text" = "3270g_text"
+"ui.gutter" = "3270g_bg"
+"ui.linenr" = "muted_green"
+"ui.linenr.selected" = { fg = "black", bg = "light-gray" }
+"ui.cursorline" = { bg="3270g_bar_bg" }
+
+"ui.selection" = { fg = "yellow", bg= "background_green" }
+
+"ui.statusline" = { fg="black", bg="faded_green" }
+"ui.statusline.inactive" = { fg="black", bg="3270g_bar_inactive" }
+
+"ui.virtual.ruler" = { bg = "#222222" }
+"ui.cursor.match" = { bg="3270g_bar_bg" }
+"ui.cursor" = { bg="cursor", fg="white" }
+
+"ui.help" = { fg="3270g_text", bg="3270g_bg" }
+
+"ui.virtual.inlay-hint" = "gray"     # all of them
+
+# Lsp and lint
+
+"diagnostic.error" = { underline = { style = "line", color = "red" } }
+"diagnostic.warning" = { underline = { style = "line", color = "red" } }
+"diagnostic.info" = { underline = { style = "line", color = "red" } }
+"diagnostic.hint" = { underline = { style = "line", color = "red" } }
+"diagnostic.label" = { fg = "red", modifiers = ["bold"] }
+
+# Basic errors and warnings
+
+"error" = { fg="bright_red" }
+"warning" = { fg="bright_yellow" }
+"hint" = { fg="white" }
+"info" = { fg = "bright_cyan" }
+"unnecessary" = { modifiers = ["dim"] }
+"deprecated" = { modifiers = ["crossed_out"] }
+
+# Diffs
+
+"diff.plus" = { fg = "bright_green" }
+"diff.delta" = { fg = "bright_yellow" }
+"diff.minus" = { fg = "bright_red" }
+
+# Text/language elements ...
+
+# Don't go wild here. I don't derive a lot of value from
+# giving each type of name or word a distinct color or
+# font. Strings, punctuation, and constants seem to warrant
+# different faces to break up the text.
+
+"punctuation" = "bright_yellow"
+"string" = "bright_cyan"
+"comment" = { fg = "3270g_comment", modifiers = [ "italic" ] }
+"keyword" = { modifiers = [ "italic" ] }
+"constant" = "blue"
+
+# A green screen oriented palette ...
+
+[palette]
+3270g_bg = "#000000"
+3270g_text = "#38DD00"                 # base text, brighter green
+3270g_comment = "#4B852E"              # comment text, a bit faded
+selected = "#EEEE9E"
+3270g_bar_bg = "#343434"
+3270g_bar_inactive = "#EAFFFF"
+muted_green = "#99B98A"
+faded_green = "#4B852E"
+background_green = "#192613"
+neutral_green = "#4BE500"
+cursor = "#114444"
+bright_green = "#00FF00"
+bright_red = "#FF0000"
+bright_yellow = "#FFFF00"
+bright_cyan   = "#00FFFF"
+# red = "#A0342F"
+# green = "#065905"
+lighter_grey = "#AAAAAA"
+orange = "#F0AD4E"
+gray = "#777777"
+
+lighter_yellow = "#424200"

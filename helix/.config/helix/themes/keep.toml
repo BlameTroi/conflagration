@@ -1,0 +1,120 @@
+# troy.toml -- a 3270 green screen inspired theme for Helix
+#
+# Goals of the theme:
+# 
+# 1. Visual clarity-I have trouble with the contrast and color selections
+#    of most themes (old age, myopia).
+# 2. Reduced use of color-Some color is good, but a separate color for every
+#    type of language element and UI widget is noise and not meaningful to
+#    me.
+# 3. Retro feel-My career began in the age of monochrome (green, white, or
+#    amber).
+#    
+# Sources:
+# 
+# vegetative theme     https://github.com/emacsfodder/emacs-theme-vegetative
+# theme template       https://github.com/joegm/helix-theme-template.git
+# acme theme           supplied with helix
+# helix documentation  https://docs.helix-editor.com/themes.html
+#                      https://helix-editor.vercel.app/reference/custom-themes
+#
+# The vegetative theme is a green screen theme that provides a good color
+# palette. The them template provides a list themeable elements. Both are
+# very helpful. The acme theme is an uncluttered theme that I find very
+# readable.
+#
+# The original vegetative theme is offered under the GNU/GPL license. The
+# helix theme template has no license listed. The acme theme will be under
+# the helix license. This theme is...
+#
+# Copyright (c) 2025 by Troy Brumley.
+#
+# My work is available under a your choice license--public domain under the
+# unlicense or the MIT license. 
+
+# Author: Two-Six<twopsix@duck.com>
+
+"ui.background" = "black"
+"ui.text" = "medium"
+"ui.text.focus" = { fg = "foreground_4" }
+"ui.text.info" = { fg = "foreground_1" }
+"ui.linenr" = "muted_green"        # {bg="acme_bg", fg="black"}
+"ui.linenr.selected" = { fg = "black", bg = "light_gray" } # {bg="acme_bg", fg="black"}
+"ui.selection" = { fg = "yellow", bg = "background_green" }
+"ui.cursor" = { bg = "muted_green", fg = "black" }
+# "ui.cursorline" = {bg="acme_bar_bg"}
+"ui.statusline" = {fg="black", bg="acme_bar_bg"}
+"ui.statusline.inactive" = {fg="black", bg="acme_bar_inactive"}
+"ui.virtual" = "indent"
+"ui.virtual.ruler" = { bg = "acme_bar_bg" }
+"ui.cursor.match" = {bg="acme_bar_bg"}
+# "ui.cursor" = {bg="cursor", fg="white"}
+"ui.debug" = {fg="orange"}
+"ui.highlight.frameline" = {bg="#da8581"}
+"ui.help" = {fg="black", bg="acme_bg"}
+"ui.popup" = {fg="black", bg="acme_bg"}
+"ui.menu" = {fg="black", bg="acme_bg"}
+"ui.menu.selected" = { bg="cyan" }
+"ui.window" = {bg="acme_bg"}
+
+"diagnostic.error" = {bg="red", fg="white", modifiers=["bold"]}
+"diagnostic.warning" = {bg="orange", fg="black", modifiers=["bold"]}
+"diagnostic.hint" = {fg="gray", modifiers=["bold"]}
+"diagnostic.unnecessary" = { modifiers = ["dim"] }
+"diagnostic.deprecated" = { modifiers = ["crossed_out"] }
+
+"ui.gutter" = { bg = "black" }
+"ui.gutter.selected" = "background_green" # 6e5336 or de....
+"ui.bufferline" = { bg = "blue" }  # { fg = "black", bg = "acme_bar_bg" }
+"ui.bufferline.active" = { fg = "black", bg = "acme_bg" }
+"ui.bufferline.background" = { bg = "#3A4047" }
+
+"diff.plus" = {fg = "green"}
+"diff.delta" = {fg = "acme_bar_bg"}
+"diff.minus" = {fg = "red"}
+
+"ui.virtual.jump-label" = { modifiers = ["reversed"] } # bg = "background-green", fg = "black" }
+
+# language elements
+ 
+
+"punctuation" = { fg = "bright_yellow" } # Any punctuation symbol.
+"string" = "bright_cyan"
+"comment" = { fg = "faded_green", modifiers = [ "italic" ] }
+"keyword" = { fg = "neutral_green", modifiers = [ "italic" ] } # Language reserved keywords.
+"operator" = { fg = "medium" } # Logical, mathematical, and other operators.
+"function" = { fg = "medium", modifiers = [ "bold" ] }
+"constant" = { fg = "blue" } # Constant value
+# "variable" = { fg = "faded_green" } # Variable names.
+
+[palette]
+white = "#ffffff"            # duh
+black = "#000000"            # duh
+acme_bg = "#ffffea"          # lightly yellowish white
+selected = "#eeee9e"         # pale yellow putty
+acme_bar_bg = "#0F3000"       # was "#aeeeee"      # a washed cyan
+acme_bar_inactive = "#eaffff" # a very washed cyan
+cursor = "#444444"           # dark grey
+red = "#a0342f"              # dark red, native
+green = "#065905"            # dark green, rich leafy
+indent = "#aaaaaa"           # light grey
+orange = "#f0ad4e"           # washed out orange
+gray = "#777777"             # grey
+
+medium = "#38dd00"           # was "#49DD00" base text green, bright
+
+background_1        = "#0F3000"    # blackboardish black
+
+foreground_1        = "#5FFF10"    # bright greens
+foreground_4        = "#4FD00E"
+
+bright_green        = "#00FF00"
+neutral_green       = "#4BE500"
+faded_green         = "#4B852E"
+muted_green         = "#99B98A"
+background_green    = "#192613"
+mid_green           = "#36890E"
+
+bright_yellow       = "#FFFF00"
+
+bright_cyan         = "#00FFFF"

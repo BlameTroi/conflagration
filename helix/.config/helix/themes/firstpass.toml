@@ -1,0 +1,273 @@
+# troy.toml -- a 3270 green screen inspired theme for Helix
+#
+# Goals of the theme:
+# 
+# 1. Visual clarity-I have trouble with the contrast and color selections
+#    of most themes (old age, myopia).
+# 2. Reduced use of color-Some color is good, but a separate color for every
+#    type of language element and UI widget is noise and not meaningful to
+#    me.
+# 3. Retro feel-My career began in the age of monochrome (green, white, or
+#    amber).
+#    
+# Sources:
+# 
+# vegetative theme     https://github.com/emacsfodder/emacs-theme-vegetative
+# theme template       https://github.com/joegm/helix-theme-template.git
+# helix documentation  https://docs.helix-editor.com/themes.html
+#                      https://helix-editor.vercel.app/reference/custom-themes
+#
+# The vegetative theme is a green screen theme that provides a good color
+# palette. The them template provides a list themeable elements. Both are
+# very helpful.
+#
+# The original vegetative theme is offered under the GNU/GPL license. The helix
+# theme template has no license listed. This theme is...
+#
+# Copyright (c) 2025 by Troy Brumley.
+#
+# My work is available under a your choice license--public domain under the
+# unlicense or the MIT license. 
+
+"warning" = { fg = "yellow" } # Editor warnings.
+"error" = { fg = "red" } # Editor errors, like mis-typing a command.
+"info" = { fg = "cyan"} # Contextual info in diagnostic messages (LSP).
+"hint" = { fg = "white" } # Code diagnostics hints (LSP).
+"diagnostic" = { fg = "red" } # Code diagnostics in editing area (LSP).
+
+"diagnostic.error" = { underline = { style = "line", color = "red" } }
+"diagnostic.warning" = { underline = { style = "line", color = "red" } }
+"diagnostic.info" = { underline = { style = "line", color = "red" } }
+"diagnostic.hint" = { underline = { style = "line", color = "red" } }
+"diagnostic.label" = { fg = "red", modifiers = ["bold"] }
+
+
+# ========== The main UI ===========
+# For styling helix itself.
+ 
+"ui.window" = { bg = "background-1" } # Window border between splits.
+"ui.gutter" = { bg = "background-0-hard" } # Left gutter for diagnostics and breakpoints.
+"ui.linenr.selected" = { bg = "light-gray" }
+"ui.linenr" = "muted-green"
+
+"ui.text" = "medium"
+"ui.text.focus" = { fg = "foreground-4" } # Selection highlight in buffer-picker or file-picker.
+"ui.text.info" = { fg = "foreground-1" } # Info popup contents (space mode menu).
+
+"ui.background" = { bg = "background-0-hard" }
+
+"ui.menu.selected" = { bg = "cyan" }
+
+"ui.selection" = { fg = "yellow", bg="background-green"}
+"ui.selection.primary" = { fg = "cyan", bg = "background-green" } # The primary selection when there are multiple.
+
+"ui.cursor" = { bg = "muted-green", fg="black" }
+# "ui.cursor.primary" = { } # The primary cursor when there are multiple (shift-c).
+# "ui.cursor.insert" = { } # The cursor in insert mode (i).
+# "ui.cursor.select" = { } # The cursor in select mode (v).
+# "ui.cursor.match" = { } # The matching parentheses of that under the cursor.
+
+"ui.virtual.diagnostic.error" = { fg = "red" }
+"ui.virtual.diagnostic.warning" = { fg = "yellow" }
+"ui.virtual.diagnostic.hint" = { fg = "cyan" }
+"ui.virtual.diagnostic.info" = { fg = "white" }
+"ui.lint.error" = { fg = "red" }
+
+"ui.lint.warning" = { fg = "yellow" }
+"ui.lint.info" = { fg = "cyan" }
+"ui.lint.hint" = { fg = "white" }
+
+"ui.bufferline.active" = { bg = "blue" }
+"ui.bufferline.background" = { bg = "#3A4047" }
+"ui.gutter.selected" = "background-green" # "#de6e5336"
+
+"ui.virtual.ruler" = { bg = "#888888" }
+"ui.virtual.jump-label" = { modifiers = ["reversed"] } # bg = "background-green", fg = "black" }
+# virtual wrap doesn't seem to take, but virtual ruler shows there.
+"ui.virtual.wrap" = { bg = "#888888" } # background-orange" }
+
+# ========== What's being edited ============
+"comment" = { fg = "faded-green", modifiers = [ "italic" ] }
+"comment.line" = { fg = "faded-green", modifiers = [ "bold" ] }
+"comment.block" = { fg = "faded-green", modifiers = [ "italic" ] }
+"comment.block.documentation" = { fg = "faded-green" }
+"string" = { fg = "bright-cyan" } # String literal.
+"punctuation" = { fg = "bright-yellow" } # Any punctuation symbol.
+"keyword" = { modifiers = [ "bold" ] } # Language reserved keywords.
+"operator" = { fg = "medium" } # Logical, mathematical, and other operators.
+"function" = { fg = "medium", modifiers = [ "bold" ] }
+"constant" = { fg = "blue" } # Constant value
+"variable" = { fg = "faded-green" } # Variable names.
+
+# Unused theme keys.
+# 
+# "string.regexp" = { } # Regular expression literal.
+# "string.special" = { } # Strings containing a path, URL, etc.
+# "string.special.path" = { } # String containing a file path.
+# "string.special.url" = { } # String containing a web URL.
+# "string.special.symbol" = { } # Erlang/Elixir atoms, Ruby symbols, Clojure keywords.
+# "ui.syntax.bracket" = "blue"
+# "ui.syntax.bracket.1" = "red"
+# "ui.syntax.bracket.2" = "green"
+# "ui.syntax.bracket.3" = "#5fff87"
+# "ui.syntax.bracket.4" = "#ffd75f"
+# "ui.syntax.bracket.5" = "#af87ff"
+# "ui.syntax.bracket.6" = "#d75f5f"
+# 
+# "punctuation.delimiter" = { } # Commas, colons or other delimiter depending on the language.
+# "punctuation.bracket" = { } # Parentheses, angle brackets, etc.
+# 
+# "keyword.control" = { } # Control keywords.
+# "keyword.control.conditional" = { } # `if`, `else`, `elif`.
+# "keyword.control.repeat" = { } # `for`, `while`, `loop`.
+# "keyword.control.import" = { } # `import`, `export` `use`.
+# "keyword.control.return" = { } # `return` in most languages.
+# "keyword.control.exception" = { } # `try`, `catch`, `raise`/`throw` and related.
+# "keyword.operator" = { } # `or`, `and`, `in`.
+# "keyword.directive" = { } # Preprocessor directives (#if in C...).
+# "keyword.function" = { fg="neutral-green" } # The keyword to define a function: "def", "fun", "fn".
+# 
+# "function.builtin" = { fg = "mid-green" }
+# "function.method" = { } # Class / Struct methods.
+# "function.macro" = { }
+# "function.special" = { } # Preprocessor function in C.
+# 
+# "constant.builtin" = { } # Special constants like `true`, `false`, `none`, etc.
+# "constant.builtin.boolean" = { } # True or False.
+# "constant.character" = { } # Constant of character type.
+# "constant.character.escape" = { } # escape codes like \n.
+# "constant.numeric"  = { } # constant integer or float value.
+# "constant.numeric.integer" = { } # constant integer value.
+# "constant.numeric.float" = { } # constant float value.
+# 
+# "variable.builtin" = { } # Language reserved variables: `this`, `self`, `super`, etc.
+# "variable.parameter" = { } # Function parameters.
+# "variable.other.member" = { } # Fields of composite data types (e.g. structs, unions).
+
+
+# Version control changes.
+
+"diff.plus"        = { fg="green" } # Additions.
+"diff.minus"       = { fg="red" } # Deletions.
+"diff.delta"       = { fg="blue" } # Modifications.
+"diff.delta.moved" = { fg="bright-purple" } # Renamed or moved files.
+
+
+# The color names from the vegetative theme were prefixed "vegetative-". But
+# with the lack of namespace clutter in Helix I've dropped that prefix.
+#
+# There are more colors available than I need but I've kept the unused colors
+# for reference.
+
+
+[palette]
+"darkblue"             = "#313742"
+"palewhite"            = "#F4F5F1"
+"background-0-hard"    = "#000000"
+"background-0"         = "#081900"
+"background-0-soft"    = "#0A2000"
+"background-1"         = "#0F3000"
+"background-2"         = "#154000"
+"background-3"         = "#174700"
+"background-4"         = "#1A4F00"
+
+"medium"               = "#38dd00"   # was "#49DD00"
+"foreground-0-hard"    = "#FEFFFE"
+"foreground-0"         = "#D4FFC0"
+"foreground-0-soft"    = "#74FF30"
+"foreground-1"         = "#5FFF10"
+"foreground-2"         = "#59F00F"
+"foreground-3"         = "#54E00E"
+"foreground-4"         = "#4FD00E"
+
+"bright-red"          = "#FF0000"
+"bright-green"        = "#00FF00"
+"bright-yellow"       = "#FFFF00"
+"bright-blue"         = "#0000FF"
+"bright-purple"       = "#FF00FF"
+"bright-teal"         = "#008080"
+"bright-orange"       = "#FF8800"
+"bright-cyan"         = "#00FFFF"
+
+"neutral-red"         = "#54FF00"
+"neutral-green"       = "#4BE500"
+"neutral-yellow"      = "#56FF01"
+"neutral-blue"        = "#7FFF40"
+"neutral-purple"      = "#58B22C"
+"neutral-teal"        = "#8AFF50"
+"neutral-orange"      = "#54FF00"
+"neutral-cyan"        = "#AAFF80"
+
+"faded-red"           = "#73CC47"
+"faded-green"         = "#4B852E"
+"faded-yellow"        = "#73CC47"
+"faded-blue"          = "#59A037"
+"faded-purple"        = "#90FF59"
+"faded-teal"          = "#519032"
+"faded-orange"        = "#4C862F"
+"faded-cyan"          = "#4C862F"
+
+"muted-red"           = "#D4FFBF"
+"muted-green"         = "#99B98A"
+"muted-yellow"        = "#D4FFBF"
+"muted-blue"          = "#85A078"
+"muted-purple"        = "#D4FFBF"
+"muted-teal"          = "#77906C"
+"muted-orange"        = "#9ABA8B"
+"muted-cyan"          = "#9ABA8B"
+
+"background-red"      = "#091901"
+"background-green"    = "#192613"
+"background-yellow"   = "#0D2601"
+"background-blue"     = "#14260C"
+"background-purple"   = "#1D2619"
+"background-teal"     = "#192614"
+"background-orange"   = "#0C2600"
+"background-cyan"     = "#20261E"
+
+"mid-red"             = "#3FBF00"
+"mid-green"           = "#36890E"
+"mid-yellow"          = "#3AAF00"
+"mid-blue"            = "#3A930F"
+"mid-purple"          = "#49BF0F"
+"mid-teal"            = "#3AB000"
+"mid-orange"          = "#3FBF00"
+"mid-cyan"            = "#3BB200"
+"delimiter-1"         = "#54FF00"
+"delimiter-2"         = "#4AE100"
+"delimiter-3"         = "#45D000"
+"delimiter-4"         = "#38AA00"
+
+"identifiers-1"       = "#54FF00"
+"identifiers-2"       = "#4EED00"
+"identifiers-3"       = "#47D700"
+"identifiers-4"       = "#40C100"
+"identifiers-5"       = "#3EBB00"
+"identifiers-6"       = "#54FF00"
+"identifiers-7"       = "#4EED00"
+"identifiers-8"       = "#47D700"
+"identifiers-9"       = "#40C100"
+"identifiers-10"      = "#3EBB00"
+"identifiers-11"      = "#54FF00"
+"identifiers-12"      = "#4EED00"
+"identifiers-13"      = "#47D700"
+"identifiers-14"      = "#40C100"
+"identifiers-15"      = "#3EBB00"
+
+# white               = "#FFFFFF"
+# black               = "#000000"
+"accent-1"            = "#54FF00"
+"accent-2"            = "#54FF00"
+"accent-3"            = "#54FF00"
+"accent-4"            = "#54FF00"
+"accent-5"            = "#54FF00"
+"accent-6"            = "#52F700"
+
+"dark-accent-1"       = "#329800"
+"dark-accent-2"       = "#2D8800"
+"dark-accent-3"       = "#277800"
+"dark-accent-4"       = "#226800"
+"dark-accent-5"       = "#1D5800"
+"dark-accent-6"       = "#174800"
+
+ # custom-theme-set-variables "vegetative

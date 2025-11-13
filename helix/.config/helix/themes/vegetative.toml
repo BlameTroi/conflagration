@@ -1,0 +1,233 @@
+
+# The original theme can be found here:
+# Copyright (c) 2022 Jason Milkins (GNU/GPL Licence)
+# Authors: Jason Milkins <jasonm23@gmail.com>
+# URL: http://github.com/emacsfodder/emacs-theme-vegetative
+# Version: 1.0.2
+
+# Helix has a smaller set of UI elements to theme, so I start
+# by ripping out the face definitions and then translating the
+# palette defintion from auto-themer elisp to toml.
+
+# Using the template from:
+# Template document for helix color schemes
+# See also: https://docs.helix-editor.com/themes.html
+#
+# NOTE: Keys default to the most specific parent value.
+#       e.g ui.cursor.primary > ui.cursor > ui
+
+# GENERAL ==============================
+
+# "ui.virtual" = { } # Namespace for additions to the editing area.
+# "ui.virtual.ruler" = { } # Vertical rulers (colored columns in editing area).
+# "ui.virtual.whitespace" = { } # Whitespace markers in editing area.
+
+# "ui.statusline" = { } # Status line.
+# "ui.statusline.active" = { } # Status line in focused windows.
+# "ui.statusline.inactive" = { } # Status line in unfocused windows.
+# "ui.statusline.normal" = { } # Statusline mode during normal mode (only if editor.color-modes is enabled)
+# "ui.statusline.insert" = { } # Statusline mode during insert mode (only if editor.color-modes is enabled)
+# "ui.statusline.select" = { } # Statusline mode during select mode (only if editor.color-modes is enabled)
+
+# "ui.help" = { } # `:command` descriptions above the command line.
+
+# "ui.highlight" = { } # selected contents of symbol pickers (spc-s, spc-S) and current line in buffer picker (spc-b).
+
+# "ui.menu" = { } # Autocomplete menu.
+# "ui.menu.selected" = { } # Selected autocomplete item.
+
+# "ui.popup" = { } # Documentation popups (space-k).
+# "ui.popup.info" = { } # Info popups box (space mode menu).
+
+
+# SYNTAX HIGHLIGHTING ==============================
+# All the keys here are Treesitter scopes.
+
+# "property" = { } # Regex group names.
+# "special" = { } # Special symbols e.g `?` in Rust, `...` in Hare.
+# "attribute" = { } # Class attributes, html tag attributes.
+
+# "type" = { } # Variable type, like integer or string, including program defined classes, structs etc..
+# "type.builtin" = { } # Primitive types of the language (string, int, float).
+# "type.enum.variant" = { } # A variant of an enum.
+
+# "constructor" = { } # Constructor method for a class or struct.
+
+
+
+
+# "label" = { } # Loop labels, among other things.
+
+
+# "tag" = { } # As in <body> for html, css tags.
+# "tag.error" = { } # Erroneous closing html tags.
+
+# "namespace" = { } # Namespace or module identifier.
+
+
+# Markup ==============================
+# Colors for markup languages, like Markdown or XML.
+
+# "markup.heading.1" = { } # Markdown heading 1 color.
+# "markup.heading.2" = { } # Markdown heading 2 color.
+# "markup.heading.3" = { } # Markdown heading 3 color.
+# "markup.heading.4" = { } # Markdown heading 4 color.
+# "markup.heading.5" = { } # Markdown heading 5 color.
+# "markup.heading.6" = { } # Markdown heading 6 color.
+# "markup.heading.marker" = { } # Hashtag color on Markdown headings.
+
+# "markup.list" = { }
+# "markup.list.numbered" = { } # Numbered list.
+# "markup.list.unnumbered" = { } # Bullet point list.
+
+# "markup.bold" = { } # Bold text.
+# "markup.italic" = { } # Italicised text.
+
+# "markup.link" = { }
+# "markup.link.url" = { } # Urls pointed to by links.
+# "markup.link.label" = { } # Non-URL link references.
+# "markup.link.text" = { } # URL and image descriptions in links.
+
+# "markup.quote" = { } # `> Quotes` in Markdown.
+
+
+# Markup - Interface ==============================
+# "These scopes are used for theming the editor interface."
+
+# "markup.normal" = { }
+# "markup.normal.completion" = { } # For completion doc popup ui.
+# "markup.normal.raw" = { } # For hover popup ui.
+
+# "markup.heading.completion" = { } # Headings for completion doc popup ui.
+# "markup.heading.raw" = { } # Headings for hover popup ui.
+
+# "markup.raw" = { } # Code block in Markdown.
+# "markup.raw.block" = { } # Multiline (```) codeblock in Markdown.
+# "markup.raw.inline" = { } # `Inline code block` in Markdown.
+# "markup.raw.inline.completion" = { } # ?
+# "markup.raw.inline.hover" = { } # ?
+
+
+[palette] # Define your custom colors here.
+#white = ""#ffffff"
+
+
+"background-0-hard"    = "#000000"
+"background-0"         = "#081900"
+"background-0-soft"    = "#0A2000"
+"background-1"         = "#0F3000"
+"background-2"         = "#154000"
+"background-3"         = "#174700"
+"background-4"         = "#1A4F00"
+
+"medium"               = "#49DD00"
+
+"foreground-0-hard"    = "#FEFFFE"
+"foreground-0"         = "#D4FFC0"
+"foreground-0-soft"    = "#74FF30"
+"foreground-1"         = "#5FFF10"
+"foreground-2"         = "#59F00F"
+"foreground-3"         = "#54E00E"
+"foreground-4"         = "#4FD00E"
+
+"bright-red"          = "#FF0000"
+"bright-green"        = "#00FF00"
+"bright-yellow"       = "#FFFF00"
+"bright-blue"         = "#0000FF"
+"bright-purple"       = "#FF00FF"
+"bright-teal"         = "#008080"
+"bright-orange"       = "#FF8800"
+"bright-cyan"         = "#00FFFF"
+
+"neutral-red"         = "#54FF00"
+"neutral-green"       = "#4BE500"
+"neutral-yellow"      = "#56FF01"
+"neutral-blue"        = "#7FFF40"
+"neutral-purple"      = "#58B22C"
+"neutral-teal"        = "#8AFF50"
+"neutral-orange"      = "#54FF00"
+"neutral-cyan"        = "#AAFF80"
+
+"faded-red"           = "#73CC47"
+"faded-green"         = "#4B852E"
+"faded-yellow"        = "#73CC47"
+"faded-blue"          = "#59A037"
+"faded-purple"        = "#90FF59"
+"faded-teal"          = "#519032"
+"faded-orange"        = "#4C862F"
+"faded-cyan"          = "#4C862F"
+
+"muted-red"           = "#D4FFBF"
+"muted-green"         = "#99B98A"
+"muted-yellow"        = "#D4FFBF"
+"muted-blue"          = "#85A078"
+"muted-purple"        = "#D4FFBF"
+"muted-teal"          = "#77906C"
+"muted-orange"        = "#9ABA8B"
+"muted-cyan"          = "#9ABA8B"
+
+"background-red"      = "#091901"
+"background-green"    = "#192613"
+"background-yellow"   = "#0D2601"
+"background-blue"     = "#14260C"
+"background-purple"   = "#1D2619"
+"background-teal"     = "#192614"
+"background-orange"   = "#0C2600"
+"background-cyan"     = "#20261E"
+
+"mid-red"             = "#3FBF00"
+"mid-green"           = "#36890E"
+"mid-yellow"          = "#3AAF00"
+"mid-blue"            = "#3A930F"
+"mid-purple"          = "#49BF0F"
+"mid-teal"            = "#3AB000"
+"mid-orange"          = "#3FBF00"
+"mid-cyan"            = "#3BB200"
+"delimiter-1"         = "#54FF00"
+"delimiter-2"         = "#4AE100"
+"delimiter-3"         = "#45D000"
+"delimiter-4"         = "#38AA00"
+
+"identifiers-1"       = "#54FF00"
+"identifiers-2"       = "#4EED00"
+"identifiers-3"       = "#47D700"
+"identifiers-4"       = "#40C100"
+"identifiers-5"       = "#3EBB00"
+"identifiers-6"       = "#54FF00"
+"identifiers-7"       = "#4EED00"
+"identifiers-8"       = "#47D700"
+"identifiers-9"       = "#40C100"
+"identifiers-10"      = "#3EBB00"
+"identifiers-11"      = "#54FF00"
+"identifiers-12"      = "#4EED00"
+"identifiers-13"      = "#47D700"
+"identifiers-14"      = "#40C100"
+"identifiers-15"      = "#3EBB00"
+
+# white               = "#FFFFFF"
+# black               = "#000000"
+"accent-1"            = "#54FF00"
+"accent-2"            = "#54FF00"
+"accent-3"            = "#54FF00"
+"accent-4"            = "#54FF00"
+"accent-5"            = "#54FF00"
+"accent-6"            = "#52F700"
+
+"dark-accent-1"       = "#329800"
+"dark-accent-2"       = "#2D8800"
+"dark-accent-3"       = "#277800"
+"dark-accent-4"       = "#226800"
+"dark-accent-5"       = "#1D5800"
+"dark-accent-6"       = "#174800"
+
+ # custom-theme-set-variables "vegetative
+ #                             `pos-tip-foreground-color ,vegetative-foreground-0-hard)
+ #                             `pos-tip-background-color ,vegetative-background-teal)
+ #                             `ansi-color-names-vector [,vegetative-background-1
+ #                                                        ,vegetative-bright-red
+ #                                                        ,vegetative-bright-green
+ #                                                        ,vegetative-bright-yellow
+ #                                                        ,vegetative-bright-blue
+ #                                                        ,vegetative-bright-purple
+ #                                                        ,vegetative-bright-cyan
+ #                                                       ,vegetative-foreground-1])))

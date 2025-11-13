@@ -2,11 +2,19 @@
 # going to avoid mimicking vim or emacs.
 
 #theme = "barebone"
-theme = "base16_default_dark"
+#theme = "base16_default_dark"
+# theme = "base16_terminal"
+# theme = "amberwood"
+theme = "TroiRetroGreen"
+# theme = "TroiRetroAmber"
+# theme = "Troi3279"
+# theme = "acme"
 
 # General editor settings.
 
 [editor]
+true-color = true
+auto-pairs = false # more trouble than it's worth
 # Default settings that I probably won't override in languages.
 # Note: Apparently the editor.auto-format is whether or not helix
 # _allows_ auto formatting. This is clearly misnamed. There's a
@@ -17,16 +25,15 @@ line-number = "absolute"  # I never understood using relative.
 mouse = false  # Just say no.
 cursorline = true  # Eye catcher.
 auto-save = false  # I prefer to stay in control.
-text-width = 80  # For :reflow and soft wrapping.
+text-width = 65  # For :reflow and soft wrapping.
 auto-format = true  # Handle by language.
-color-modes = true  # This means editor mode indicstor.
+color-modes = true  # This means editor mode indicator can change colors.
 popup-border = "all"  # Bling.
 editor-config = false  # So not a fan of this.
 # TODO: completion settings.
-# TODO: jump label alphabet, should I try homekey style?
 # TODO: end of line diagnostics. Maybe this is by language?
 # Typical but overrideable settings.
-rulers = [80]  # Eye guides.
+# rulers = [75]  # Eye guides, ## I've decided I don't want this ##
 
 # I'm used to this triad. Remeber that only the primary cursor
 # changes shape by mode.
@@ -47,18 +54,24 @@ hidden = false
 # come close.
 
 [editor.statusline]
+separator = "|"
 left = [
   "mode",
   "spinner",
   "version-control",
   "file-name",
-  "file-type",
   "read-only-indicator",
   "file-modification-indicator",
 ]
-center = ["diagnostics", "workspace-diagnostics"]
+center = []
 right = [
+  "diagnostics",
+  "workspace-diagnostics",
+  "separator",
   "file-encoding",
+  "file-line-ending",
+  "file-type",
+  "separator",
   "selections",
   "register",
   "separator",
@@ -80,11 +93,27 @@ wrap-at-text-width = false  # same as enabled
 # Most of the LSP defaults are fine.
 
 [editor.lsp]
-display-inlay-hints = true  # I might end up removing these.
-inlay-hints-length-limit = 35  # And I'm not sure about length.
+display-inlay-hints = true 
+inlay-hints-length-limit = 35
+# Trim trailing whitespace, seems somewhat religious in the various
+# issues for Helix. From #1481
+# ~/.config/helix/config.toml
+
+[keys.normal]
+C-s = [
+    "save_selection",
+    "select_all",
+    # Delete trailing whitespace from end of each line
+    ":pipe sed 's/[ \t]*$//'",
+    # Delete trailing blank lines (including whitespace) from end of the buffer
+    ":pipe awk '/^\\s*$/ {b=b $0 \"\\n\"; next;} {printf \"%s\",b; b=\"\"; print;}'",
+    "collapse_selection",
+    "jump_backward",
+    "commit_undo_checkpoint",
+    ":write",
+]
 
 # Uses space like vim uses leader. Let's try to keep this small.
-
 [keys.normal.space]
 # Custom command for count of words in a selection. So, to get the word
 # count of the whole file:
@@ -103,4 +132,17 @@ inlay-hints-length-limit = 35  # And I'm not sure about length.
 A-w = "@<A-|>tee /tmp/helix-wc.file<ret>:sh cat /tmp/helix-wc.file | wc -w<ret>"
 
 # An example of a toggle command.
-# x = ":toggle whitespace.render all none"
+
+x = ":toggle whitespace.render all none"
+
+
+# turn off arrow keys for insert mode
+[keys.insert]
+up = "no_op"
+down = "no_op"
+left = "no_op"
+right = "no_op"
+pageup = "no_op"
+pagedown = "no_op"
+home = "no_op"
+end = "no_op"
