@@ -43,10 +43,12 @@ scope = "source.pascal"
 injection-regex = "pascal"
 # file-types = ["pascal", "pas", "pp", "inc", "lpr", "lfm"]
 file-types = [ "pascal", {glob = "*.pas"}, {glob = "*.p"}, {glob = "*.pp"}, {glob = "*.lpr"}, {glob = "*.lfm"}]
-indent = { tab-width = 2, unit = " " }
+indent = { tab-width = 3, unit = "   " }
 block-comment-tokens = { start = "{", end = "}" }
 # language-servers = ["pasls", "scls"]
 language-servers = ["scls"]
+rulers = [70]
+text-width = 70
 
 [[language]]
 name = "forth"
@@ -55,8 +57,12 @@ scope = "source.forth"
 block-comment-tokens = { start = "( ", end = " )" }
 injection-regex = "forth"
 file-types = [ "forth", {glob = "*.f" }, {glob = "*.fs"}, {glob = "*.fth"}]
-indent = { tab-width = 4, unit = " " }
+indent = { tab-width = 3, unit = "   " }
 language-servers = ["scls"]
+# keep line width within the old 16x64 block structure.
+rulers = [60]
+text-width = 61
+
 # "forth-lsp"]
 # ### this needs to be built ###
 # [language-server.pasls]
@@ -78,6 +84,7 @@ language-servers = ["scls"]
 name = "go"
 auto-format = true
 language-servers = ["gopls"]
+rulers = [70]
 
 # Markdown (gfm) for text and prose:
 #
@@ -97,7 +104,8 @@ file-types = ["md", {glob = "*.md"}]
 # soft-wrap.wrap-at-text-width = false
 auto-format = true
 formatter = { command = "dprint", args = ["fmt", "--stdin", "md"] }
-language-servers = ["marksman", "mpls", "harper-ls"]
+language-servers = ["marksman", "harper-ls"]
+# Removed mpls for testing, I rarely need it anymore.
 
 # Language Server Settings.
 #
@@ -130,6 +138,8 @@ isolateEnglish = false
 dialect = "American"
 
 [language-server.harper-ls.config.harper-ls.linters]
+OrthographicConsistency = false
+BoringWords = false
 SpellCheck = true
 SpelledNumbers = false
 AnA = true
@@ -149,6 +159,5 @@ ExpandArgument = false
 ExpandMinimum = false
 ExpandMemoryShorthands = false
 AvoidCurses = false
-BoringWords = true
 Months = false
 ExpandTimeShorthands = false

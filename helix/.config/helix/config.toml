@@ -1,10 +1,6 @@
-# Working on a helix configuration that feels comfortable. I am
-# going to avoid mimicking vim or emacs.
+# Working on a helix configuration that feels comfortable. I am going to
+# avoid mimicking vim or emacs.
 
-#theme = "barebone"
-#theme = "base16_default_dark"
-# theme = "base16_terminal"
-# theme = "amberwood"
 theme = "TroiRetroGreen"
 # theme = "TroiRetroAmber"
 # theme = "Troi3279"
@@ -15,38 +11,33 @@ theme = "TroiRetroGreen"
 [editor]
 true-color = true
 auto-pairs = false # more trouble than it's worth
-# Default settings that I probably won't override in languages.
-# Note: Apparently the editor.auto-format is whether or not helix
-# _allows_ auto formatting. This is clearly misnamed. There's a
-# discussion where most everyone seems to think this is silly, but
-# there you go.
 scrolloff = 0  # Not a setting I like.
 line-number = "absolute"  # I never understood using relative.
 mouse = false  # Just say no.
 cursorline = true  # Eye catcher.
 auto-save = false  # I prefer to stay in control.
-text-width = 65  # For :reflow and soft wrapping.
 auto-format = true  # Handle by language.
 color-modes = true  # This means editor mode indicator can change colors.
 popup-border = "all"  # Bling.
 editor-config = false  # So not a fan of this.
-# TODO: completion settings.
-# TODO: end of line diagnostics. Maybe this is by language?
-# Typical but overrideable settings.
-# rulers = [75]  # Eye guides, ## I've decided I don't want this ##
+text-width = 75  # For :reflow and soft wrapping.
+rulers = [75]  # Eye guides ... language specific overrides
 
-# I'm used to this triad. Remeber that only the primary cursor
-# changes shape by mode.
+# I'm used to this triad. Remeber that only the primary cursor changes
+# shape by mode.
+
 [editor.cursor-shape]
 insert = "bar"
 normal = "block"
 select = "underline"
 
 # TODO: Grok this.
+
 [editor.smart-tab]
 enable = false
 
 # The defaults look OK but I prefer to expose hidden files.
+
 [editor.file-picker]
 hidden = false
 
@@ -95,6 +86,7 @@ wrap-at-text-width = false  # same as enabled
 [editor.lsp]
 display-inlay-hints = true 
 inlay-hints-length-limit = 35
+ 
 # Trim trailing whitespace, seems somewhat religious in the various
 # issues for Helix. From #1481
 # ~/.config/helix/config.toml
@@ -114,7 +106,9 @@ C-s = [
 ]
 
 # Uses space like vim uses leader. Let's try to keep this small.
+
 [keys.normal.space]
+ 
 # Custom command for count of words in a selection. So, to get the word
 # count of the whole file:
 #
@@ -135,8 +129,8 @@ A-w = "@<A-|>tee /tmp/helix-wc.file<ret>:sh cat /tmp/helix-wc.file | wc -w<ret>"
 
 x = ":toggle whitespace.render all none"
 
-
 # turn off arrow keys for insert mode
+
 [keys.insert]
 up = "no_op"
 down = "no_op"

@@ -1,10 +1,13 @@
 " ------------------------------------------------------------------------------
-" Fonts for MacViim.
+" Fonts for MacVim.
 
-set guifont=JetBrainsMono\ Nerd\ Font\ Propo:h15
+" set guifont=JetBrainsMono\ Nerd\ Font\ Propo:h17
+set guifont=JetBrainsMonoNL\ Nerd\ Font:h17
+" set guifont=FiraMono\ Nerd\ Font\ Mono:h17
+" set guifont=Source\ Code\ Pro\ Medium:h18
 "set guicursor= taking default
 " not on mac--set guiligatures=!\"#$%&()*+-./:<=>?@[]^_{\|~
-set macligatures
+" set macligatures
 "set noguipty only if problems with terminal ptty commands
 set guioptions=gTr
 

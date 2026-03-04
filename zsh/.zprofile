@@ -126,10 +126,13 @@ export CMAKE_GENERATOR="Ninja Multi-Config"
 
 typeset -U path PATH
 path=(${HOME}/.local/bin \
-		$(go env GOPATH)/bin \
-		/opt/homebrew/opt/ncurses/bin \
-		${HOME}/.cargo/bin \
-#		${HOME}/Projects/lazarus \
+    /Applications/MacVim.app/Contents/bin \
+    ${HOME}/.dotnet \
+    $(go env GOPATH)/bin \
+    /opt/homebrew/opt/universal-ctags/bin \
+    /opt/homebrew/opt/ncurses/bin \
+    ${HOME}/.cargo/bin \
+    ${HOME}/Projects/lazarus \
     /opt/homebrew/opt \
 #    /opt/homebrew/opt/node@20/bin \
     /opt/homebrew/opt/ruby/bin \
@@ -165,3 +168,12 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 
 # For compilers to find openjdk you may need to set:
 #  export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"
+
+# Forth includes
+export GFORTHPATH=.:$HOME/.local/forth/include:$HOME/.local/lib/gforth/0.7.9_20251203:$HOME/.local/share/gforth/0.7.9_20251203
+# It's not clear how to extend the default gforthpath yet.
+
+export DOTNET_ROOT=$HOME/.dotnet
+
+# Sublime text command line tools
+export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"

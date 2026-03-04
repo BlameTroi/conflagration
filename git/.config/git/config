@@ -12,18 +12,13 @@
 [init]
 	defaultBranch = main
 [merge]
-	tool = vimdiff
+	tool = mvimdiff
 	conflictStyle = zdiff3
 [diff]
-	tool = vimdiff
+	tool = mvimdiff
 [difftool]
 	prompt = false
 [interactive]
 	diffFilter = delta --color-only
 [delta]
 	navigate = true
-[merge]
-    tool = vimdiff
-    conflictstyle = zdiff3
-[mergetool "vimdiff"]
-    cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
